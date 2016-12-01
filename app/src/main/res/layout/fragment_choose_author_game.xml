@@ -1,0 +1,76 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ghelius.artifacts.artifacts.ChooseAuthorGameFragment">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/main_pic"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
+
+        <LinearLayout
+            android:paddingTop="16dp"
+            android:layout_weight="0"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/button_0"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:text="Author 0 Name" />
+                <TextView
+                    android:id="@+id/button_1"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:text="Author 1 Name" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/button_2"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:text="Author 2 Name" />
+                <TextView
+                    android:id="@+id/button_3"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:text="Author 3 Name" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</FrameLayout>
