@@ -27,6 +27,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class ChooseAuthorGameFragment extends Fragment {
     FirebaseDatabase mDatabase;
     private boolean picturesReady = false;
     private boolean authorReady = false;
+    private boolean buttonBlocked = false;
 
     public ChooseAuthorGameFragment() {
         // Required empty public constructor
@@ -60,7 +62,17 @@ public class ChooseAuthorGameFragment extends Fragment {
                 Log.d(TAG,"got uri");
                 Activity a = getActivity();
                 if (a != null) {
-                    Picasso.with(a.getApplicationContext()).load(uri.toString()).into(mImageView);
+                    Picasso.with(a.getApplicationContext()).load(uri.toString()).into(mImageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            showButtonBlock(true);
+                        }
+
+                        @Override
+                        public void onError() {
+                            Toast.makeText(getActivity(), "Sorry, can't load image...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -69,6 +81,12 @@ public class ChooseAuthorGameFragment extends Fragment {
                 // Handle any errors
             }
         });
+    }
+
+    private void showButtonBlock(boolean b) {
+        for (int i = 0; i < buttons.size(); i++) {
+            buttons.get(i).setVisibility(b ? View.VISIBLE : View.INVISIBLE);
+        }
     }
 
     @Override
@@ -98,6 +116,10 @@ public class ChooseAuthorGameFragment extends Fragment {
     }
 
     private void choose(int ind) {
+
+        if (buttonBlocked)
+            return;
+
         // check user choosing
         if (ind == trueButtonIndex) {
             Toast.makeText(getActivity(), "Yep!", Toast.LENGTH_SHORT).show();
@@ -108,10 +130,12 @@ public class ChooseAuthorGameFragment extends Fragment {
                     buttons.get(i).setText("");
                 }
             }
+            buttonBlocked = true;
             final Handler h = new Handler ();
             h.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    buttonBlocked = false;
                     createNewGame();
                 }
             }, 2000);
@@ -202,11 +226,7 @@ public class ChooseAuthorGameFragment extends Fragment {
 
     void createNewGame()
     {
-        // clear prev buttons
-        for(int i = 0; i < buttons.size(); i++) {
-            buttons.get(i).setText("");
-        }
-
+        showButtonBlock(false);
         // select and load pic
         Picture pic = pictures.get(rnd.nextInt(pictures.size()-1));
         loadPicture(pic);
