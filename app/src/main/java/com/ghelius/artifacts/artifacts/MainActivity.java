@@ -2,9 +2,6 @@ package com.ghelius.artifacts.artifacts;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.view.View;
-import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG="mainActivity";
