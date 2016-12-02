@@ -17,14 +17,11 @@
         <LinearLayout
             android:paddingTop="16dp"
             android:layout_weight="0"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+
 
                 <TextView
                     android:id="@+id/button_0"
@@ -41,11 +38,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp" />
 
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+
                 <TextView
                     android:id="@+id/button_2"
                     android:textAlignment="center"
@@ -62,7 +55,7 @@
                     android:layout_height="48dp" />
 
 
-            </LinearLayout>
+
 
 
         </LinearLayout>

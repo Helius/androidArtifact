@@ -77,12 +77,6 @@ public class ChooseAuthorGameFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
-//        mImageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                loadPicture(pictures.get(Math.abs(rnd.nextInt() % pictures.size())));
-//            }
-//        });
 
         buttons.add((TextView)view.findViewById(R.id.button_0));
         buttons.add((TextView)view.findViewById(R.id.button_1));
@@ -159,14 +153,16 @@ public class ChooseAuthorGameFragment extends Fragment {
 
     private void checkAllDataReady() {
         if (picturesReady && authorReady) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    createNewGame();
-                }
-            });
-        } else {
-            // WTF?
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        createNewGame();
+                    }
+                });
+            } else {
+                // WTF?
+            }
         }
     }
 
@@ -206,6 +202,11 @@ public class ChooseAuthorGameFragment extends Fragment {
 
     void createNewGame()
     {
+        // clear prev buttons
+        for(int i = 0; i < buttons.size(); i++) {
+            buttons.get(i).setText("");
+        }
+
         // select and load pic
         Picture pic = pictures.get(rnd.nextInt(pictures.size()-1));
         loadPicture(pic);
