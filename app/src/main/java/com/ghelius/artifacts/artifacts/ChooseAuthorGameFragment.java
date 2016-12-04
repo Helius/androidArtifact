@@ -1,13 +1,15 @@
 package com.ghelius.artifacts.artifacts;
 
 
-import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +25,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +44,6 @@ public class ChooseAuthorGameFragment extends Fragment {
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
     private ImageView mImageView;
-    private int trueButtonIndex;
     private Random rnd = new Random(System.currentTimeMillis());
     private ArrayList<TextView> buttons = new ArrayList<>();
     FirebaseDatabase mDatabase;
@@ -51,42 +51,19 @@ public class ChooseAuthorGameFragment extends Fragment {
     private boolean authorReady = false;
     private boolean buttonBlocked = false;
 
+    private ArrayList<ChooseAuthorGame> games;
+    private int gameIndex = 0;
+
     public ChooseAuthorGameFragment() {
         // Required empty public constructor
     }
 
-    public void loadPicture(Picture picture) {
-        mStorageRef.child(picture.path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Log.d(TAG,"got uri");
-                Activity a = getActivity();
-                if (a != null) {
-                    Picasso.with(a.getApplicationContext()).load(uri.toString()).into(mImageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            showButtonBlock(true);
-                        }
-
-                        @Override
-                        public void onError() {
-                            Toast.makeText(getActivity(), "Sorry, can't load image...", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-            }
-        });
-    }
 
     private void showButtonBlock(boolean b) {
         for (int i = 0; i < buttons.size(); i++) {
             buttons.get(i).setVisibility(b ? View.VISIBLE : View.INVISIBLE);
         }
+        buttonBlocked = false;
     }
 
     @Override
@@ -106,7 +83,7 @@ public class ChooseAuthorGameFragment extends Fragment {
             buttons.get(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    choose(index);
+                    buttonSelected(index);
                 }
             });
 
@@ -115,31 +92,39 @@ public class ChooseAuthorGameFragment extends Fragment {
         return view;
     }
 
-    private void choose(int ind) {
+    private void buttonSelected(int ind) {
 
         if (buttonBlocked)
             return;
+        buttonBlocked = true;
 
-        // check user choosing
-        if (ind == trueButtonIndex) {
-            Toast.makeText(getActivity(), "Yep!", Toast.LENGTH_SHORT).show();
-            createNewGame();
+        if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
+            buttons.get(ind).setTextColor(0xFF09AD1F);
         } else {
-            for(int i = 0; i < buttons.size(); i++) {
-                if (i != trueButtonIndex) {
-                    buttons.get(i).setText("");
+            buttons.get(ind).setTextColor(ContextCompat.getColor(getActivity(), android.R.color.holo_red_dark));
+
+            for (int i = 0; i < buttons.size(); i++) {
+                if(((Author)buttons.get(i).getTag()).id == games.get(gameIndex).picture.author) {
+                    buttons.get(i).setTextColor(0xFF09AD1F);
                 }
             }
-            buttonBlocked = true;
-            final Handler h = new Handler ();
-            h.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    buttonBlocked = false;
-                    createNewGame();
-                }
-            }, 2000);
         }
+
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ++gameIndex;
+                showButtonBlock(true);
+                if (gameIndex < games.size()) {
+                    showButtonBlock(false);
+                    playGame(gameIndex);
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), "You play 10 times!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 2000);
+
     }
 
     @Override
@@ -176,17 +161,31 @@ public class ChooseAuthorGameFragment extends Fragment {
     }
 
     private void checkAllDataReady() {
+        Log.d(TAG, "checkAllDataReady" + (picturesReady && authorReady));
         if (picturesReady && authorReady) {
             if (getActivity() != null) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        createNewGame();
-                    }
-                });
+                games = createNewGame(10);
+                playGame(gameIndex);
             } else {
                 // WTF?
             }
+        }
+    }
+
+
+    private void playGame(int gameIndex) {
+
+        Log.d(TAG, "play game " + gameIndex);
+        ChooseAuthorGame game = games.get(gameIndex);
+        game.loadPicture();
+        for (int i = 0; i < buttons.size(); i++) {
+            buttons.get(i).setText(game.authors_variant.get(i).name_ru);
+            buttons.get(i).setTag(game.authors_variant.get(i));
+            buttons.get(i).setTextColor(ContextCompat.getColor(getActivity(), android.R.color.tab_indicator_text));
+        }
+
+        if (gameIndex + 1 < games.size()) {
+            games.get(gameIndex + 1).loadPicture();
         }
     }
 
@@ -219,39 +218,43 @@ public class ChooseAuthorGameFragment extends Fragment {
         super.onAttach(context);
     }
 
+
     @Override
     public void onDetach() {
         super.onDetach();
     }
 
-    void createNewGame()
+    ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
-        showButtonBlock(false);
-        // select and load pic
-        Picture pic = pictures.get(rnd.nextInt(pictures.size()-1));
-        loadPicture(pic);
+        Log.d(TAG, "create new " + count + "games");
+        ArrayList<ChooseAuthorGame> games = new ArrayList<>();
 
+        ArrayList<Picture> tmp_pic = new ArrayList<>();
+        tmp_pic.addAll(pictures);
+        Collections.shuffle(tmp_pic);
 
-        // select button
-        trueButtonIndex = rnd.nextInt(buttons.size());
-        buttons.get(trueButtonIndex).setText(getAuthorById(pic.author).name_ru);
-
-        ArrayList<Author> tmp_authors = new ArrayList<>();
-        for (Author a: authors) {
-            if (a.id != pic.author)
-                tmp_authors.add(a);
-        }
-        long seed = System.nanoTime();
-        Collections.shuffle(tmp_authors, new Random(seed));
-
-        // arrange other
-        for(int i = 0; i < buttons.size(); i++) {
-            if (trueButtonIndex != i) {
-                Author a = tmp_authors.get(i % tmp_authors.size());
-                buttons.get(i).setText(a.name_ru);
+        for (int i = 0; i < count; i++) {
+            ChooseAuthorGame game = new ChooseAuthorGame(i);
+            if (tmp_pic.size() > 0) {
+                game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
+                game.authors_variant.add(getAuthorById(game.picture.author));
+                int author_count = 3;
+                while (author_count > 0) {
+                    Author a = authors.get(rnd.nextInt(authors.size()));
+                    if (!game.authors_variant.contains(a)) {
+                        game.authors_variant.add(a);
+                        author_count--;
+                    }
+                }
+                Collections.shuffle(game.authors_variant, rnd);
             }
+            games.add(game);
         }
+        games.get(0).loadPicture();
+        games.get(1).loadPicture();
+        return games;
     }
+
 
     private Author getAuthorById (Long id) {
         for (Author a : authors) {
@@ -260,6 +263,56 @@ public class ChooseAuthorGameFragment extends Fragment {
             }
         }
         return null;
+    }
+
+    class ChooseAuthorGame {
+        public Picture picture;
+        public ArrayList<Author> authors_variant = new ArrayList<>();
+        private int index;
+
+        Target imageTarget = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Log.d(TAG, "helius: image " + index + "loaded from " + from);
+                if (index == gameIndex) {
+                    mImageView.setImageBitmap(bitmap);
+                    showButtonBlock(true);
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+
+        ChooseAuthorGame(int index) {
+            this.index = index;
+        }
+
+        public void loadPicture() {
+            mStorageRef.child(picture.path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.with(getActivity().getApplicationContext()).setIndicatorsEnabled(true);
+                    Picasso.with(getActivity().getApplicationContext())
+                            .load(uri.toString())
+                            .resize(mImageView.getWidth(), mImageView.getHeight())
+                            .centerCrop()
+                            .into(imageTarget);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
+        }
     }
 
 }
