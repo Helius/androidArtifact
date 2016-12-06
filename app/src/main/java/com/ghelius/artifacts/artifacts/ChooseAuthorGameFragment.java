@@ -97,10 +97,12 @@ public class ChooseAuthorGameFragment extends Fragment {
         if (buttonBlocked)
             return;
         buttonBlocked = true;
+        int timeout = 500;
 
         if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
             buttons.get(ind).setTextColor(0xFF09AD1F);
         } else {
+            timeout = 1500;
             buttons.get(ind).setTextColor(ContextCompat.getColor(getActivity(), android.R.color.holo_red_dark));
 
             for (int i = 0; i < buttons.size(); i++) {
@@ -123,7 +125,7 @@ public class ChooseAuthorGameFragment extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(), "You play 10 times!", Toast.LENGTH_SHORT).show();
                 }
             }
-        }, 2000);
+        }, timeout);
 
     }
 
@@ -302,8 +304,7 @@ public class ChooseAuthorGameFragment extends Fragment {
                     Picasso.with(getActivity().getApplicationContext()).setIndicatorsEnabled(true);
                     Picasso.with(getActivity().getApplicationContext())
                             .load(uri.toString())
-                            .resize(mImageView.getWidth(), mImageView.getHeight())
-                            .centerCrop()
+                            .resize(mImageView.getWidth(),0)
                             .into(imageTarget);
                 }
             }).addOnFailureListener(new OnFailureListener() {
