@@ -25,18 +25,27 @@ def parsePicFile(s, authorFolder, authorId):
     try:
         return str('{"level": ' + m.group(1) + \
             ', "path": "' + authorFolder + '/' + m.group(0) +\
-            ', "author": "' + str(authorId) + '"'  +\
+            '", "author": "' + str(authorId)  +\
             '", "movement_id": "' + str(0) + '"}')
     except:
         warn('warning!: ' + s)
 
+def parseAuthorId(s):
+    m = re.search('"id":([0-9]+)', s)
+    try:
+        return m.group(1)
+    except:
+        warn('Can\'t parse Author ID for ' + s)
 
 def collectPic():
     for dirName, subdirList, fileList in os.walk(rootDir):
         print('Found directory: %s' % dirName)
         authorId = 0
         if 'author.json' in fileList:
-            print ('found author.json')
+            print ('found author.json in %s' % dirName)
+            author_str = open(dirName + '/author.json', 'r').read().replace('\n', '')
+            author_out.append(author_str)
+            authorId = parseAuthorId(author_str)
             fileList.remove('author.json')
         else:
             warn('author.json not found')
@@ -54,4 +63,9 @@ rootDir = sys.argv[1]
 collectPic()
 
 for a in pic_out:
+    print (a)
+
+print ("------------------")
+
+for a in author_out:
     print (a)
