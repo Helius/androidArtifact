@@ -2,6 +2,7 @@
 import os
 import sys
 import re
+import json
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -19,7 +20,6 @@ author_out = []
 def warn(s):
     sys.stdout.write(RED+s+RESET+'\n')
 
-
 def parsePicFile(s, authorFolder, authorId):
     m = re.search('([0-9])[-_](.*)', s)
     try:
@@ -31,11 +31,11 @@ def parsePicFile(s, authorFolder, authorId):
         warn('warning!: ' + s)
 
 def parseAuthorId(s):
-    m = re.search('"id":([0-9]+)', s)
+    jauthor = json.loads(s)
     try:
-        return m.group(1)
+        return jauthor["id"]
     except:
-        warn('Can\'t parse Author ID for ' + s)
+        warn('Can\'t parse Author ID json for ' + s)
 
 def collectPic():
     for dirName, subdirList, fileList in os.walk(rootDir):
@@ -51,8 +51,6 @@ def collectPic():
             warn('author.json not found')
         for fname in fileList:
             print('\t%s' % fname)
-            if fname is 'author.json':
-                print ('found Author')
             out = parsePicFile(fname, os.path.basename(dirName), authorId)
             if out is not None:
                 pic_out.append(out)
@@ -62,10 +60,19 @@ rootDir = sys.argv[1]
 
 collectPic()
 
-for a in pic_out:
-    print (a)
+db_out = "{\n    \"content\": {"
 
-print ("------------------")
+author_out = sorted(author_out, key=lambda a: parseAuthorId(a))
+
 
 for a in author_out:
     print (a)
+    a = "-" + a + "-"
+    print (a)
+
+
+#for a in pic_out:
+#    print (a)
+db_out += "\n    }\n}"
+print ("------- db out -------")
+print (db_out)
