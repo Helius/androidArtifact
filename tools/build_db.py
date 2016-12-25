@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 import sys
 import re
@@ -23,10 +23,12 @@ def warn(s):
 def parsePicFile(s, authorFolder, authorId):
     m = re.search('([0-9])[-_](.*)', s)
     try:
-        return str('{"level": ' + m.group(1) + \
-            ', "path": "' + authorFolder + '/' + m.group(0) +\
-            '", "author": "' + str(authorId)  +\
-            '", "movement_id": "' + str(0) + '"}')
+        pic = {}
+        pic["level"] = int(m.group(1))
+        pic["path"] = authorFolder + '/' + m.group(0)
+        pic["author"] = authorId
+        pic["movement_id"] = 0
+        return pic
     except:
         warn('warning!: ' + s)
 
@@ -44,8 +46,9 @@ def collectPic():
         if 'author.json' in fileList:
             print ('found author.json in %s' % dirName)
             author_str = open(dirName + '/author.json', 'r').read().replace('\n', '')
-            author_out.append(author_str)
-            authorId = parseAuthorId(author_str)
+            author_j = json.loads(author_str)
+            author_out.append(author_j)
+            authorId = author_j["id"]
             fileList.remove('author.json')
         else:
             warn('author.json not found')
@@ -55,24 +58,53 @@ def collectPic():
             if out is not None:
                 pic_out.append(out)
 
+def print_array(dic):
+    cnt = 0
+    for key in dic:
+        cnt = cnt + 1
+        if (cnt == len(dic)):
+            out('        ' + json.dumps(key, ensure_ascii=False))
+        else:
+            out('        ' + json.dumps(key, ensure_ascii=False) + ',')
+
+
+def out(s):
+    #print (s) # for Debug
+    outFile.write(s + '\n')
+
+
+def db_pretty_print(jdb):
+    out('{\n    "content": {')
+
+    out('    "authors": [')
+    print_array(jdb["content"]["authors"])
+    out ('    ],')
+    
+    out('    "movements": [')
+    print_array(jdb["content"]["movements"])
+    out ('    ],')
+
+    out('    "pitctures": [')
+    print_array(jdb["content"]["pictures"])
+    out ('    ]')
+
+    out("    }")
+    out("}")
+
 
 rootDir = sys.argv[1]
 
 collectPic()
 
-db_out = "{\n    \"content\": {"
+author_out = sorted(author_out, key=lambda a: a["id"])
 
-author_out = sorted(author_out, key=lambda a: parseAuthorId(a))
-
-
-for a in author_out:
-    print (a)
-    a = "-" + a + "-"
-    print (a)
-
-
-#for a in pic_out:
-#    print (a)
-db_out += "\n    }\n}"
-print ("------- db out -------")
-print (db_out)
+db_out = {}
+db_out["content"] = {}
+db_out["content"] = json.loads(open(os.path.join(rootDir, 'movements.json')).read())
+db_out["content"]["authors"] = author_out
+db_out["content"]["pictures"] = pic_out
+print("writing...")
+outFile = open("out_db.json",'w')
+db_pretty_print (db_out)
+outFile.close()
+print("saved to out_db.json")
