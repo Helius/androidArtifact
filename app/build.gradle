@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.ghelius.artifacts.artifacts"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -25,13 +25,13 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile group: 'com.squareup.picasso', name: 'picasso', version: '2.5.0'
-    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.google.firebase:firebase-storage:9.8.0'
     compile 'com.google.firebase:firebase-auth:9.8.0'
     compile 'com.google.firebase:firebase-database:9.8.0'
-    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.android.support:support-v4:25.1.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:design:25.1.0'
 }
 
 
