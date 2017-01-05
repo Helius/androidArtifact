@@ -1,6 +1,7 @@
 package com.ghelius.artifacts.artifacts;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -16,16 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -40,22 +34,32 @@ public class ChooseAuthorGameFragment extends Fragment {
 
     private static final String TAG = "ChooseAuthor";
 
-    private StorageReference mStorageRef;
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
+
+    private StorageReference mStorageRef;
     private ImageView mImageView;
-    private Random rnd = new Random(System.currentTimeMillis());
-    private ArrayList<TextView> buttons = new ArrayList<>();
-    FirebaseDatabase mDatabase;
-    private boolean picturesReady = false;
-    private boolean authorReady = false;
-    private boolean buttonBlocked = false;
+    private Random rnd;
+    private ArrayList<TextView> buttons;
+    private boolean buttonBlocked;
 
     private ArrayList<ChooseAuthorGame> games;
-    private int gameIndex = 0;
+    private int gameIndex;
+    GameSetFinishedDialog dialog;
+    private int GameCount = 10;
+    private int trueAnswerCount;
+
+    private void init () {
+        gameIndex = 0;
+        trueAnswerCount = 0;
+        rnd = new Random(System.currentTimeMillis());
+        buttons = new ArrayList<>();
+        buttonBlocked = false;
+    }
 
     public ChooseAuthorGameFragment() {
         // Required empty public constructor
+        init();
     }
 
 
@@ -86,10 +90,15 @@ public class ChooseAuthorGameFragment extends Fragment {
                     buttonSelected(index);
                 }
             });
-
         }
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        games = createNewGame(GameCount);
+        playGame(gameIndex);
     }
 
     private void buttonSelected(int ind) {
@@ -100,10 +109,14 @@ public class ChooseAuthorGameFragment extends Fragment {
         int timeout = 500;
 
         if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
+            // Right )
+            trueAnswerCount++;
             buttons.get(ind).setTextColor(0xFF09AD1F);
         } else {
+            // Fail (
             timeout = 1500;
-            buttons.get(ind).setTextColor(ContextCompat.getColor(getActivity(), android.R.color.holo_red_dark));
+            buttons.get(ind).setTextColor(
+                    ContextCompat.getColor(getActivity(), android.R.color.holo_red_dark));
 
             for (int i = 0; i < buttons.size(); i++) {
                 if(((Author)buttons.get(i).getTag()).id == games.get(gameIndex).picture.author) {
@@ -116,13 +129,28 @@ public class ChooseAuthorGameFragment extends Fragment {
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 ++gameIndex;
                 showButtonBlock(true);
                 if (gameIndex < games.size()) {
                     showButtonBlock(false);
                     playGame(gameIndex);
                 } else {
-                    Toast.makeText(getActivity().getApplicationContext(), "You play 10 times!", Toast.LENGTH_SHORT).show();
+                    dialog = new GameSetFinishedDialog();
+                    dialog.init(trueAnswerCount, GameCount, 0, false);
+                    dialog.show(getFragmentManager(), "dialog");
+                    dialog.setEventListener(new GameSetFinishedDialog.DialogEventListener() {
+                        @Override
+                        public void moreButtonPressed() {
+                            games = createNewGame(GameCount);
+                            playGame(gameIndex);
+                        }
+
+                        @Override
+                        public void finishButtonPressed() {
+                            getActivity().getSupportFragmentManager().popBackStack();
+                        }
+                    });
                 }
             }
         }, timeout);
@@ -133,47 +161,12 @@ public class ChooseAuthorGameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        mDatabase = FirebaseDatabase.getInstance();
-        loadPictData();
-        loadAuthorData();
     }
 
-    private void loadPictData () {
-        DatabaseReference dbRef = mDatabase.getReference("content").child("pictures");
-
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                GenericTypeIndicator<ArrayList<Picture>> t = new GenericTypeIndicator<ArrayList<Picture>>(){};
-                pictures = dataSnapshot.getValue(t);
-                picturesReady = true;
-                checkAllDataReady();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-
+    public void setServerResources(ArrayList<Picture> pictures, ArrayList<Author> authors) {
+        this.pictures = pictures;
+        this.authors = authors;
     }
-
-    private void checkAllDataReady() {
-        Log.d(TAG, "checkAllDataReady" + (picturesReady && authorReady));
-        if (picturesReady && authorReady) {
-            if (getActivity() != null) {
-                games = createNewGame(10);
-                playGame(gameIndex);
-            } else {
-                // WTF?
-            }
-        }
-    }
-
 
     private void playGame(int gameIndex) {
 
@@ -191,33 +184,12 @@ public class ChooseAuthorGameFragment extends Fragment {
         }
     }
 
-    private void loadAuthorData () {
-        DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
-
-        dbRef1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>(){};
-                authors = dataSnapshot.getValue(t);
-                authorReady = true;
-                checkAllDataReady();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        init();
     }
 
 
@@ -229,6 +201,8 @@ public class ChooseAuthorGameFragment extends Fragment {
     ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
         Log.d(TAG, "create new " + count + "games");
+        gameIndex = 0;
+        trueAnswerCount = 0;
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();
@@ -279,6 +253,10 @@ public class ChooseAuthorGameFragment extends Fragment {
                 if (index == gameIndex) {
                     mImageView.setImageBitmap(bitmap);
                     showButtonBlock(true);
+                    View v = getView();
+                    if (v != null) {
+                        getView().findViewById(R.id.progress_view).setVisibility(View.GONE);
+                    }
                 }
             }
 
@@ -289,7 +267,6 @@ public class ChooseAuthorGameFragment extends Fragment {
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-
             }
         };
 
@@ -298,11 +275,17 @@ public class ChooseAuthorGameFragment extends Fragment {
         }
 
         public void loadPicture() {
+            final View v = getView();
+            if (v == null)
+                return;
+            v.findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
             mStorageRef.child(picture.path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    Picasso.with(getActivity().getApplicationContext()).setIndicatorsEnabled(true);
-                    Picasso.with(getActivity().getApplicationContext())
+                    Activity a = getActivity();
+                    if (a == null)
+                        return;
+                    Picasso.with(a.getApplicationContext())
                             .load(uri.toString())
                             .resize(mImageView.getWidth(),0)
                             .into(imageTarget);

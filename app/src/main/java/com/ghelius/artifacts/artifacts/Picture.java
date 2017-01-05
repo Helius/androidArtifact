@@ -9,14 +9,16 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Picture {
     public Long author;
+    public Long level;
     public Long movement_id;
     public String path;
 
 
     public Picture() {}
 
-    public Picture(Long author, Long movement_id, String path) {
+    public Picture(Long author, Long level, Long movement_id, String path) {
         this.author = author;
+        this.level = level;
         this.movement_id = movement_id;
         this.path = path;
     }

@@ -1,25 +1,45 @@
 package com.ghelius.artifacts.artifacts;
 
 
+import android.animation.ValueAnimator;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG="mainActivity";
     ChooseAuthorGameFragment chooseAuthorGameFragment;
-//    ActionBar actionBar;
+    ActionBarDrawerToggle toggle;
+    ValueAnimator arrowForwardAnimation;
+    ValueAnimator arrowBackAnimation;
+
+    private FirebaseDatabase mDatabase;
+    private ArrayList<Picture> pictures;
+    private ArrayList<Author> authors;
+
+    private boolean picturesReady;
+    private boolean authorReady;
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -50,17 +70,19 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        initAnimation();
+
 
         MainMenuFragment mainMenuFragment = new MainMenuFragment();
 
@@ -68,29 +90,66 @@ public class MainActivity extends AppCompatActivity
                 .add(R.id.main_fragment_holder, mainMenuFragment)
                 .commit();
 
-
-
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                ActionBar actionBar = getSupportActionBar();
                 if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
-//                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    toggle.syncState();
+                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                                getSupportFragmentManager().popBackStack();
+                                arrowBackAnimation.start();
+                                toggle.syncState();
+                            }
+                        }
+                    });
+                    arrowForwardAnimation.start();
                 } else {
-//                    actionBar.setDisplayHomeAsUpEnabled(false);
+                    toggle.syncState();
+                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            drawer.openDrawer(GravityCompat.START);
+                        }
+                    });
+                    arrowBackAnimation.start();
                 }
             }
         });
 
+        mDatabase = FirebaseDatabase.getInstance();
+        loadPictData();
+        loadAuthorData();
     }
 
-    //TODO delete this shit
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    private void initAnimation() {
+        arrowForwardAnimation = ValueAnimator.ofFloat(0, 1);
+        arrowForwardAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float slideOffset = (Float) valueAnimator.getAnimatedValue();
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                toggle.onDrawerSlide(drawer, slideOffset);
+            }
+        });
+        arrowForwardAnimation.setInterpolator(new DecelerateInterpolator());
+        arrowForwardAnimation.setDuration(500);
+
+        arrowBackAnimation = ValueAnimator.ofFloat(1, 0);
+        arrowBackAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float slideOffset = (Float) valueAnimator.getAnimatedValue();
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                toggle.onDrawerSlide(drawer, slideOffset);
+            }
+        });
+        arrowBackAnimation.setInterpolator(new DecelerateInterpolator());
+        arrowBackAnimation.setDuration(500);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -102,18 +161,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    getSupportFragmentManager().popBackStack();
-                }
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+    public void onConfigurationChanged(Configuration newConfig) {
+        toggle.onConfigurationChanged(newConfig);
     }
+
+    // UI stuff ~~~
 
     public void launchChooseTypeAuthor(View view) {
         Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
@@ -130,10 +184,68 @@ public class MainActivity extends AppCompatActivity
     public void launchChooseAuthor(View view) {
         if (chooseAuthorGameFragment == null) {
             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
+            chooseAuthorGameFragment.setServerResources(pictures, authors);
         }
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
                 .addToBackStack("game").commit();
+    }
+
+    // game stuff ~~~
+
+    private void loadPictData () {
+        DatabaseReference dbRef = mDatabase.getReference("content").child("pictures");
+
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+
+                GenericTypeIndicator<ArrayList<Picture>> t = new GenericTypeIndicator<ArrayList<Picture>>() {
+                };
+                pictures = dataSnapshot.getValue(t);
+                picturesReady = true;
+                checkAllDataReady();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    private void loadAuthorData () {
+        DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
+
+        dbRef1.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+
+                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>(){};
+                authors = dataSnapshot.getValue(t);
+                authorReady = true;
+                checkAllDataReady();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    private void checkAllDataReady() {
+        Log.d(TAG, "checkAllDataReady" + (picturesReady && authorReady));
+        if (picturesReady && authorReady) {
+            //TODO: now we can enable game buttons
+            findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
+        }
     }
 }

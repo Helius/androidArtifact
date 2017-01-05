@@ -79,12 +79,12 @@ def db_pretty_print(jdb):
     out('    "authors": [')
     print_array(jdb["content"]["authors"])
     out ('    ],')
-    
+
     out('    "movements": [')
     print_array(jdb["content"]["movements"])
     out ('    ],')
 
-    out('    "pitctures": [')
+    out('    "pictures": [')
     print_array(jdb["content"]["pictures"])
     out ('    ]')
 
