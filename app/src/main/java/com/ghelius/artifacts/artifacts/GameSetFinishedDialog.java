@@ -25,10 +25,11 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
         mListener = listener;
     }
 
+
     @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-        if (mListener != null) {
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
+        if(mListener != null) {
             mListener.finishButtonPressed();
         }
     }
