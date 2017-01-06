@@ -85,6 +85,29 @@ public class MainActivity extends AppCompatActivity
 
 
         MainMenuFragment mainMenuFragment = new MainMenuFragment();
+        mainMenuFragment.setMainMenuListener(new MainMenuFragment.MainMenuListener() {
+            @Override
+            public void menuClicked(int number) {
+                switch (number) {
+                    case 0:
+                        if (chooseAuthorGameFragment == null) {
+                            chooseAuthorGameFragment = new ChooseAuthorGameFragment();
+                            chooseAuthorGameFragment.setServerResources(pictures, authors);
+                        }
+
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
+                                .addToBackStack("game").commit();
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    default:
+                        Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            }
+        });
 
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.main_fragment_holder, mainMenuFragment)
@@ -169,28 +192,6 @@ public class MainActivity extends AppCompatActivity
 
     // UI stuff ~~~
 
-    public void launchChooseTypeAuthor(View view) {
-        Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
-    }
-
-    public void launchChooseMovements(View view) {
-        Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
-    }
-
-    public void launchChoosePaint(View view) {
-        Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
-    }
-
-    public void launchChooseAuthor(View view) {
-        if (chooseAuthorGameFragment == null) {
-            chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-            chooseAuthorGameFragment.setServerResources(pictures, authors);
-        }
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
-                .addToBackStack("game").commit();
-    }
 
     // game stuff ~~~
 

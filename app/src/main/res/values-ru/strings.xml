@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Artifacts</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Настройки</string>
+    <string name="game_1_title">Назови художника</string>
+    <string name="game_2_title">Выбери картину</string>
+    <string name="game_3_title">Выбери направление</string>
+    <string name="game_0_title">Выбери художника</string>
+</resources>
