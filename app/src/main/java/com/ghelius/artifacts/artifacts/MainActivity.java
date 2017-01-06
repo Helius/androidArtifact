@@ -4,6 +4,8 @@ package com.ghelius.artifacts.artifacts;
 import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG="mainActivity";
+    private static final String TAG = "mainActivity";
     ChooseAuthorGameFragment chooseAuthorGameFragment;
     ActionBarDrawerToggle toggle;
     ValueAnimator arrowForwardAnimation;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity
 
     private boolean picturesReady;
     private boolean authorReady;
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -83,19 +86,20 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         initAnimation();
 
-
-        MainMenuFragment mainMenuFragment = new MainMenuFragment();
+        final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.main_menu_fragment);
         mainMenuFragment.setMainMenuListener(new MainMenuFragment.MainMenuListener() {
             @Override
-            public void menuClicked(int number) {
+            public void menuClicked(final int number) {
                 switch (number) {
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
+                            chooseAuthorGameFragment.setServerResources(pictures, authors);
                         }
-                        chooseAuthorGameFragment.setServerResources(pictures, authors);
 
                         getSupportFragmentManager().beginTransaction()
+                                .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
                                 .addToBackStack("game").commit();
                         break;
@@ -104,14 +108,27 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                     default:
                         Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
-                    break;
+                        break;
                 }
+
             }
         });
 
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.main_fragment_holder, mainMenuFragment)
-                .commit();
+        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            toggle.syncState();
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                        getSupportFragmentManager().popBackStack();
+                        arrowBackAnimation.start();
+                        toggle.syncState();
+                    }
+                }
+            });
+            arrowForwardAnimation.start();
+        }
+
 
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
@@ -145,6 +162,7 @@ public class MainActivity extends AppCompatActivity
         mDatabase = FirebaseDatabase.getInstance();
         loadPictData();
         loadAuthorData();
+        findViewById(R.id.main_progress_fade).setVisibility(View.VISIBLE);
     }
 
     private void initAnimation() {
@@ -190,12 +208,9 @@ public class MainActivity extends AppCompatActivity
         toggle.onConfigurationChanged(newConfig);
     }
 
-    // UI stuff ~~~
-
-
     // game stuff ~~~
 
-    private void loadPictData () {
+    private void loadPictData() {
         DatabaseReference dbRef = mDatabase.getReference("content").child("pictures");
 
         dbRef.addValueEventListener(new ValueEventListener() {
@@ -219,7 +234,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void loadAuthorData () {
+    private void loadAuthorData() {
         DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
 
         dbRef1.addValueEventListener(new ValueEventListener() {
@@ -228,7 +243,8 @@ public class MainActivity extends AppCompatActivity
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
 
-                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>(){};
+                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>() {
+                };
                 authors = dataSnapshot.getValue(t);
                 authorReady = true;
                 checkAllDataReady();

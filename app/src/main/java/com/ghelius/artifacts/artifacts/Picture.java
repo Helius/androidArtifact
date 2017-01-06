@@ -7,7 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
  */
 
 @IgnoreExtraProperties
-public class Picture {
+public class Picture  {
     public Long author;
     public Long level;
     public Long movement_id;

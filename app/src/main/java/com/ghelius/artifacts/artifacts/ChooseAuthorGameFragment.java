@@ -4,13 +4,11 @@ package com.ghelius.artifacts.artifacts;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +26,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +34,7 @@ import java.util.Random;
 
 public class ChooseAuthorGameFragment extends Fragment {
 
-    private static final String TAG = "ChooseAuthor";
+    private static final String TAG = "ChooseAuthorGame";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
@@ -49,7 +45,7 @@ public class ChooseAuthorGameFragment extends Fragment {
     private boolean buttonBlocked;
     private ArrayList<ChooseButton> mButtons;
     private ButtonAdapter mButtonAdapter;
-    private ArrayList<ChooseAuthorGame> games;
+    private ArrayList<ChooseAuthorGame> games = null;
     private int gameIndex;
     GameSetFinishedDialog dialog;
     private int GameCount = 10;
@@ -57,12 +53,10 @@ public class ChooseAuthorGameFragment extends Fragment {
 
     enum ButtonState {Normal, True, False};
 
-
-
     private class ChooseButton {
         String text;
         ButtonState state;
-        public Long author_id;
+        Long author_id;
 
         ChooseButton(String text, Long author_id) {
             this.text = text;
@@ -76,7 +70,7 @@ public class ChooseAuthorGameFragment extends Fragment {
         private final LayoutInflater mInflater;
         private ArrayList<ChooseButton> mButtons;
 
-        public ButtonAdapter(Context context, ArrayList<ChooseButton> buttons) {
+        ButtonAdapter(Context context, ArrayList<ChooseButton> buttons) {
             mButtons = buttons;
             this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -119,7 +113,7 @@ public class ChooseAuthorGameFragment extends Fragment {
             return view;
         }
 
-        public void update(int i) {
+        void update(int i) {
             notifyDataSetChanged();
         }
     }
@@ -163,20 +157,21 @@ public class ChooseAuthorGameFragment extends Fragment {
                 buttonSelected(i);
             }
         });
-
+        if (games == null) {
+            games = createNewGame(GameCount);
+        }
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        games = createNewGame(GameCount);
-        playGame(gameIndex);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        playGame(gameIndex);
     }
 
     private void buttonSelected(int ind) {
@@ -195,7 +190,6 @@ public class ChooseAuthorGameFragment extends Fragment {
             timeout = 1500;
             mButtons.get(ind).state = ButtonState.False;
 
-//            for (int i = 0; i < mButtons.size(); i++) {
             for(ChooseButton button : mButtons) {
                 if(button.author_id == games.get(gameIndex).picture.author) {
                     button.state = ButtonState.True;
@@ -240,6 +234,8 @@ public class ChooseAuthorGameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        setRetainInstance(true);
+        init();
     }
 
     public void setServerResources(ArrayList<Picture> pictures, ArrayList<Author> authors) {
@@ -268,7 +264,6 @@ public class ChooseAuthorGameFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        init();
     }
 
 
@@ -321,12 +316,12 @@ public class ChooseAuthorGameFragment extends Fragment {
     }
 
     class ChooseAuthorGame {
-        public Picture picture;
-        public ArrayList<Author> authors_variant = new ArrayList<>();
+        Picture picture;
+        ArrayList<Author> authors_variant = new ArrayList<>();
         private int index;
 
 
-        SimpleTarget target = new SimpleTarget<Bitmap>(300,300) {
+        SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(300,300) {
             @Override
             public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
                 Log.d(TAG, "helius: image " + index + "loaded from ??");
@@ -341,37 +336,11 @@ public class ChooseAuthorGameFragment extends Fragment {
             }
         };
 
-
-
-//        Target imageTarget = new Target() {
-//            @Override
-//            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-//                Log.d(TAG, "helius: image " + index + "loaded from " + from);
-//                if (index == gameIndex) {
-//                    mImageView.setImageBitmap(bitmap);
-//                    showButtonBlock(true);
-//                    View v = getView();
-//                    if (v != null) {
-//                        getView().findViewById(R.id.progress_view).setVisibility(View.GONE);
-//                    }
-//                }
-//            }
-
-//            @Override
-//            public void onBitmapFailed(Drawable errorDrawable) {
-//
-//            }
-//
-//            @Override
-//            public void onPrepareLoad(Drawable placeHolderDrawable) {
-//            }
-//        };
-
         ChooseAuthorGame(int index) {
             this.index = index;
         }
 
-        public void loadPicture() {
+        void loadPicture() {
             final View v = getView();
             if (v == null)
                 return;
@@ -383,10 +352,6 @@ public class ChooseAuthorGameFragment extends Fragment {
                     if (a == null)
                         return;
 
-//                    Picasso.with(a.getApplicationContext())
-//                            .load(uri.toString())
-//                            .resize(mImageView.getWidth(),0)
-//                            .into(imageTarget);
                     Glide.with(a.getApplicationContext())
                             .load(uri.toString())
                             .asBitmap()
