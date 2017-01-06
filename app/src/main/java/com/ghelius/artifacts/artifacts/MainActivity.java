@@ -92,8 +92,8 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(pictures, authors);
                         }
+                        chooseAuthorGameFragment.setServerResources(pictures, authors);
 
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)

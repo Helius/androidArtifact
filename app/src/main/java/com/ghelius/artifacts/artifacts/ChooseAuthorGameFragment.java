@@ -15,9 +15,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,20 +46,90 @@ public class ChooseAuthorGameFragment extends Fragment {
     private StorageReference mStorageRef;
     private ImageView mImageView;
     private Random rnd;
-    private ArrayList<TextView> buttons;
     private boolean buttonBlocked;
-
+    private ArrayList<ChooseButton> mButtons;
+    private ButtonAdapter mButtonAdapter;
     private ArrayList<ChooseAuthorGame> games;
     private int gameIndex;
     GameSetFinishedDialog dialog;
     private int GameCount = 10;
     private int trueAnswerCount;
 
+    enum ButtonState {Normal, True, False};
+
+
+
+    private class ChooseButton {
+        String text;
+        ButtonState state;
+        public Long author_id;
+
+        ChooseButton(String text, Long author_id) {
+            this.text = text;
+            this.state = ButtonState.Normal;
+            this.author_id = author_id;
+        }
+    }
+
+
+    private class ButtonAdapter extends BaseAdapter {
+        private final LayoutInflater mInflater;
+        private ArrayList<ChooseButton> mButtons;
+
+        public ButtonAdapter(Context context, ArrayList<ChooseButton> buttons) {
+            mButtons = buttons;
+            this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            return mButtons.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            if (view == null) {
+                view = mInflater.inflate(R.layout.choose_button_item, viewGroup, false);
+            }
+            TextView text = (TextView) view.findViewById(R.id.text);
+            ChooseButton button = mButtons.get(i);
+            text.setText(button.text);
+            switch (button.state) {
+                case True:
+                    text.setBackgroundResource(R.drawable.choose_button_true_background_shape);
+                    break;
+                case False:
+                    text.setBackgroundResource(R.drawable.choose_button_false_background_shape);
+                    break;
+                default:
+                    text.setBackgroundResource(0);
+                    break;
+            }
+
+            return view;
+        }
+
+        public void update(int i) {
+            notifyDataSetChanged();
+        }
+    }
+
+
     private void init () {
         gameIndex = 0;
         trueAnswerCount = 0;
         rnd = new Random(System.currentTimeMillis());
-        buttons = new ArrayList<>();
+        mButtons = new ArrayList<>();
         buttonBlocked = false;
     }
 
@@ -63,42 +139,44 @@ public class ChooseAuthorGameFragment extends Fragment {
     }
 
 
-    private void showButtonBlock(boolean b) {
-        for (int i = 0; i < buttons.size(); i++) {
-            buttons.get(i).setVisibility(b ? View.VISIBLE : View.INVISIBLE);
+    private void showButtonBlock(boolean show) {
+        if (show) {
+            getView().findViewById(R.id.choose_button_grid_view).setVisibility(View.VISIBLE);
+        } else {
+            getView().findViewById(R.id.choose_button_grid_view).setVisibility(View.INVISIBLE);
         }
         buttonBlocked = false;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
+        GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
+        mButtons = new ArrayList<>();
+        mButtonAdapter = new ButtonAdapter(getActivity().getApplicationContext(), mButtons);
+        mGridView.setAdapter(mButtonAdapter);
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                buttonSelected(i);
+            }
+        });
 
-        buttons.add((TextView)view.findViewById(R.id.button_0));
-        buttons.add((TextView)view.findViewById(R.id.button_1));
-        buttons.add((TextView)view.findViewById(R.id.button_2));
-        buttons.add((TextView)view.findViewById(R.id.button_3));
-
-        for (int i = 0; i < buttons.size(); i++) {
-            final int index = i;
-            buttons.get(i).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    buttonSelected(index);
-                }
-            });
-        }
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        games = createNewGame(GameCount);
+        playGame(gameIndex);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        games = createNewGame(GameCount);
-        playGame(gameIndex);
     }
 
     private void buttonSelected(int ind) {
@@ -111,19 +189,20 @@ public class ChooseAuthorGameFragment extends Fragment {
         if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
             // Right )
             trueAnswerCount++;
-            buttons.get(ind).setTextColor(0xFF09AD1F);
+            mButtons.get(ind).state = ButtonState.True;
         } else {
             // Fail (
             timeout = 1500;
-            buttons.get(ind).setTextColor(
-                    ContextCompat.getColor(getActivity(), android.R.color.holo_red_dark));
+            mButtons.get(ind).state = ButtonState.False;
 
-            for (int i = 0; i < buttons.size(); i++) {
-                if(((Author)buttons.get(i).getTag()).id == games.get(gameIndex).picture.author) {
-                    buttons.get(i).setTextColor(0xFF09AD1F);
+//            for (int i = 0; i < mButtons.size(); i++) {
+            for(ChooseButton button : mButtons) {
+                if(button.author_id == games.get(gameIndex).picture.author) {
+                    button.state = ButtonState.True;
                 }
             }
         }
+        mButtonAdapter.update(ind);
 
         Handler h = new Handler();
         h.postDelayed(new Runnable() {
@@ -173,11 +252,11 @@ public class ChooseAuthorGameFragment extends Fragment {
         Log.d(TAG, "play game " + gameIndex);
         ChooseAuthorGame game = games.get(gameIndex);
         game.loadPicture();
-        for (int i = 0; i < buttons.size(); i++) {
-            buttons.get(i).setText(game.authors_variant.get(i).name_ru);
-            buttons.get(i).setTag(game.authors_variant.get(i));
-            buttons.get(i).setTextColor(ContextCompat.getColor(getActivity(), android.R.color.tab_indicator_text));
+        mButtons.clear();
+        for (Author author: game.authors_variant) {
+            mButtons.add(new ChooseButton(author.name_ru, author.id));
         }
+        mButtonAdapter.update(0);
 
         if (gameIndex + 1 < games.size()) {
             games.get(gameIndex + 1).loadPicture();
@@ -246,10 +325,11 @@ public class ChooseAuthorGameFragment extends Fragment {
         public ArrayList<Author> authors_variant = new ArrayList<>();
         private int index;
 
-        Target imageTarget = new Target() {
+
+        SimpleTarget target = new SimpleTarget<Bitmap>(300,300) {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.d(TAG, "helius: image " + index + "loaded from " + from);
+            public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
+                Log.d(TAG, "helius: image " + index + "loaded from ??");
                 if (index == gameIndex) {
                     mImageView.setImageBitmap(bitmap);
                     showButtonBlock(true);
@@ -259,16 +339,33 @@ public class ChooseAuthorGameFragment extends Fragment {
                     }
                 }
             }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
         };
+
+
+
+//        Target imageTarget = new Target() {
+//            @Override
+//            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                Log.d(TAG, "helius: image " + index + "loaded from " + from);
+//                if (index == gameIndex) {
+//                    mImageView.setImageBitmap(bitmap);
+//                    showButtonBlock(true);
+//                    View v = getView();
+//                    if (v != null) {
+//                        getView().findViewById(R.id.progress_view).setVisibility(View.GONE);
+//                    }
+//                }
+//            }
+
+//            @Override
+//            public void onBitmapFailed(Drawable errorDrawable) {
+//
+//            }
+//
+//            @Override
+//            public void onPrepareLoad(Drawable placeHolderDrawable) {
+//            }
+//        };
 
         ChooseAuthorGame(int index) {
             this.index = index;
@@ -285,10 +382,16 @@ public class ChooseAuthorGameFragment extends Fragment {
                     Activity a = getActivity();
                     if (a == null)
                         return;
-                    Picasso.with(a.getApplicationContext())
+
+//                    Picasso.with(a.getApplicationContext())
+//                            .load(uri.toString())
+//                            .resize(mImageView.getWidth(),0)
+//                            .into(imageTarget);
+                    Glide.with(a.getApplicationContext())
                             .load(uri.toString())
-                            .resize(mImageView.getWidth(),0)
-                            .into(imageTarget);
+                            .asBitmap()
+                            .into(target);
+
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

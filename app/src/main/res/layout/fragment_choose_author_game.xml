@@ -25,59 +25,19 @@
                 app:cpv_animAutostart="true"
                 app:cpv_indeterminate="true" />
         </RelativeLayout>
-
-        <LinearLayout
-            android:paddingTop="16dp"
-            android:layout_weight="0"
-            android:orientation="vertical"
+        <GridView
+            android:id="@+id/choose_button_grid_view"
+            android:numColumns="2"
+            android:horizontalSpacing="10dp"
+            android:verticalSpacing="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+        </GridView>
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/button_0"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp" />
-                <TextView
-                    android:id="@+id/button_1"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp" />
-
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/button_2"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp" />
-                <TextView
-                    android:id="@+id/button_3"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp" />
-
-
-            </LinearLayout>
-
-
-        </LinearLayout>
     </LinearLayout>
 
 
