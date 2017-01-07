@@ -2,6 +2,7 @@ package com.ghelius.artifacts.artifacts;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +34,7 @@ import java.util.Collections;
 import java.util.Random;
 
 
-public class ChooseAuthorGameFragment extends Fragment {
+public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
 
     private static final String TAG = "ChooseAuthorGame";
 
@@ -160,6 +162,13 @@ public class ChooseAuthorGameFragment extends Fragment {
         if (games == null) {
             games = createNewGame(GameCount);
         }
+        dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+        if (dialog == null) {
+            dialog = new GameSetFinishedDialog();
+        }
+        dialog.init(trueAnswerCount, GameCount, 0, false);
+        dialog.setEventListener(this);
+
         return view;
     }
 
@@ -199,35 +208,33 @@ public class ChooseAuthorGameFragment extends Fragment {
         mButtonAdapter.update(ind);
 
         Handler h = new Handler();
+
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                ++gameIndex;
                 showButtonBlock(true);
-                if (gameIndex < games.size()) {
+                if (gameIndex+1 < games.size()) {
                     showButtonBlock(false);
-                    playGame(gameIndex);
+                    playGame(++gameIndex);
                 } else {
-                    dialog = new GameSetFinishedDialog();
                     dialog.init(trueAnswerCount, GameCount, 0, false);
-                    dialog.show(getFragmentManager(), "dialog");
-                    dialog.setEventListener(new GameSetFinishedDialog.DialogEventListener() {
-                        @Override
-                        public void moreButtonPressed() {
-                            games = createNewGame(GameCount);
-                            playGame(gameIndex);
-                        }
-
-                        @Override
-                        public void finishButtonPressed() {
-                            getActivity().getSupportFragmentManager().popBackStack();
-                        }
-                    });
+                    dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }
         }, timeout);
 
+    }
+
+    @Override
+    public void moreButtonPressed() {
+        games = createNewGame(GameCount);
+        playGame(gameIndex);
+    }
+
+    @Override
+    public void finishButtonPressed() {
+        getActivity().getSupportFragmentManager().popBackStack();
     }
 
     @Override
@@ -244,33 +251,27 @@ public class ChooseAuthorGameFragment extends Fragment {
     }
 
     private void playGame(int gameIndex) {
+        if (gameIndex < games.size()) {
+            Log.d(TAG, "play game " + gameIndex);
+            ChooseAuthorGame game = games.get(gameIndex);
+            game.loadPicture();
+            mButtons.clear();
+            for (Author author : game.authors_variant) {
+                mButtons.add(new ChooseButton(author.name_ru, author.id));
+            }
+            mButtonAdapter.update(0);
 
-        Log.d(TAG, "play game " + gameIndex);
-        ChooseAuthorGame game = games.get(gameIndex);
-        game.loadPicture();
-        mButtons.clear();
-        for (Author author: game.authors_variant) {
-            mButtons.add(new ChooseButton(author.name_ru, author.id));
+            if (gameIndex + 1 < games.size()) {
+                games.get(gameIndex + 1).loadPicture();
+            }
+        } else { // we played all game and now just show last one
+            ChooseAuthorGame game = games.get(gameIndex-1);
+            game.loadPicture();
+            mButtonAdapter.update(0);
         }
-        mButtonAdapter.update(0);
-
-        if (gameIndex + 1 < games.size()) {
-            games.get(gameIndex + 1).loadPicture();
-        }
     }
 
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
     ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
@@ -318,14 +319,14 @@ public class ChooseAuthorGameFragment extends Fragment {
     class ChooseAuthorGame {
         Picture picture;
         ArrayList<Author> authors_variant = new ArrayList<>();
-        private int index;
+        private int id;
 
 
         SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(300,300) {
             @Override
             public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-                Log.d(TAG, "helius: image " + index + "loaded from ??");
-                if (index == gameIndex) {
+                Log.d(TAG, "helius: image " + id + "loaded from ??");
+                if (id == gameIndex) {
                     mImageView.setImageBitmap(bitmap);
                     showButtonBlock(true);
                     View v = getView();
@@ -336,8 +337,8 @@ public class ChooseAuthorGameFragment extends Fragment {
             }
         };
 
-        ChooseAuthorGame(int index) {
-            this.index = index;
+        ChooseAuthorGame(int id) {
+            this.id = id;
         }
 
         void loadPicture() {
