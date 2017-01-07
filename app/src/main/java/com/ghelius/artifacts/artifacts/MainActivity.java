@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -163,6 +164,32 @@ public class MainActivity extends AppCompatActivity
         loadPictData();
         loadAuthorData();
         findViewById(R.id.main_progress_fade).setVisibility(View.VISIBLE);
+//        scoresRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
+//                System.out.println("The " + snapshot.getKey() + " dinosaur's score is " + snapshot.getValue());
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                Log.d(TAG, "data changed");
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                Log.d(TAG, "data remove");
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//                Log.d(TAG, "data moved");
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.d(TAG, "onCancelled");
+//            }
+//        });
     }
 
     private void initAnimation() {
@@ -263,6 +290,8 @@ public class MainActivity extends AppCompatActivity
         if (picturesReady && authorReady) {
             //TODO: now we can enable game buttons
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
+            DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
+            scoresRef.keepSynced(true);
         }
     }
 }
