@@ -234,6 +234,8 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
     @Override
     public void finishButtonPressed() {
+        // delete games here, when we will return, we create new one, instead using existing
+        games = null;
         getActivity().getSupportFragmentManager().popBackStack();
     }
 
