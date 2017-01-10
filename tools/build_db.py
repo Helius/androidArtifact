@@ -21,15 +21,18 @@ def warn(s):
     sys.stdout.write(RED+s+RESET+'\n')
 
 def parsePicFile(s, authorFolder, authorId):
-    m = re.search('([0-9])[-_](.*)', s)
+    m = re.match('([0-9])_(([0-9]+)_)?', s)
     try:
         pic = {}
-        pic["level"] = int(m.group(1))
-        pic["path"] = authorFolder + '/' + m.group(0)
+        pic["level"] = int(m.groups()[0])
+        pic["path"] = authorFolder + '/' + s
         pic["author"] = authorId
-        pic["movement_id"] = 0
+        if m.groups()[2] != None:
+            pic["movement_id"] = int(m.groups()[2])
+        else:
+            pic["movement_id"] = 0
         return pic
-    except:
+    except Exception as e:
         warn('warning!: ' + s)
 
 def parseAuthorId(s):
