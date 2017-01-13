@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -324,7 +325,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         private int id;
 
 
-        SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(300,300) {
+        SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(600,600) {
             @Override
             public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
                 Log.d(TAG, "helius: image " + id + "loaded from ??");
@@ -344,29 +345,23 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         }
 
         void loadPicture() {
+            Activity a = getActivity();
+            if (a == null)
+                return;
+
             final View v = getView();
             if (v == null)
                 return;
-            v.findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
-            mStorageRef.child(picture.path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Activity a = getActivity();
-                    if (a == null)
-                        return;
-
-                    Glide.with(a.getApplicationContext())
-                            .load(uri.toString())
-                            .asBitmap()
-                            .into(target);
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                }
-            });
+            if (id == gameIndex) {
+                getView().findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
+            }
+            Glide.with(a.getApplicationContext())
+                    .using(new FirebaseImageLoader())
+                    .load(mStorageRef.child(picture.path))
+                    .asBitmap()
+                    .override(600,600)
+                    .fitCenter()
+                    .into(target);
         }
     }
 
