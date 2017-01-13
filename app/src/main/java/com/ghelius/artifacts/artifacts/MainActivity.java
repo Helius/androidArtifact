@@ -33,16 +33,20 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "mainActivity";
     ChooseAuthorGameFragment chooseAuthorGameFragment;
+    ChooseMovementGameFragment chooseMovementGameFragment;
+    ChoosePaintGameFragment choosePaintGameFragment;
     ActionBarDrawerToggle toggle;
     ValueAnimator arrowForwardAnimation;
     ValueAnimator arrowBackAnimation;
 
     private FirebaseDatabase mDatabase;
     private ArrayList<Picture> pictures;
+    private ArrayList<Movement> movements;
     private ArrayList<Author> authors;
 
     private boolean picturesReady;
     private boolean authorReady;
+    private boolean movementsReady;
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -105,8 +109,30 @@ public class MainActivity extends AppCompatActivity
                                 .addToBackStack("game").commit();
                         break;
                     case 1:
+                        Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
+                        break;
                     case 2:
+                        if (choosePaintGameFragment == null) {
+                            choosePaintGameFragment = new ChoosePaintGameFragment();
+                            choosePaintGameFragment.setServerResources(pictures, authors);
+                        }
+
+                        getSupportFragmentManager().beginTransaction()
+                                .hide(mainMenuFragment)
+                                .replace(R.id.main_fragment_holder, choosePaintGameFragment)
+                                .addToBackStack("game").commit();
+                        break;
                     case 3:
+                        if (chooseMovementGameFragment == null) {
+                            chooseMovementGameFragment = new ChooseMovementGameFragment();
+                            chooseMovementGameFragment.setServerResources(pictures, movements);
+                        }
+
+                        getSupportFragmentManager().beginTransaction()
+                                .hide(mainMenuFragment)
+                                .replace(R.id.main_fragment_holder, chooseMovementGameFragment)
+                                .addToBackStack("game").commit();
+                        break;
                     default:
                         Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
                         break;
@@ -163,6 +189,7 @@ public class MainActivity extends AppCompatActivity
         mDatabase = FirebaseDatabase.getInstance();
         loadPictData();
         loadAuthorData();
+        loadMovementsData();
         findViewById(R.id.main_progress_fade).setVisibility(View.VISIBLE);
 //        scoresRef.addChildEventListener(new ChildEventListener() {
 //            @Override
@@ -261,6 +288,30 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    private void loadMovementsData() {
+        DatabaseReference dbRef = mDatabase.getReference("content").child("movements");
+
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+
+                GenericTypeIndicator<ArrayList<Movement>> t = new GenericTypeIndicator<ArrayList<Movement>>() {
+                };
+                movements = dataSnapshot.getValue(t);
+                movementsReady = true;
+                checkAllDataReady();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
     private void loadAuthorData() {
         DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
 
@@ -286,8 +337,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void checkAllDataReady() {
-        Log.d(TAG, "checkAllDataReady" + (picturesReady && authorReady));
-        if (picturesReady && authorReady) {
+        Log.d(TAG, "checkAllDataReady" + (picturesReady && authorReady && movementsReady));
+        if (picturesReady && authorReady && movementsReady) {
             //TODO: now we can enable game buttons
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
             DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");

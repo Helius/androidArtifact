@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Артифакты</string>
+    <string name="app_name">Артефакты</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -9,4 +9,7 @@
     <string name="game_2_title">Выбери картину</string>
     <string name="game_3_title">Выбери направление</string>
     <string name="game_0_title">Выбери художника</string>
+    <string name="finish_dialog_message" >Вы угадали %1$d из %2$d</string>
+    <string name="finish">Закончить</string>
+    <string name="try_more">Ещё!</string>
 </resources>

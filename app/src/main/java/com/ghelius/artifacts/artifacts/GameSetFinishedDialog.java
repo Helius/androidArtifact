@@ -59,7 +59,7 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
             }
         });
         TextView textView = (TextView)v.findViewById(R.id.guessed_message);
-        textView.setText("Вы угадали " + trueCount + " из " + from + "!");
+        textView.setText(getResources().getString(R.string.finish_dialog_message, trueCount, from)); //"Вы угадали " + trueCount + " из " + from + "!");
         getDialog().setCanceledOnTouchOutside(true);
         return v;
     }

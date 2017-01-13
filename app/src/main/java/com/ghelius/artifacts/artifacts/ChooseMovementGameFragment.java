@@ -33,12 +33,12 @@ import java.util.Locale;
 import java.util.Random;
 
 
-public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
+public class ChooseMovementGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
 
-    private static final String TAG = "ChooseAuthorGame";
+    private static final String TAG = "ChooseMovementsGame";
 
     private ArrayList<Picture> pictures;
-    private ArrayList<Author> authors;
+    private ArrayList<Movement> movements;
 
     private StorageReference mStorageRef;
     private ImageView mImageView;
@@ -46,7 +46,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     private boolean buttonBlocked;
     private ArrayList<ChooseButton> mButtons;
     private ButtonAdapter mButtonAdapter;
-    private ArrayList<ChooseAuthorGame> games = null;
+    private ArrayList<ChooseMovementGame> games = null;
     private int gameIndex;
     GameSetFinishedDialog dialog;
     private int GameCount = 10;
@@ -58,12 +58,12 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     private class ChooseButton {
         String text;
         ButtonState state;
-        Long author_id;
+        Long movement_id;
 
-        ChooseButton(String text, Long author_id) {
+        ChooseButton(String text, Long movement_id) {
             this.text = text;
             this.state = ButtonState.Normal;
-            this.author_id = author_id;
+            this.movement_id = movement_id;
         }
     }
 
@@ -129,7 +129,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         buttonBlocked = false;
     }
 
-    public ChooseAuthorGameFragment() {
+    public ChooseMovementGameFragment() {
         // Required empty public constructor
         init();
     }
@@ -150,7 +150,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
+        View view = inflater.inflate(R.layout.fragment_choose_movement_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
         GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
         mButtons = new ArrayList<>();
@@ -194,7 +194,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         buttonBlocked = true;
         int timeout = 500;
 
-        if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
+        if (games.get(gameIndex).picture.author == games.get(gameIndex).movement_variant.get(ind).id) {
             // Right )
             trueAnswerCount++;
             mButtons.get(ind).state = ButtonState.True;
@@ -204,7 +204,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
             mButtons.get(ind).state = ButtonState.False;
 
             for(ChooseButton button : mButtons) {
-                if(button.author_id == games.get(gameIndex).picture.author) {
+                if(button.movement_id == games.get(gameIndex).picture.movement_id) {
                     button.state = ButtonState.True;
                 }
             }
@@ -251,22 +251,22 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         init();
     }
 
-    public void setServerResources(ArrayList<Picture> pictures, ArrayList<Author> authors) {
+    public void setServerResources(ArrayList<Picture> pictures, ArrayList<Movement> movements ) {
         this.pictures = pictures;
-        this.authors = authors;
+        this.movements = movements;
     }
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
             Log.d(TAG, "play game " + gameIndex);
-            ChooseAuthorGame game = games.get(gameIndex);
+            ChooseMovementGame game = games.get(gameIndex);
             game.loadPicture();
             mButtons.clear();
-            for (Author author : game.authors_variant) {
+            for (Movement movement : game.movement_variant) {
                 if (locale.equals("ru")) {
-                    mButtons.add(new ChooseButton(author.name_ru, author.id));
+                    mButtons.add(new ChooseButton(movement.name_ru, movement.id));
                 } else {
-                    mButtons.add(new ChooseButton(author.name_en, author.id));
+                    mButtons.add(new ChooseButton(movement.name_en, movement.id));
                 }
             }
             mButtonAdapter.update(0);
@@ -275,7 +275,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                 games.get(gameIndex + 1).loadPicture();
             }
         } else { // we played all game and now just show last one
-            ChooseAuthorGame game = games.get(gameIndex-1);
+            ChooseMovementGame game = games.get(gameIndex-1);
             game.loadPicture();
             mButtonAdapter.update(0);
         }
@@ -283,31 +283,36 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
 
 
-    ArrayList<ChooseAuthorGame> createNewGame(int count)
+    ArrayList<ChooseMovementGame> createNewGame(int count)
     {
         Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
         trueAnswerCount = 0;
-        ArrayList<ChooseAuthorGame> games = new ArrayList<>();
+        ArrayList<ChooseMovementGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();
-        tmp_pic.addAll(pictures);
+        for (Picture pic: pictures) {
+            if (pic.movement_id != 0) {
+                tmp_pic.add(pic);
+            }
+        }
         Collections.shuffle(tmp_pic);
 
+
         for (int i = 0; i < count; i++) {
-            ChooseAuthorGame game = new ChooseAuthorGame(i);
+            ChooseMovementGame game = new ChooseMovementGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
-                game.authors_variant.add(getAuthorById(game.picture.author));
-                int author_count = 3;
-                while (author_count > 0) {
-                    Author a = authors.get(rnd.nextInt(authors.size()));
-                    if (!game.authors_variant.contains(a)) {
-                        game.authors_variant.add(a);
-                        author_count--;
+                game.movement_variant.add(getMovementById(game.picture.movement_id));
+                int movement_count = 3;
+                while (movement_count > 0) {
+                    Movement a = movements.get(rnd.nextInt(movements.size()));
+                    if (!game.movement_variant.contains(a)) {
+                        game.movement_variant.add(a);
+                        movement_count--;
                     }
                 }
-                Collections.shuffle(game.authors_variant, rnd);
+                Collections.shuffle(game.movement_variant, rnd);
             }
             games.add(game);
         }
@@ -317,8 +322,8 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     }
 
 
-    private Author getAuthorById (Long id) {
-        for (Author a : authors) {
+    private Movement getMovementById (Long id) {
+        for (Movement a : movements) {
             if (a.id == id) {
                 return a;
             }
@@ -326,9 +331,9 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         return null;
     }
 
-    class ChooseAuthorGame {
+    class ChooseMovementGame {
         Picture picture;
-        ArrayList<Author> authors_variant = new ArrayList<>();
+        ArrayList<Movement> movement_variant = new ArrayList<>();
         private int id;
 
 
@@ -347,7 +352,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
             }
         };
 
-        ChooseAuthorGame(int id) {
+        ChooseMovementGame(int id) {
             this.id = id;
         }
 
