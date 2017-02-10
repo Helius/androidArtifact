@@ -29,13 +29,29 @@
         android:layout_below="@id/paint_grid"
         android:layout_marginTop="30dp"
         />
-    <ImageView
-        android:id="@+id/full_image"
-        android:scaleType="fitCenter"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <RelativeLayout
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_centerInParent="true"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/full_image_fade_background"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:alpha="255">
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/full_image"
+            android:scaleType="fitCenter"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
 </RelativeLayout>

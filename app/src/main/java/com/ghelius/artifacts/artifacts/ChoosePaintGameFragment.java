@@ -1,6 +1,8 @@
 package com.ghelius.artifacts.artifacts;
 
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Transformation;
@@ -65,6 +68,8 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
     private int GameCount = 10;
     private int trueAnswerCount;
     private String locale;
+    private boolean fullShowed = false;
+    private Drawable background;
 
     enum ButtonState {Normal, True, Hide, False}
 
@@ -114,45 +119,15 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
             if (view == null) {
                 view = mInflater.inflate(R.layout.choose_paint_item, viewGroup, false);
             }
-            Log.d(TAG, "getView " + i);
+//            Log.d(TAG, "getView " + i);
             final ChooseButton button = mButtons.get(i);
             final ImageView pic = (ImageView) view.findViewById(R.id.picture);
             pic.setImageBitmap(mButtons.get(i).cachedBitmap);
-//            if (button.url == null) {
-//                mStorageRef.child(button.picture.path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                    @Override
-//                    public void onSuccess(Uri uri) {
-//                        button.url = uri.toString();
-//                        Activity a = getActivity();
-//                        if (a == null)
-//                            return;
-
-//                        Log.d(TAG, "loading image ");
-//                        Glide.with(a.getApplicationContext())
-//                                .using(new FirebaseImageLoader())
-//                                .load(mStorageRef.child(button.picture.path))
-//                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                                .placeholder(R.drawable.progress_circle)
-//                                .crossFade()
-////                            .centerCrop()
-//                                .into(pic);
-
-//                    }
-////                }).addOnFailureListener(new OnFailureListener() {
-////                                            @Override
-////                                            public void onFailure(@NonNull Exception exception) {
-////
-////                                            }
-////                                        }
-////                );
-//            }
-
-
             switch (button.state) {
                 case True:
                     break;
                 case False:
-                    pic.setAlpha(127);
+                    pic.setAlpha(50);
                     break;
                 case Hide:
                     pic.setAlpha(0);
@@ -255,10 +230,24 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
 
         fullImage = (ImageView) view.findViewById(R.id.full_image);
 
+        View backgroundView = view.findViewById(R.id.full_image_fade_background);
+        background = backgroundView.getBackground();
+        background.setAlpha(0);
+
         return view;
     }
 
     private void hideFullImageDialog() {
+
+        Activity a = getActivity();
+        if (a == null)
+            return;
+
+        if (!fullShowed) {
+            return;
+        }
+        fullShowed = false;
+
         int width  = fullImage.getMeasuredWidth();
         int height  = fullImage.getMeasuredHeight();
         SizeChangeAnimation anim = new SizeChangeAnimation(fullImage);
@@ -266,6 +255,12 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         anim.setWidths(height, 0);
         anim.setDuration(100);
         fullImage.startAnimation(anim);
+
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(background,
+                PropertyValuesHolder.ofInt("alpha", 160, 0));
+        animator.setTarget(background);
+        animator.setDuration(100);
+        animator.start();
     }
 
     private void showFullImageDialog(final int i) {
@@ -273,6 +268,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         if (a == null)
             return;
 
+        fullShowed = true;
         fullImage.setVisibility(View.VISIBLE);
         fullImage.setImageBitmap(mButtons.get(i).cachedBitmap);
         View layout = getView().findViewById(R.id.choose_pict_root_layout);
@@ -283,6 +279,12 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         anim.setWidths(10, height);
         anim.setDuration(150);
         fullImage.startAnimation(anim);
+
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(background,
+                PropertyValuesHolder.ofInt("alpha", 0, 160));
+        animator.setTarget(background);
+        animator.setDuration(200);
+        animator.start();
     }
 public class SizeChangeAnimation extends Animation {
 
@@ -347,29 +349,19 @@ public class SizeChangeAnimation extends Animation {
         buttonBlocked = true;
         int timeout = 500;
 
+        // Right )
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
-            // Right )
             trueAnswerCount++;
-            for(int i = 0; i < mButtons.size(); ++i) {
-                if (i != ind) {
-                    mButtons.get(i).state = Hide;
-                }
-            }
+        // Fail (
         } else {
-            // Fail (
             timeout = 1500;
-            mButtons.get(ind).state = False;
-
-            for(ChooseButton button : mButtons) {
-                if(button.author_id == games.get(gameIndex).author.id) {
-                    button.state = True;
-                }
+        }
+        for(ChooseButton button : mButtons) {
+            if(button.author_id == games.get(gameIndex).author.id) {
+                button.state = True;
             }
-
-            for(int i = 0; i < mButtons.size(); ++i) {
-                if (i != ind && mButtons.get(i).state != True) {
-                    mButtons.get(i).state = False;
-                }
+            else {
+                button.state = False;
             }
         }
         mButtonAdapter.update(ind);
