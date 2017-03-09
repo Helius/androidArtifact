@@ -4,8 +4,6 @@ package com.ghelius.artifacts.artifacts;
 import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -16,10 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     ChooseAuthorGameFragment chooseAuthorGameFragment;
     ChooseMovementGameFragment chooseMovementGameFragment;
     ChoosePaintGameFragment choosePaintGameFragment;
+    TypeAuthorGameFragment typeAuthorGameFragment;
     ActionBarDrawerToggle toggle;
     ValueAnimator arrowForwardAnimation;
     ValueAnimator arrowBackAnimation;
@@ -78,6 +77,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -109,7 +109,14 @@ public class MainActivity extends AppCompatActivity
                                 .addToBackStack("game").commit();
                         break;
                     case 1:
-                        Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
+                        if (typeAuthorGameFragment == null) {
+                            typeAuthorGameFragment = new TypeAuthorGameFragment();
+                            typeAuthorGameFragment.setServerResources(pictures, authors);
+                        }
+                        getSupportFragmentManager().beginTransaction()
+                                .hide(mainMenuFragment)
+                                .replace(R.id.main_fragment_holder, typeAuthorGameFragment)
+                                .addToBackStack("game").commit();
                         break;
                     case 2:
                         if (choosePaintGameFragment == null) {

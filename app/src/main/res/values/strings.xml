@@ -9,7 +9,10 @@
     <string name="game_0_title">Choose artist</string>
     <string name="game_1_title">Type artist</string>
     <string name="game_3_title">Choose movement</string>
-    <string name="finish_dialog_message" >You have hit %1$d from %2$d</string>
+    <string name="finish_dialog_message">You have hit %1$d from %2$d</string>
     <string name="finish">Finish</string>
     <string name="try_more">Try more!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
