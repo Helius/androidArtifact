@@ -23,10 +23,25 @@
             app:cpv_animAutostart="true"
             app:cpv_color="@color/cpv_default_color"
             app:cpv_indeterminate="true" />
+
+        <TextView
+            android:id="@+id/author_name_hint"
+            android:textSize="28sp"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
     </RelativeLayout>
 
-    <EditText
+    <AutoCompleteTextView
+        android:id="@+id/text_input"
         android:layout_weight="0"
+        android:completionThreshold="1"
+        android:imeOptions="actionDone"
+
+        android:inputType="text"
+        android:maxLines="1"
         android:layout_width="match_parent"
         android:layout_height="50dp" />
 
