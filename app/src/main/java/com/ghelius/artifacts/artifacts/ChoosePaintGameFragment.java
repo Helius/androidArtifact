@@ -7,19 +7,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.BounceInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -28,12 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -44,7 +37,6 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.False;
-import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.Hide;
 import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.True;
 
 
