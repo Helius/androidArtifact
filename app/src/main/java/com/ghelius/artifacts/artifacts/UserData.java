@@ -28,6 +28,7 @@ public abstract class UserData {
     public void setLevel(int level) {
         try {
             data.put("level", level);
+            saveUserData(data);
         } catch (JSONException e) {
             e.printStackTrace();
         }

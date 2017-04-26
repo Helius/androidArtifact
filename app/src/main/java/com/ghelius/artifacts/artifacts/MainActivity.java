@@ -4,6 +4,7 @@ package com.ghelius.artifacts.artifacts;
 import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -25,11 +26,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "mainActivity";
+    UserData userData;
     ChooseAuthorGameFragment chooseAuthorGameFragment;
     ChooseMovementGameFragment chooseMovementGameFragment;
     ChoosePaintGameFragment choosePaintGameFragment;
@@ -91,6 +96,30 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         initAnimation();
 
+        userData = new UserData() {
+            @Override
+            boolean saveUserData(JSONObject data) {
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).
+                        edit().putString("userData", data.toString()).
+                        apply();
+                return true;
+            }
+
+            @Override
+            JSONObject loadUserData() {
+                String data = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("userData","");
+                Log.d(TAG, data);
+                JSONObject result;
+                try {
+                    result = new JSONObject(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    result = new JSONObject();
+                }
+                return result;
+            }
+        };
+
         final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.main_menu_fragment);
         mainMenuFragment.setMainMenuListener(new MainMenuFragment.MainMenuListener() {
@@ -100,7 +129,7 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(pictures, authors);
+                            chooseAuthorGameFragment.setServerResources(userData, pictures, authors);
                         }
 
                         getSupportFragmentManager().beginTransaction()
