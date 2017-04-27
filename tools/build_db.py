@@ -14,11 +14,13 @@ REVERSE = "\033[;7m"
 
 oldstdout = sys.stdout
 
+warn_out = []
 pic_out = []
 author_out = []
 
 def warn(s):
     sys.stdout.write(RED+s+RESET+'\n')
+    warn_out.append(RED+s+RESET+'\n')
 
 def parsePicFile(s, authorFolder, authorId):
     m = re.match('([0-9])_(([0-9]+)_)?', s)
@@ -33,7 +35,8 @@ def parsePicFile(s, authorFolder, authorId):
             pic["movement_id"] = 0
         return pic
     except Exception as e:
-        warn('warning!: ' + s)
+        warn('warning!: ' + s + ' ' + str(e))
+
 
 def parseAuthorId(s):
     jauthor = json.loads(s)
@@ -111,3 +114,4 @@ outFile = open("out_db.json",'w')
 db_pretty_print (db_out)
 outFile.close()
 print("saved to out_db.json")
+sys.stdout.write(" ".join(warn_out))
