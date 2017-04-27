@@ -42,7 +42,7 @@ import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonStat
 
 public class ChoosePaintGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
 
-    private static final String TAG = "ChoosePaint";
+    public static final String TAG = "ChoosePaint";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;

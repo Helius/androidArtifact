@@ -35,7 +35,7 @@ import java.util.Random;
 
 public class ChooseMovementGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
 
-    private static final String TAG = "ChooseMovements";
+    public static final String TAG = "ChooseMovements";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Movement> movements;

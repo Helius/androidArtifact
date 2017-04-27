@@ -32,7 +32,7 @@ import java.util.Random;
 
 public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
 
-    private static final String TAG = "ChooseAuthor";
+    public static final String TAG = "ChooseAuthor";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;

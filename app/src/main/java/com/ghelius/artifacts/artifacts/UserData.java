@@ -16,6 +16,7 @@ public abstract class UserData {
 
     abstract boolean saveUserData(JSONObject data);
     abstract JSONObject loadUserData();
+    abstract void onLevelChanged();
 
     public UserData() {
         data = loadUserData();
@@ -29,6 +30,7 @@ public abstract class UserData {
         try {
             data.put("level", level);
             saveUserData(data);
+            onLevelChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }

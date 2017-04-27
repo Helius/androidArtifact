@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "mainActivity";
     UserData userData;
+    ChooseLevelDialog chooseLevelDialog;
+    StatisticFragment statisticFragment;
     ChooseAuthorGameFragment chooseAuthorGameFragment;
     ChooseMovementGameFragment chooseMovementGameFragment;
     ChoosePaintGameFragment choosePaintGameFragment;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private boolean picturesReady;
     private boolean authorReady;
     private boolean movementsReady;
+    private TextView sbMainText;
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -59,18 +63,30 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_level) {
+            chooseLevelDialog = (ChooseLevelDialog) getSupportFragmentManager().findFragmentByTag("level_dialog");
+            if (chooseLevelDialog == null) {
+                chooseLevelDialog = new ChooseLevelDialog();
+            }
+            chooseLevelDialog.init(getUserData());
+            chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
+        } else if (id == R.id.nav_settings) {
+            Log.d(TAG, "pressed nav_settings");
+        } else if (id == R.id.nav_statistics) {
+            statisticFragment = (StatisticFragment) getSupportFragmentManager().findFragmentByTag("statistics");
+            if (statisticFragment == null) {
+                statisticFragment = new StatisticFragment();
+                statisticFragment.init(userData);
+                final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.main_menu_fragment);
+                getSupportFragmentManager().beginTransaction()
+                        .hide(mainMenuFragment)
+                        .replace(R.id.main_fragment_holder, statisticFragment)
+                        .addToBackStack("statistic").commit();
+            }
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_view) {
+            Log.d(TAG, "pressed nav_view");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -92,33 +108,14 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         initAnimation();
+        View headerLayout = navigationView.getHeaderView(0);
 
-        userData = new UserData() {
-            @Override
-            boolean saveUserData(JSONObject data) {
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).
-                        edit().putString("userData", data.toString()).
-                        apply();
-                return true;
-            }
+        sbMainText = (TextView) headerLayout.findViewById(R.id.side_bar_main_text);
 
-            @Override
-            JSONObject loadUserData() {
-                String data = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("userData","");
-                Log.d(TAG, data);
-                JSONObject result;
-                try {
-                    result = new JSONObject(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    result = new JSONObject();
-                }
-                return result;
-            }
-        };
 
         final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.main_menu_fragment);
@@ -129,7 +126,7 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(userData, pictures, authors);
+                            chooseAuthorGameFragment.setServerResources(getUserData(), pictures, authors);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -140,7 +137,7 @@ public class MainActivity extends AppCompatActivity
                     case 1:
                         if (typeAuthorGameFragment == null) {
                             typeAuthorGameFragment = new TypeAuthorGameFragment();
-                            typeAuthorGameFragment.setServerResources(userData, pictures, authors);
+                            typeAuthorGameFragment.setServerResources(getUserData(), pictures, authors);
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -150,7 +147,7 @@ public class MainActivity extends AppCompatActivity
                     case 2:
                         if (choosePaintGameFragment == null) {
                             choosePaintGameFragment = new ChoosePaintGameFragment();
-                            choosePaintGameFragment.setServerResources(userData, pictures, authors);
+                            choosePaintGameFragment.setServerResources(getUserData(), pictures, authors);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -161,7 +158,7 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                         if (chooseMovementGameFragment == null) {
                             chooseMovementGameFragment = new ChooseMovementGameFragment();
-                            chooseMovementGameFragment.setServerResources(userData, pictures, movements);
+                            chooseMovementGameFragment.setServerResources(getUserData(), pictures, movements);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -227,32 +224,64 @@ public class MainActivity extends AppCompatActivity
         loadAuthorData();
         loadMovementsData();
         findViewById(R.id.main_progress_fade).setVisibility(View.VISIBLE);
-//        scoresRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
-//                System.out.println("The " + snapshot.getKey() + " dinosaur's score is " + snapshot.getValue());
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                Log.d(TAG, "data changed");
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                Log.d(TAG, "data remove");
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//                Log.d(TAG, "data moved");
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.d(TAG, "onCancelled");
-//            }
-//        });
+        updateSideBarInfo();
+
+        chooseLevelDialog = (ChooseLevelDialog) getSupportFragmentManager().findFragmentByTag("level_dialog");
+        if (chooseLevelDialog != null) {
+            chooseLevelDialog.init(getUserData());
+        }
+    }
+
+    private UserData getUserData () {
+        if (userData == null) {
+            userData = new UserData() {
+                @Override
+                boolean saveUserData(JSONObject data) {
+                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).
+                            edit().putString("userData", data.toString()).
+                            apply();
+                    return true;
+                }
+
+                @Override
+                JSONObject loadUserData() {
+                    String data = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("userData", "");
+                    Log.d(TAG, data);
+                    JSONObject result;
+                    try {
+                        result = new JSONObject(data);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        result = new JSONObject();
+                    }
+                    return result;
+                }
+
+                @Override
+                void onLevelChanged() {
+                    updateSideBarInfo();
+                }
+            };
+        }
+        return userData;
+    }
+
+    private void updateSideBarInfo() {
+        if (sbMainText != null) {
+            String msg;
+            switch (getUserData().getLevel()) {
+                case 1:
+                    msg = getString(R.string.level_1_text);
+                    break;
+                case 2:
+                    msg = getString(R.string.level_2_text);
+                    break;
+                default:
+                    msg = getString(R.string.level_0_text);
+                    break;
+            }
+            sbMainText.setText(msg);
+        }
     }
 
     private void initAnimation() {
