@@ -65,12 +65,7 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
         return v;
     }
 
-    public void init(int cnt, int from, int level, boolean show) {
-        this.trueCount = cnt;
-        this.from = from;
-    }
-
-    public void init(BaseGameStatistic sessionStatistic, BaseGameStatistic totalStatistic, int i) {
+    public void init(BaseGameStatistic sessionStatistic, BaseGameStatistic totalStatistic, int level) {
         this.trueCount = sessionStatistic.successfullAttempt;
         this.from = sessionStatistic.totalAttempt;
     }

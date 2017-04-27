@@ -32,8 +32,7 @@ import java.util.Random;
 
 public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
 
-    private static final String TAG = "ChooseAuthorGame";
-    private static final int CHOOSE_AUTHOR_ID = 0;
+    private static final String TAG = "ChooseAuthor";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
@@ -47,7 +46,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     private ArrayList<ChooseAuthorGame> games = null;
     private int gameIndex;
     GameSetFinishedDialog dialog;
-    private int GameCount = 10;
+    private int gameCount = 10;
     private BaseGameStatistic sessionStatistic;
     private String locale;
     private UserData userData;
@@ -122,7 +121,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
     private void init () {
         gameIndex = 0;
-        sessionStatistic = new BaseGameStatistic(GameCount, 0);
+        sessionStatistic = new BaseGameStatistic();
         rnd = new Random(System.currentTimeMillis());
         mButtons = new ArrayList<>();
         buttonBlocked = false;
@@ -162,13 +161,13 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
             }
         });
         if (games == null) {
-            games = createNewGame(GameCount);
+            games = createNewGame(gameCount);
         }
         dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(userData.getGameStatistic(CHOOSE_AUTHOR_ID), sessionStatistic, userData.getLevel());
+        dialog.init(userData.getGameStatistic(TAG), sessionStatistic, userData.getLevel());
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -193,9 +192,10 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         buttonBlocked = true;
         int timeout = 500;
 
+        sessionStatistic.addAttempt();
         if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
             // Right )
-            sessionStatistic.addPoint();
+            sessionStatistic.addRight();
             mButtons.get(ind).state = ButtonState.True;
         } else {
             // Fail (
@@ -221,8 +221,8 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData.getGameStatistic(CHOOSE_AUTHOR_ID), userData.getLevel());
-                    userData.updateGameStatistic(CHOOSE_AUTHOR_ID, sessionStatistic);
+                    dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+                    userData.updateGameStatistic(TAG, sessionStatistic);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }
@@ -232,7 +232,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
     @Override
     public void moreButtonPressed() {
-        games = createNewGame(GameCount);
+        games = createNewGame(gameCount);
         playGame(gameIndex);
     }
 
@@ -288,7 +288,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     {
         Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
-        sessionStatistic = new BaseGameStatistic(GameCount, 0);
+        sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();

@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
                     case 1:
                         if (typeAuthorGameFragment == null) {
                             typeAuthorGameFragment = new TypeAuthorGameFragment();
-                            typeAuthorGameFragment.setServerResources(pictures, authors);
+                            typeAuthorGameFragment.setServerResources(userData, pictures, authors);
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity
                     case 2:
                         if (choosePaintGameFragment == null) {
                             choosePaintGameFragment = new ChoosePaintGameFragment();
-                            choosePaintGameFragment.setServerResources(pictures, authors);
+                            choosePaintGameFragment.setServerResources(userData, pictures, authors);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                         if (chooseMovementGameFragment == null) {
                             chooseMovementGameFragment = new ChooseMovementGameFragment();
-                            chooseMovementGameFragment.setServerResources(pictures, movements);
+                            chooseMovementGameFragment.setServerResources(userData, pictures, movements);
                         }
 
                         getSupportFragmentManager().beginTransaction()

@@ -33,7 +33,7 @@ import java.util.Random;
 
 public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
 
-    private static final String TAG = "TypeAuthorGame";
+    private static final String TAG = "TypeAuthor";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
@@ -46,9 +46,9 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     AutoCompleteTextView mEditText;
     private View loader;
     GameSetFinishedDialog dialog;
-    private int trueAnswerCount = 0;
-    private int totalGameCount = 0;
+    BaseGameStatistic sessionStatistic;
     private TextView authorHint;
+    private UserData userData;
 
     public TypeAuthorGameFragment() {
         // Required empty public constructor
@@ -83,8 +83,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         if (games == null) {
-            totalGameCount = 0;
-            trueAnswerCount = 0;
+            sessionStatistic = new BaseGameStatistic();
             games = createNewGames(gameCount);
         }
 
@@ -92,7 +91,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(trueAnswerCount, totalGameCount, 0, false);
+        dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
         dialog.setEventListener(this);
 
         View v = inflater.inflate(R.layout.fragment_type_author_game, container, false);
@@ -129,11 +128,11 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     }
 
     private void checkResult() {
-        totalGameCount++;
+        sessionStatistic.addAttempt();
         if (mEditText.getText().toString().equals(games.get(gameIndex).author.name_ru) ||
                 mEditText.getText().toString().equals(games.get(gameIndex).author.name_en)) {
             playGame(++gameIndex);
-            trueAnswerCount++;
+            sessionStatistic.addRight();
         } else {
             //TODO: wrong! try again! (3 times)
             Log.d(TAG, "wrong! try again (" + games.get(gameIndex).author.name_ru);
@@ -152,7 +151,8 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     }
 
 
-    public void setServerResources(ArrayList<Picture> pictures, ArrayList<Author> authors) {
+    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Author> authors) {
+        this.userData = userData;
         this.pictures = pictures;
         this.authors = authors;
     }
@@ -166,7 +166,8 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
                 games.get(index + 1).loadPicture();
             }
         } else {
-            dialog.init(trueAnswerCount, totalGameCount, 0, false);
+            dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+            userData.updateGameStatistic(TAG, sessionStatistic);
             dialog.show(getActivity().getSupportFragmentManager(), "dialog");
         }
     }
@@ -184,7 +185,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     @Override
     public void moreButtonPressed() {
         gameIndex = 0;
-        totalGameCount = 0;
+        sessionStatistic = new BaseGameStatistic();
         games = createNewGames(gameCount);
         playGame(gameIndex);
     }

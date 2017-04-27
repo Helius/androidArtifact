@@ -35,7 +35,7 @@ import java.util.Random;
 
 public class ChooseMovementGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
 
-    private static final String TAG = "ChooseMovementsGame";
+    private static final String TAG = "ChooseMovements";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Movement> movements;
@@ -49,9 +49,10 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
     private ArrayList<ChooseMovementGame> games = null;
     private int gameIndex;
     GameSetFinishedDialog dialog;
-    private int GameCount = 10;
-    private int trueAnswerCount;
+    private int gameCount = 10;
+    private BaseGameStatistic sessionStatistic;
     private String locale;
+    private UserData userData;
 
     enum ButtonState {Normal, True, False};
 
@@ -122,8 +123,8 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
 
 
     private void init () {
+        sessionStatistic = new BaseGameStatistic();
         gameIndex = 0;
-        trueAnswerCount = 0;
         rnd = new Random(System.currentTimeMillis());
         mButtons = new ArrayList<>();
         buttonBlocked = false;
@@ -163,13 +164,13 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
             }
         });
         if (games == null) {
-            games = createNewGame(GameCount);
+            games = createNewGame(gameCount);
         }
         dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(trueAnswerCount, GameCount, 0, false);
+        dialog.init(userData.getGameStatistic(TAG), sessionStatistic, userData.getLevel());
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -193,10 +194,10 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
             return;
         buttonBlocked = true;
         int timeout = 500;
-
+        sessionStatistic.addAttempt();
         if (games.get(gameIndex).picture.author == games.get(gameIndex).movement_variant.get(ind).id) {
             // Right )
-            trueAnswerCount++;
+            sessionStatistic.addRight();
             mButtons.get(ind).state = ButtonState.True;
         } else {
             // Fail (
@@ -222,7 +223,8 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(trueAnswerCount, GameCount, 0, false);
+                    dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+                    userData.updateGameStatistic(TAG, sessionStatistic);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }
@@ -232,7 +234,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
 
     @Override
     public void moreButtonPressed() {
-        games = createNewGame(GameCount);
+        games = createNewGame(gameCount);
         playGame(gameIndex);
     }
 
@@ -251,7 +253,8 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         init();
     }
 
-    public void setServerResources(ArrayList<Picture> pictures, ArrayList<Movement> movements ) {
+    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Movement> movements) {
+        this.userData = userData;
         this.pictures = pictures;
         this.movements = movements;
     }
@@ -287,7 +290,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
     {
         Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
-        trueAnswerCount = 0;
+        sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseMovementGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();

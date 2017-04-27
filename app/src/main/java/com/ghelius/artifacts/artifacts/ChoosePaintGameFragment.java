@@ -42,7 +42,7 @@ import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonStat
 
 public class ChoosePaintGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
 
-    private static final String TAG = "ChooseGameGame";
+    private static final String TAG = "ChoosePaint";
 
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
@@ -57,11 +57,12 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
     private int gameIndex;
     GameSetFinishedDialog dialog;
     ImageView fullImage;
-    private int GameCount = 10;
-    private int trueAnswerCount;
+    private int gameCount = 10;
+    BaseGameStatistic sessionStatistic;
     private String locale;
     private boolean fullShowed = false;
     private Drawable background;
+    private UserData userData;
 
     enum ButtonState {Normal, True, Hide, False}
 
@@ -145,7 +146,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
 
     private void init () {
         gameIndex = 0;
-        trueAnswerCount = 0;
+        sessionStatistic = new BaseGameStatistic();
         rnd = new Random(System.currentTimeMillis());
         mButtons = new ArrayList<>();
         buttonBlocked = false;
@@ -211,13 +212,13 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         });
 
         if (games == null) {
-            games = createNewGame(GameCount);
+            games = createNewGame(gameCount);
         }
         dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(trueAnswerCount, GameCount, 0, false);
+        dialog.init(userData.getGameStatistic(TAG), sessionStatistic, userData.getLevel());
         dialog.setEventListener(this);
 
         fullImage = (ImageView) view.findViewById(R.id.full_image);
@@ -341,9 +342,10 @@ public class SizeChangeAnimation extends Animation {
         buttonBlocked = true;
         int timeout = 500;
 
+        sessionStatistic.addAttempt();
         // Right )
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
-            trueAnswerCount++;
+            sessionStatistic.addRight();
         // Fail (
         } else {
             timeout = 1500;
@@ -369,7 +371,8 @@ public class SizeChangeAnimation extends Animation {
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(trueAnswerCount, GameCount, 0, false);
+                    dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+                    userData.updateGameStatistic(TAG, sessionStatistic);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }
@@ -379,7 +382,7 @@ public class SizeChangeAnimation extends Animation {
 
     @Override
     public void moreButtonPressed() {
-        games = createNewGame(GameCount);
+        games = createNewGame(gameCount);
         playGame(gameIndex);
     }
 
@@ -398,7 +401,8 @@ public class SizeChangeAnimation extends Animation {
         init();
     }
 
-    public void setServerResources(ArrayList<Picture> pictures, ArrayList<Author> authors) {
+    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Author> authors) {
+        this.userData = userData;
         this.pictures = pictures;
         this.authors = authors;
     }
@@ -441,7 +445,7 @@ public class SizeChangeAnimation extends Animation {
     {
         Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
-        trueAnswerCount = 0;
+        sessionStatistic = new BaseGameStatistic();
         ArrayList<ChoosePaintGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();

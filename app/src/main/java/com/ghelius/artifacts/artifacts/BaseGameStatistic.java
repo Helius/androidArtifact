@@ -17,7 +17,11 @@ public class BaseGameStatistic {
         this.successfullAttempt = rightCount;
     }
 
-    public void addPoint() {
+    public void addRight() {
         this.successfullAttempt++;
+    }
+
+    public void addAttempt() {
+        this.totalAttempt++;
     }
 }
