@@ -42,6 +42,11 @@ public class ExampleInstrumentedTest {
             JSONObject loadUserData() {
                 return new JSONObject();
             }
+
+            @Override
+            void onLevelChanged() {
+
+            }
         };
         assertEquals(0, userData.getGameStatistic("game1").totalAttempt);
         assertEquals(0, userData.getGameStatistic("game1").successfullAttempt);

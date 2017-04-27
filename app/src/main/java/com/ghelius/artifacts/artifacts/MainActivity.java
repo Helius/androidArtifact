@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
+import android.support.test.espresso.core.deps.guava.base.Predicates;
+import android.support.test.espresso.core.deps.guava.collect.Collections2;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,6 +34,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static android.R.id.list;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "mainActivity";
@@ -50,6 +54,10 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<Picture> pictures;
     private ArrayList<Movement> movements;
     private ArrayList<Author> authors;
+
+    private ArrayList<Picture> pictures_leveled = new ArrayList<>();
+    private ArrayList<Movement> movements_leveled = new ArrayList<>();
+    private ArrayList<Author> authors_leveled = new ArrayList<>();
 
     private boolean picturesReady;
     private boolean authorReady;
@@ -126,7 +134,7 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(getUserData(), pictures, authors);
+                            chooseAuthorGameFragment.setServerResources(getUserData(), pictures_leveled, authors_leveled);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -137,7 +145,7 @@ public class MainActivity extends AppCompatActivity
                     case 1:
                         if (typeAuthorGameFragment == null) {
                             typeAuthorGameFragment = new TypeAuthorGameFragment();
-                            typeAuthorGameFragment.setServerResources(getUserData(), pictures, authors);
+                            typeAuthorGameFragment.setServerResources(getUserData(), pictures_leveled, authors_leveled);
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -147,7 +155,7 @@ public class MainActivity extends AppCompatActivity
                     case 2:
                         if (choosePaintGameFragment == null) {
                             choosePaintGameFragment = new ChoosePaintGameFragment();
-                            choosePaintGameFragment.setServerResources(getUserData(), pictures, authors);
+                            choosePaintGameFragment.setServerResources(getUserData(), pictures_leveled, authors_leveled);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -158,7 +166,7 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                         if (chooseMovementGameFragment == null) {
                             chooseMovementGameFragment = new ChooseMovementGameFragment();
-                            chooseMovementGameFragment.setServerResources(getUserData(), pictures, movements);
+                            chooseMovementGameFragment.setServerResources(getUserData(), pictures_leveled, movements_leveled);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -260,10 +268,43 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 void onLevelChanged() {
                     updateSideBarInfo();
+                    updateGameData();
                 }
             };
         }
         return userData;
+    }
+
+    private void updateGameData() {
+        pictures_leveled.clear();
+        for (Picture p: pictures) {
+            if (p.level <= userData.getLevel() + 1) {
+                pictures_leveled.add(p);
+            }
+        }
+        authors_leveled.clear();
+        for(Author a: authors) {
+            for(Picture p: pictures_leveled) {
+                if (p.author == a.id) {
+                    authors_leveled.add(a);
+                    break;
+                }
+            }
+        }
+        movements_leveled.clear();
+        for(Movement m: movements) {
+            for(Picture p: pictures_leveled) {
+                if (m.id == p.movement_id) {
+                    movements_leveled.add(m);
+                    break;
+                }
+            }
+        }
+        Log.d(TAG, "data for level: "
+                + pictures_leveled.size() + ", " +
+                + authors_leveled.size()  + ", " +
+                + movements_leveled.size()+ ", "
+        );
     }
 
     private void updateSideBarInfo() {
@@ -408,6 +449,7 @@ public class MainActivity extends AppCompatActivity
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
             DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
             scoresRef.keepSynced(true);
+            updateGameData();
         }
     }
 }
