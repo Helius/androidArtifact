@@ -23,4 +23,7 @@
     <string name="level_0_text">Beginner</string>
     <string name="select_level_dialog_title">Select level</string>
     <string name="statistics_title">Statistic</string>
+    <string name="gallery">Gallery</string>
+    <string name="authors_count">%1$d Artists</string>
+    <string name="picture_level_text">Level %1$d</string>
 </resources>

@@ -170,7 +170,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(userData.getGameStatistic(TAG), sessionStatistic, userData.getLevel());
+        dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -195,7 +195,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         buttonBlocked = true;
         int timeout = 500;
         sessionStatistic.addAttempt();
-        if (games.get(gameIndex).picture.author == games.get(gameIndex).movement_variant.get(ind).id) {
+        if (games.get(gameIndex).picture.movement_id == games.get(gameIndex).movement_variant.get(ind).id) {
             // Right )
             sessionStatistic.addRight();
             mButtons.get(ind).state = ButtonState.True;

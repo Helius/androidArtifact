@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private boolean authorReady;
     private boolean movementsReady;
     private TextView sbMainText;
+    private GalleryFragment galleryFragment;
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -95,6 +96,18 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_view) {
             Log.d(TAG, "pressed nav_view");
+        } else if (id == R.id.nav_gallery) {
+            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
+            if (galleryFragment == null) {
+                galleryFragment = new GalleryFragment();
+                galleryFragment.init(authors, pictures, movements);
+                final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.main_menu_fragment);
+                getSupportFragmentManager().beginTransaction()
+                        .hide(mainMenuFragment)
+                        .replace(R.id.main_fragment_holder, galleryFragment)
+                        .addToBackStack("gallery").commit();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

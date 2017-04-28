@@ -218,7 +218,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(userData.getGameStatistic(TAG), sessionStatistic, userData.getLevel());
+        dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
         dialog.setEventListener(this);
 
         fullImage = (ImageView) view.findViewById(R.id.full_image);
