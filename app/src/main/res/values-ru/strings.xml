@@ -24,5 +24,7 @@
     <string name="gallery">Галерея</string>
     <string name="authors_count">%1$d Художников</string>
     <string name="picture_level_text">Уровень %1$d</string>
-    <string name="movements_count" >Направлений по уровням: 1:%1$d, 2:%2$d, 3:%3$d</string>
+    <string name="movements_count" >Картин по уровням: 1:%1$d, 2:%2$d, 3:%3$d</string>
+    <string name="pic_by_level_count">Картин по уровням %1$d, %2$d, %3$d</string>
+    <string name="undefined_movements_name">Без направления</string>
 </resources>

@@ -21,6 +21,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -32,6 +33,7 @@ public class PictureListFragment extends Fragment {
     private int authorId;
     private ArrayList<Picture> pictures;
     private StorageReference mStorageRef;
+    private ArrayList<Movement> movements;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,16 +45,42 @@ public class PictureListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
         locale = Locale.getDefault().getLanguage();
         View v = inflater.inflate(R.layout.picture_list_fragment, container, false);
         ListView listView = (ListView) v.findViewById(R.id.picture_list_view);
         listView.setAdapter(new PictureListAdapter(getActivity().getApplicationContext(), pictures));
+
+        String movements_str = "";
+        HashMap<Integer, Integer> mov_map = new HashMap<>();
+        for (Picture p: pictures) {
+            Integer value = mov_map.get(p.movement_id.intValue());
+            if (value == null)
+                value = 0;
+            mov_map.put(p.movement_id.intValue(), ++value);
+        }
+        for(Integer collected_id : mov_map.keySet()) {
+            String name = getString(R.string.undefined_movements_name);
+            for (Movement m: movements) {
+                if (m.id.intValue() == collected_id) {
+                    if (locale.equals("ru"))
+                        name = m.name_ru;
+                    else
+                        name = m.name_en;
+                    break;
+                }
+            }
+            movements_str += name + ": " + mov_map.get(collected_id) + " ";
+        }
+        ((TextView) v.findViewById(R.id.authors_movements)).setText(movements_str);
+
         return v;
     }
 
-    public void init(ArrayList<Picture> pictures) {
+    public void init(ArrayList<Picture> pictures, ArrayList<Movement> movements) {
         this.pictures = pictures;
+        this.movements = movements;
     }
 
     private class PictureListAdapter extends BaseAdapter {

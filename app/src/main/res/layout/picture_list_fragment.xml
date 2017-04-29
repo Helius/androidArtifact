@@ -4,6 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
+    <TextView
+        android:gravity="center"
+        android:id="@+id/authors_movements"
+        android:textSize="18sp"
+        android:textColor="@android:color/darker_gray"
+        android:ellipsize="none"
+        android:scrollHorizontally="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
+        />
     <ListView
         android:id="@+id/picture_list_view"
         android:layout_width="match_parent"

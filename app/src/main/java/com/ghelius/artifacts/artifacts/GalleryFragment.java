@@ -76,7 +76,7 @@ public class GalleryFragment extends Fragment {
                 if (pictureListFragment == null) {
                     pictureListFragment = new PictureListFragment();
                 }
-                pictureListFragment.init(authors_picture);
+                pictureListFragment.init(authors_picture, movements);
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .hide(GalleryFragment.this)
                         .replace(R.id.main_fragment_holder, pictureListFragment)
@@ -123,12 +123,25 @@ public class GalleryFragment extends Fragment {
                 ((TextView) view.findViewById(R.id.gallery_author_name)).setText(authors.get(i).name_en);
             }
             int pictures_count = 0;
+            int level_1_cnt = 0;
+            int level_2_cnt = 0;
+            int level_3_cnt = 0;
             for(Picture p: pictures) {
                 if (p.author == authors.get(i).id) {
                     pictures_count++;
+                    if (p.level == 1) {
+                        level_1_cnt++;
+                    } else if (p.level == 2) {
+                        level_2_cnt++;
+                    } else if (p.level == 3) {
+                        level_3_cnt++;
+                    }
                 }
             }
             ((TextView) view.findViewById(R.id.picture_count)).setText(Integer.toString(pictures_count));
+            ((TextView) view.findViewById(R.id.pic_by_level_count))
+                    .setText(getResources().getString(R.string.pic_by_level_count, level_1_cnt, level_2_cnt, level_3_cnt));
+
             String movement_name = "Not defined";
             for(Movement m: movements) {
                 if (authors.get(i).movement_id == m.id) {

@@ -26,5 +26,7 @@
     <string name="gallery">Gallery</string>
     <string name="authors_count">%1$d Artists</string>
     <string name="picture_level_text">Level %1$d</string>
-    <string name="movements_count" >Movements by level 1:%1$d, 2:%2$d, 3:%3$d</string>
+    <string name="movements_count" >Pictures by level 1:%1$d, 2:%2$d, 3:%3$d</string>
+    <string name="pic_by_level_count">Pics by level %1$d, %2$d, %3$d</string>
+    <string name="undefined_movements_name">Without</string>
 </resources>
