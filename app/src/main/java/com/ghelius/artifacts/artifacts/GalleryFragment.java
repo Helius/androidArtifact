@@ -45,6 +45,22 @@ public class GalleryFragment extends Fragment {
         locale = Locale.getDefault().getLanguage();
         View v = inflater.inflate(R.layout.gallery_fragment, container, false);
         ((TextView) v.findViewById(R.id.authors_count)).setText(getResources().getString(R.string.authors_count, authors.size()));
+
+        int level_1_cnt = 0;
+        int level_2_cnt = 0;
+        int level_3_cnt = 0;
+        for (Picture p: pictures) {
+            if (p.level == 1) {
+                level_1_cnt++;
+            } else if (p.level == 2) {
+                level_2_cnt++;
+            } else if (p.level == 3) {
+                level_3_cnt++;
+            }
+        }
+        ((TextView) v.findViewById(R.id.movements_count))
+                .setText(getResources().getString(R.string.movements_count, level_1_cnt, level_2_cnt, level_3_cnt));
+
         ListView listView = (ListView) v.findViewById(R.id.gallery_listview);
         listView.setAdapter(new AuthorListAdapter(getActivity().getApplicationContext(), authors));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
