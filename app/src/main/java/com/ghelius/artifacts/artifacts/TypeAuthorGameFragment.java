@@ -76,6 +76,8 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
         setRetainInstance(true);
+        games = createNewGame(gameCount);
+        sessionStatistic = new BaseGameStatistic();
     }
 
     @Override
@@ -84,7 +86,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         // Inflate the layout for this fragment
         if (games == null) {
             sessionStatistic = new BaseGameStatistic();
-            games = createNewGames(gameCount);
+            games = createNewGame(gameCount);
         }
 
         dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
@@ -182,7 +184,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         }
     }
 
-    private ArrayList<Game> createNewGames(int num)
+    private ArrayList<Game> createNewGame(int num)
     {
         ArrayList<Game> games = new ArrayList<>();
         for (int i = 0; i < num; ++i) {
@@ -196,7 +198,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     public void moreButtonPressed() {
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
-        games = createNewGames(gameCount);
+        games = createNewGame(gameCount);
         playGame(gameIndex);
     }
 

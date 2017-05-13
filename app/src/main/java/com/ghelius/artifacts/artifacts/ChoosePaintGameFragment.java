@@ -226,6 +226,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         View backgroundView = view.findViewById(R.id.full_image_fade_background);
         background = backgroundView.getBackground();
         background.setAlpha(0);
+        Log.d(TAG,"onCreateView");
 
         return view;
     }
@@ -327,6 +328,7 @@ public class SizeChangeAnimation extends Animation {
     @Override
     public void onStart() {
         super.onStart();
+        Log.d(TAG,"onStart");
     }
 
     @Override
@@ -334,6 +336,7 @@ public class SizeChangeAnimation extends Animation {
         super.onResume();
         playGame(gameIndex);
         getActivity().setTitle(R.string.game_2_title);
+        Log.d(TAG,"onResume");
     }
 
     private void buttonSelected(int ind) {
@@ -399,7 +402,9 @@ public class SizeChangeAnimation extends Animation {
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
         setRetainInstance(true);
+        games = createNewGame(gameCount);
         init();
+        Log.d(TAG,"onCreate");
     }
 
     public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Author> authors) {

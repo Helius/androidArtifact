@@ -249,6 +249,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
         setRetainInstance(true);
+        games = createNewGame(gameCount);
         init();
     }
 

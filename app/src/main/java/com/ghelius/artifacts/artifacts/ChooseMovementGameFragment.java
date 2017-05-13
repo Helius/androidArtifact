@@ -251,6 +251,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
         setRetainInstance(true);
+        games = createNewGame(gameCount);
         init();
     }
 
