@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.main_menu_fragment);
         mainMenuFragment.setMainMenuListener(new MainMenuFragment.MainMenuListener() {
             @Override
-            public void menuClicked(final int number) {
+            public void menuClicked(final int number, final MainMenuFragment.GameEntry gameEntry) {
                 switch (number) {
                     case 0:
                         if (chooseAuthorGameFragment == null) {
@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity
                                 .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
                                 .addToBackStack("game").commit();
+
                         break;
                     case 1:
                         if (typeAuthorGameFragment == null) {
@@ -191,7 +192,6 @@ public class MainActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
                         break;
                 }
-
             }
         });
 
@@ -236,6 +236,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
                     arrowBackAnimation.start();
+                    setTitle(R.string.app_name);
                 }
             }
         });

@@ -22,10 +22,10 @@ public class MainMenuFragment extends Fragment {
     MainMenuListener mListener;
 
     public interface MainMenuListener {
-        void menuClicked(int number);
+        void menuClicked(int number, GameEntry entry);
     }
 
-    private class GameEntry {
+    public class GameEntry {
         GameEntry(Integer thumbRes, String title) {
             this.thumbRes = thumbRes;
             this.title = title;
@@ -60,7 +60,7 @@ public class MainMenuFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (mListener != null) {
-                    mListener.menuClicked(i);
+                    mListener.menuClicked(i, mGameEntries.get(i));
                 }
             }
         });
@@ -77,6 +77,7 @@ public class MainMenuFragment extends Fragment {
         mGameEntries.add(new GameEntry(R.drawable.icon2, getString(R.string.game_2_title)));
         mGameEntries.add(new GameEntry(R.drawable.icon3, getString(R.string.game_3_title)));
     }
+
 
     // Item adapter ~~~
 

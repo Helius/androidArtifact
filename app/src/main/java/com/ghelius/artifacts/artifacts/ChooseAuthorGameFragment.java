@@ -183,6 +183,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     public void onResume() {
         super.onResume();
         playGame(gameIndex);
+        getActivity().setTitle(R.string.game_0_title);
     }
 
     private void buttonSelected(int ind) {

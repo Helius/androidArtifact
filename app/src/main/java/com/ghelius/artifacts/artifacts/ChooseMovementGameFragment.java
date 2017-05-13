@@ -186,6 +186,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
     public void onResume() {
         super.onResume();
         playGame(gameIndex);
+        getActivity().setTitle(R.string.game_3_title);
     }
 
     private void buttonSelected(int ind) {

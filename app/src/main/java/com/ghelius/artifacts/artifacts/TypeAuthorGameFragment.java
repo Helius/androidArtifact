@@ -134,6 +134,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         super.onResume();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(mEditText, InputMethodManager.SHOW_IMPLICIT);
+        getActivity().setTitle(R.string.game_1_title);
     }
 
     private void checkResult() {

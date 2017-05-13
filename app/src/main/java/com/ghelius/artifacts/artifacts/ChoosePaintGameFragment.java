@@ -333,6 +333,7 @@ public class SizeChangeAnimation extends Animation {
     public void onResume() {
         super.onResume();
         playGame(gameIndex);
+        getActivity().setTitle(R.string.game_2_title);
     }
 
     private void buttonSelected(int ind) {
