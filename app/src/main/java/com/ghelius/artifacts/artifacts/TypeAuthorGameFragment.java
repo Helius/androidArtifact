@@ -124,15 +124,24 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         loader = v.findViewById(R.id.progress_view);
         authorHint = (TextView)v.findViewById(R.id.author_name_hint);
         playGame(gameIndex);
+
+
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mEditText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     private void checkResult() {
         sessionStatistic.addAttempt();
         if (mEditText.getText().toString().equals(games.get(gameIndex).author.name_ru) ||
                 mEditText.getText().toString().equals(games.get(gameIndex).author.name_en)) {
-            playGame(++gameIndex);
             sessionStatistic.addRight();
+            playGame(++gameIndex);
         } else {
             //TODO: wrong! try again! (3 times)
             Log.d(TAG, "wrong! try again (" + games.get(gameIndex).author.name_ru);

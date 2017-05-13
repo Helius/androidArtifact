@@ -39,6 +39,7 @@
         android:layout_weight="0"
         android:completionThreshold="1"
         android:imeOptions="actionDone"
+        android:hint="@string/author_name_hint"
 
         android:inputType="text"
         android:maxLines="1"
