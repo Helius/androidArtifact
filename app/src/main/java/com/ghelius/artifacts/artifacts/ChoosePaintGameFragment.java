@@ -277,7 +277,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(background,
                 PropertyValuesHolder.ofInt("alpha", 0, 160));
         animator.setTarget(background);
-        animator.setDuration(200);
+        animator.setDuration(1);
         animator.start();
     }
 public class SizeChangeAnimation extends Animation {
@@ -432,6 +432,7 @@ public class SizeChangeAnimation extends Animation {
     }
 
     void loadAllImages() {
+        getView().findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
         for (final ChooseButton b : mButtons) {
             Glide.with(getActivity())
                     .using(new FirebaseImageLoader())

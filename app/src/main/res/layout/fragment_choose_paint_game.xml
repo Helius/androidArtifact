@@ -4,29 +4,42 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <GridView
-        android:id="@+id/paint_grid"
-        android:numColumns="2"
+    <RelativeLayout
+        android:id="@+id/grid_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:verticalSpacing="5dp"
-        android:horizontalSpacing="5dp"
-        android:padding="3dp"
-        android:stretchMode="columnWidth"
-        android:layout_centerHorizontal="true"
-        android:listSelector="@drawable/list_selector"
-        android:drawSelectorOnTop="true"
-        android:focusableInTouchMode="true"
-        android:choiceMode="singleChoice"
-        >
-    </GridView>
+        android:layout_height="wrap_content">
+        <GridView
+            android:id="@+id/paint_grid"
+            android:numColumns="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:verticalSpacing="5dp"
+            android:horizontalSpacing="5dp"
+            android:padding="3dp"
+            android:stretchMode="columnWidth"
+            android:layout_centerHorizontal="true"
+            android:listSelector="@drawable/list_selector"
+            android:drawSelectorOnTop="true"
+            android:focusableInTouchMode="false"
+            android:choiceMode="singleChoice" >
+        </GridView>
+        <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_centerInParent="true"
+            android:id="@+id/progress_view"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cpv_color="@color/cpv_default_color"
+            app:cpv_animAutostart="true"
+            app:cpv_indeterminate="true" />
+    </RelativeLayout>
     <TextView
         android:gravity="center"
         android:id="@+id/author"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/paint_grid"
+        android:layout_below="@id/grid_layout"
+        android:textSize="14pt"
         android:layout_marginTop="50dp"
         />
     <RelativeLayout
@@ -48,10 +61,9 @@
             android:scaleType="fitCenter"
             android:layout_width="0dp"
             android:layout_height="0dp"
-
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_centerInParent="true"
             />
-    </RelativeLayout>
+        </RelativeLayout>
 </RelativeLayout>
