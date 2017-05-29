@@ -68,10 +68,13 @@ def print_array(dic):
     cnt = 0
     for key in dic:
         cnt = cnt + 1
-        if (cnt == len(dic)):
-            out('        ' + json.dumps(key, ensure_ascii=False))
-        else:
-            out('        ' + json.dumps(key, ensure_ascii=False) + ',')
+        try:
+            if (cnt == len(dic)):
+                out('        ' + json.dumps(key, ensure_ascii=False))
+            else:
+                out('        ' + json.dumps(key, ensure_ascii=False) + ',')
+        except Exception as e:
+            warn('warning! can\'t print ' + str(key) + ' '  + str(e))
 
 
 def out(s):
@@ -85,17 +88,75 @@ def db_pretty_print(jdb):
     out('    "authors": [')
     print_array(jdb["content"]["authors"])
     out ('    ],')
-
     out('    "movements": [')
     print_array(jdb["content"]["movements"])
     out ('    ],')
-
     out('    "pictures": [')
     print_array(jdb["content"]["pictures"])
     out ('    ]')
 
     out("    }")
     out("}")
+
+def db_print_movements_stat(jdb):
+    print("\nMovements statistic:")
+    print("{0:30} {1:5}{2:5}{3:5}  {4:5}".format('', 'lev1', 'lev2', 'lev3', 'total'))
+    total_counts = [0, 0, 0, 0]
+    result = []
+    raw_result = []
+    for movement in jdb['content']['movements']:
+        counts={1:0, 2:0, 3:0}
+        for pic in jdb['content']['pictures']:
+            if pic['movement_id'] == movement['id']:
+                counts[pic['level']] = counts[pic['level']] + 1
+        total = counts[1] + counts[2] + counts[3]
+        raw_result.append({"id": movement["id"],
+                           "name": movement["name_ru"],
+                           "lev1": counts[1],
+                           "lev2": counts[2],
+                           "lev3": counts[3],
+                           "total": total})
+        result.append(str)
+        total_counts[0] += counts[1]
+        total_counts[1] += counts[2]
+        total_counts[2] += counts[3]
+        total_counts[3] += total
+
+    raw_result_sorted = sorted(raw_result, key=lambda a: a["total"])
+    for r in raw_result_sorted:
+        print ("{0:2} {1:26}{2:5}{3:5}{4:5}  {5:5}".format(r['id'], r['name'],r['lev1'],r['lev2'],r['lev3'],r['total']))
+    print('----------------------------------------------------')
+    print('{0:>34}{1:5}{2:5}   {3:5}'.format(total_counts[0], total_counts[1], total_counts[2], total_counts[3]))
+
+def db_print_authors_stat(jdb):
+    print("\nAuthors statistic:")
+    print("{0:30} {1:5}{2:5}{3:5}  {4:5}".format('', 'lev1', 'lev2', 'lev3', 'total'))
+    total_counts = [0, 0, 0, 0]
+    result = []
+    raw_result = []
+    for author in jdb['content']['authors']:
+        counts={1:0, 2:0, 3:0}
+        for pic in jdb['content']['pictures']:
+            if pic['author'] == author['id']:
+                counts[pic['level']] = counts[pic['level']] + 1
+        total = counts[1] + counts[2] + counts[3]
+        raw_result.append({"id": author["id"],
+                           "name": author["name_ru"],
+                           "lev1": counts[1],
+                           "lev2": counts[2],
+                           "lev3": counts[3],
+                           "total": total})
+        result.append(str)
+        total_counts[0] += counts[1]
+        total_counts[1] += counts[2]
+        total_counts[2] += counts[3]
+        total_counts[3] += total
+
+    raw_result_sorted = sorted(raw_result, key=lambda a: a["total"])
+    for r in raw_result_sorted:
+        print ("{0:2} {1:26}{2:5}{3:5}{4:5}  {5:5}".format(r['id'], r['name'],r['lev1'],r['lev2'],r['lev3'],r['total']))
+    print('----------------------------------------------------')
+    print('{0:>34}{1:5}{2:5}   {3:5}'.format(total_counts[0], total_counts[1], total_counts[2], total_counts[3]))
 
 
 rootDir = sys.argv[1]
@@ -115,3 +176,6 @@ db_pretty_print (db_out)
 outFile.close()
 print("saved to out_db.json")
 sys.stdout.write(" ".join(warn_out))
+print('\n -------------- Statistics --------------\n')
+db_print_movements_stat(db_out)
+db_print_authors_stat(db_out)
