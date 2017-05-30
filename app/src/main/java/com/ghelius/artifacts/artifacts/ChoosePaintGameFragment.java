@@ -118,15 +118,19 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
             pic.setImageBitmap(mButtons.get(i).cachedBitmap);
             switch (button.state) {
                 case True:
+                    view.setVisibility(View.VISIBLE);
                     break;
                 case False:
-                    pic.setAlpha(50);
+                    //pic.setAlpha(50);
+                    view.setVisibility(View.INVISIBLE);
                     break;
                 case Hide:
-                    pic.setAlpha(0);
+                    //pic.setAlpha(0);
+                    view.setVisibility(View.INVISIBLE);
                     break;
                 default:
-                    pic.setAlpha(255);
+                    //pic.setAlpha(255);
+                    view.setVisibility(View.VISIBLE);
                     break;
             }
             return view;
@@ -341,17 +345,19 @@ public class SizeChangeAnimation extends Animation {
 
     private void buttonSelected(int ind) {
 
-        if (buttonBlocked)
+        if (buttonBlocked || getView().findViewById(R.id.progress_view).getVisibility() == View.VISIBLE)
             return;
         buttonBlocked = true;
-        int timeout = 500;
+        int timeout = 800;
 
         sessionStatistic.addAttempt();
         // Right )
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
             sessionStatistic.addRight();
+            author_view.setBackgroundResource(R.drawable.choose_button_true_background_shape);
         // Fail (
         } else {
+            author_view.setBackgroundResource(R.drawable.choose_button_false_background_shape);
             timeout = 1500;
         }
         for(ChooseButton button : mButtons) {
@@ -426,14 +432,19 @@ public class SizeChangeAnimation extends Animation {
             } else {
                 author_view.setText(game.author.name_en);
             }
+            author_view.setBackgroundResource(0);
         } else { // we played all game and now just show last one
         }
         loadAllImages();
     }
 
     void loadAllImages() {
-        getView().findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
+        View v = getView().findViewById(R.id.progress_view);
+        if (v != null) {
+            v.setVisibility(View.VISIBLE);
+        }
         for (final ChooseButton b : mButtons) {
+
             Glide.with(getActivity())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(b.picture.path))
@@ -443,6 +454,18 @@ public class SizeChangeAnimation extends Animation {
                         public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
                             b.cachedBitmap = resource;
                             mButtonAdapter.update(0);
+                            int i = 0;
+                            for (final ChooseButton b: mButtons) {
+                                if (b.cachedBitmap != null) {
+                                    i++;
+                                    if (i == 4) {
+                                        View v = getView().findViewById(R.id.progress_view);
+                                        if (v != null) {
+                                            v.setVisibility(View.INVISIBLE);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     });
         }
