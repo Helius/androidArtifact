@@ -4,12 +4,12 @@
     android:shape="rectangle">
     <stroke
         android:width="2dp"
-        android:color="#1ab61a">
+        android:color="@color/green_mark_border">
     </stroke>
     <corners
         android:radius="@dimen/choose_button_background_radius">
     </corners>
     <solid
-        android:color="#b1f9b8">
+        android:color="@color/green_mark_body">
     </solid>
 </shape>

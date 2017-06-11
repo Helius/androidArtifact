@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.False;
+import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.Hide;
 import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.True;
 
 
@@ -115,22 +116,28 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
 //            Log.d(TAG, "getView " + i);
             final ChooseButton button = mButtons.get(i);
             final ImageView pic = (ImageView) view.findViewById(R.id.picture);
+            final View failMark = view.findViewById(R.id.fail_mark);
             pic.setImageBitmap(mButtons.get(i).cachedBitmap);
             switch (button.state) {
                 case True:
                     view.setVisibility(View.VISIBLE);
+                    failMark.setVisibility(View.INVISIBLE);
                     break;
                 case False:
                     //pic.setAlpha(50);
-                    view.setVisibility(View.INVISIBLE);
+                    view.setVisibility(View.VISIBLE);
+                    failMark.setVisibility(View.VISIBLE);
                     break;
                 case Hide:
                     //pic.setAlpha(0);
                     view.setVisibility(View.INVISIBLE);
+                    failMark.setVisibility(View.INVISIBLE);
                     break;
+                case Normal:
                 default:
                     //pic.setAlpha(255);
                     view.setVisibility(View.VISIBLE);
+                    failMark.setVisibility(View.INVISIBLE);
                     break;
             }
             return view;
@@ -347,26 +354,39 @@ public class SizeChangeAnimation extends Animation {
 
         if (buttonBlocked || getView().findViewById(R.id.progress_view).getVisibility() == View.VISIBLE)
             return;
+
         buttonBlocked = true;
         int timeout = 800;
 
         sessionStatistic.addAttempt();
-        // Right )
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
+            // Right )
             sessionStatistic.addRight();
             author_view.setBackgroundResource(R.drawable.choose_button_true_background_shape);
-        // Fail (
+            for(ChooseButton button : mButtons) {
+                if(button.author_id == games.get(gameIndex).author.id) {
+                    button.state = True;
+                }
+                else {
+                    button.state = Hide;
+                }
+            }
         } else {
-            author_view.setBackgroundResource(R.drawable.choose_button_false_background_shape);
+            // Fail (
+//            author_view.setBackgroundResource(R.drawable.choose_button_false_background_shape);
+            for(ChooseButton button : mButtons) {
+                if(button.author_id == games.get(gameIndex).author.id) {
+                    button.state = True;
+                }
+                else {
+                    if (mButtons.indexOf(button) == ind) {
+                        button.state = False;
+                    } else {
+                        button.state = Hide;
+                    }
+                }
+            }
             timeout = 1500;
-        }
-        for(ChooseButton button : mButtons) {
-            if(button.author_id == games.get(gameIndex).author.id) {
-                button.state = True;
-            }
-            else {
-                button.state = False;
-            }
         }
         mButtonAdapter.update(ind);
 
