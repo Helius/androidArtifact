@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
     private JSONObject db_data = null;
+    private GameDataProvider = null;
     private ArrayList<Movement> movements;
     private ArrayList<Picture> pictures;
     private ArrayList<Author> authors;
