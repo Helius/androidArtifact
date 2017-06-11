@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.test.espresso.core.deps.guava.base.Predicates;
 import android.support.test.espresso.core.deps.guava.collect.Collections2;
@@ -22,12 +23,16 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     ValueAnimator arrowBackAnimation;
 
     private FirebaseDatabase mDatabase;
+    private StorageReference mStorageRef;
     private ArrayList<Picture> pictures;
     private ArrayList<Movement> movements;
     private ArrayList<Author> authors;
@@ -245,6 +251,30 @@ public class MainActivity extends AppCompatActivity
         loadPictData();
         loadAuthorData();
         loadMovementsData();
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference fileRef = mStorageRef.child("out_db.json");
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                JSONObject db_data = null;
+                try {
+                    db_data = new JSONObject(new String(bytes));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "json downloaded successful:" + db_data.toString());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e(TAG, "Can't download db_data");
+            }
+        });
+
+
         findViewById(R.id.main_progress_fade).setVisibility(View.VISIBLE);
         updateSideBarInfo();
 
