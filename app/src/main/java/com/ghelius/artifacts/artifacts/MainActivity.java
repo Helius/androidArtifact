@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.test.espresso.core.deps.guava.base.Predicates;
-import android.support.test.espresso.core.deps.guava.collect.Collections2;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,21 +23,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -57,19 +49,16 @@ public class MainActivity extends AppCompatActivity
 
     private FirebaseDatabase mDatabase;
     private StorageReference mStorageRef;
-    private ArrayList<Picture> pictures;
-    private ArrayList<Movement> movements;
-    private ArrayList<Author> authors;
 
     private ArrayList<Picture> pictures_leveled = new ArrayList<>();
     private ArrayList<Movement> movements_leveled = new ArrayList<>();
     private ArrayList<Author> authors_leveled = new ArrayList<>();
-
-    private boolean picturesReady;
-    private boolean authorReady;
-    private boolean movementsReady;
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
+    private JSONObject db_data = null;
+    private ArrayList<Movement> movements;
+    private ArrayList<Picture> pictures;
+    private ArrayList<Author> authors;
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -248,9 +237,9 @@ public class MainActivity extends AppCompatActivity
         });
 
         mDatabase = FirebaseDatabase.getInstance();
-        loadPictData();
-        loadAuthorData();
-        loadMovementsData();
+//        loadPictData();
+//        loadAuthorData();
+//        loadMovementsData();
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
         StorageReference fileRef = mStorageRef.child("out_db.json");
@@ -259,13 +248,13 @@ public class MainActivity extends AppCompatActivity
         fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
-                JSONObject db_data = null;
                 try {
                     db_data = new JSONObject(new String(bytes));
+                    dbReadyForStart();
                 } catch (JSONException e) {
+                    //TODO: show no internet dialog here!
                     e.printStackTrace();
                 }
-                Log.d(TAG, "json downloaded successful:" + db_data.toString());
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -312,14 +301,45 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 void onLevelChanged() {
                     updateSideBarInfo();
-                    updateGameData();
+                    updateGameData(db_data);
                 }
             };
         }
         return userData;
     }
 
-    private void updateGameData() {
+    private void updateGameData(JSONObject db_data) {
+        Log.d(TAG, "start updating game data");
+        pictures = new ArrayList<>();
+        try {
+            JSONArray array = db_data.getJSONObject("content").getJSONArray("pictures");
+            for (int i = 0; i < array.length(); i++) {
+                pictures.add(new Picture(array.getJSONObject(i)));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        authors = new ArrayList<>();
+        try {
+            JSONArray array = db_data.getJSONObject("content").getJSONArray("authors");
+            for (int i = 0; i < array.length(); i++) {
+                authors.add(new Author(array.getJSONObject(i)));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        movements = new ArrayList<>();
+        try {
+            JSONArray array = db_data.getJSONObject("content").getJSONArray("movements");
+            for (int i = 0; i < array.length(); i++) {
+                movements.add(new Movement(array.getJSONObject(i)));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         pictures_leveled.clear();
         for (Picture p: pictures) {
             if (p.level <= userData.getLevel() + 1) {
@@ -349,6 +369,7 @@ public class MainActivity extends AppCompatActivity
                 + authors_leveled.size()  + ", " +
                 + movements_leveled.size()+ ", "
         );
+        Log.d(TAG, "stop updating game data");
     }
 
     private void updateSideBarInfo() {
@@ -414,86 +435,83 @@ public class MainActivity extends AppCompatActivity
 
     // game stuff ~~~
 
-    private void loadPictData() {
-        DatabaseReference dbRef = mDatabase.getReference("content").child("pictures");
+//    private void loadPictData() {
+//        DatabaseReference dbRef = mDatabase.getReference("content").child("pictures");
+//
+//        dbRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                // This method is called once with the initial value and again
+//                // whenever data at this location is updated.
+//
+//                GenericTypeIndicator<ArrayList<Picture>> t = new GenericTypeIndicator<ArrayList<Picture>>() {
+//                };
+//                pictures = dataSnapshot.getValue(t);
+//                picturesReady = true;
+//                dbReadyForStart();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//                // Failed to read value
+//                Log.w(TAG, "Failed to read value.", error.toException());
+//            }
+//        });
+//    }
+//
+//    private void loadMovementsData() {
+//        DatabaseReference dbRef = mDatabase.getReference("content").child("movements");
+//
+//        dbRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                // This method is called once with the initial value and again
+//                // whenever data at this location is updated.
+//
+//                GenericTypeIndicator<ArrayList<Movement>> t = new GenericTypeIndicator<ArrayList<Movement>>() {
+//                };
+//                movements = dataSnapshot.getValue(t);
+//                movementsReady = true;
+//                dbReadyForStart();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//                // Failed to read value
+//                Log.w(TAG, "Failed to read value.", error.toException());
+//            }
+//        });
+//    }
+//
+//    private void loadAuthorData() {
+//        DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
+//
+//        dbRef1.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                // This method is called once with the initial value and again
+//                // whenever data at this location is updated.
+//
+//                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>() {
+//                };
+//                authors = dataSnapshot.getValue(t);
+//                authorReady = true;
+//                dbReadyForStart();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//                // Failed to read value
+//                Log.w(TAG, "Failed to read value.", error.toException());
+//            }
+//        });
+//    }
 
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                GenericTypeIndicator<ArrayList<Picture>> t = new GenericTypeIndicator<ArrayList<Picture>>() {
-                };
-                pictures = dataSnapshot.getValue(t);
-                picturesReady = true;
-                checkAllDataReady();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
-    private void loadMovementsData() {
-        DatabaseReference dbRef = mDatabase.getReference("content").child("movements");
-
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                GenericTypeIndicator<ArrayList<Movement>> t = new GenericTypeIndicator<ArrayList<Movement>>() {
-                };
-                movements = dataSnapshot.getValue(t);
-                movementsReady = true;
-                checkAllDataReady();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
-    private void loadAuthorData() {
-        DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
-
-        dbRef1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>() {
-                };
-                authors = dataSnapshot.getValue(t);
-                authorReady = true;
-                checkAllDataReady();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
-    private void checkAllDataReady() {
-        Log.d(TAG, "checkAllDataReady" + (picturesReady && authorReady && movementsReady));
-        if (picturesReady && authorReady && movementsReady) {
+    private void dbReadyForStart() {
             //TODO: now we can enable game buttons
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
-            DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
-            scoresRef.keepSynced(true);
-            updateGameData();
-        }
+//            DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
+//            scoresRef.keepSynced(true);
+            updateGameData(db_data);
     }
 }

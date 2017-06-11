@@ -71,11 +71,11 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
     private class ChooseButton {
         Picture picture;
         ButtonState state;
-        Long author_id;
+        int author_id;
         String url;
         Bitmap cachedBitmap;
 
-        ChooseButton(Picture picture, Long author_id) {
+        ChooseButton(Picture picture, int author_id) {
             this.picture = picture;
             this.state = ButtonState.Normal;
             this.author_id = author_id;
@@ -505,7 +505,7 @@ public class SizeChangeAnimation extends Animation {
     }
 
 
-    private Author getAuthorById (Long id) {
+    private Author getAuthorById (int id) {
         for (Author a : authors) {
             if (a.id == id) {
                 return a;

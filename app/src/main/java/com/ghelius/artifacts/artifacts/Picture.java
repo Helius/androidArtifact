@@ -2,24 +2,25 @@ package com.ghelius.artifacts.artifacts;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by eugene on 29.11.16.
  */
 
 @IgnoreExtraProperties
 public class Picture  {
-    public Long author;
-    public Long level;
-    public Long movement_id;
+    public int author;
+    public int level;
+    public int movement_id;
     public String path;
 
 
-    public Picture() {}
-
-    public Picture(Long author, Long level, Long movement_id, String path) {
-        this.author = author;
-        this.level = level;
-        this.movement_id = movement_id;
-        this.path = path;
+    public Picture(JSONObject jsonObject) throws JSONException {
+        this.author = jsonObject.getInt("author");
+        this.level = jsonObject.getInt("level");
+        this.movement_id = jsonObject.getInt("movement_id");
+        this.path = jsonObject.getString("path");
     }
 }

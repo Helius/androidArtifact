@@ -55,15 +55,15 @@ public class PictureListFragment extends Fragment {
         String movements_str = "";
         HashMap<Integer, Integer> mov_map = new HashMap<>();
         for (Picture p: pictures) {
-            Integer value = mov_map.get(p.movement_id.intValue());
+            Integer value = mov_map.get(p.movement_id);
             if (value == null)
                 value = 0;
-            mov_map.put(p.movement_id.intValue(), ++value);
+            mov_map.put(p.movement_id, ++value);
         }
         for(Integer collected_id : mov_map.keySet()) {
             String name = getString(R.string.undefined_movements_name);
             for (Movement m: movements) {
-                if (m.id.intValue() == collected_id) {
+                if (m.id == collected_id) {
                     if (locale.equals("ru"))
                         name = m.name_ru;
                     else

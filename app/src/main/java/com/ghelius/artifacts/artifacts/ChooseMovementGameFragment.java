@@ -59,9 +59,9 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
     private class ChooseButton {
         String text;
         ButtonState state;
-        Long movement_id;
+        int movement_id;
 
-        ChooseButton(String text, Long movement_id) {
+        ChooseButton(String text, int movement_id) {
             this.text = text;
             this.state = ButtonState.Normal;
             this.movement_id = movement_id;
@@ -327,7 +327,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
     }
 
 
-    private Movement getMovementById (Long id) {
+    private Movement getMovementById (int id) {
         for (Movement a : movements) {
             if (a.id == id) {
                 return a;

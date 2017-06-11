@@ -56,9 +56,9 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     private class ChooseButton {
         String text;
         ButtonState state;
-        Long author_id;
+        int author_id;
 
-        ChooseButton(String text, Long author_id) {
+        ChooseButton(String text, int author_id) {
             this.text = text;
             this.state = ButtonState.Normal;
             this.author_id = author_id;
@@ -320,7 +320,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     }
 
 
-    private Author getAuthorById (Long id) {
+    private Author getAuthorById (int id) {
         for (Author a : authors) {
             if (a.id == id) {
                 return a;
