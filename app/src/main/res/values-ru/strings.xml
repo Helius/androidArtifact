@@ -5,10 +5,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Настройки</string>
-    <string name="game_1_title">Назови художника</string>
-    <string name="game_2_title">Выбери картину</string>
-    <string name="game_3_title">Выбери направление</string>
-    <string name="game_0_title">Выбери художника</string>
+    <string name="game_1_title">Назовите художника</string>
+    <string name="game_2_title">Выберите картину</string>
+    <string name="game_3_title">Выберите направление</string>
+    <string name="game_0_title">Выберите художника</string>
     <string name="finish_dialog_message" >Вы угадали %1$d из %2$d</string>
     <string name="finish">Закончить</string>
     <string name="try_more">Ещё!</string>
@@ -28,6 +28,6 @@
     <string name="pic_by_level_count">Картин по уровням %1$d, %2$d, %3$d</string>
     <string name="undefined_movements_name">Без направления</string>
     <string name="author_name_hint">Введите имя художника</string>
-    <string name="internet_dialog_title">Интернет соединение</string>
-    <string name="internet_dialog_message">Извините, для работы приложения нужно интернет соединение</string>
+    <string name="internet_dialog_title">Интернет-соединение</string>
+    <string name="internet_dialog_message">Извините, для работы приложения нужно интернет-соединение</string>
 </resources>
