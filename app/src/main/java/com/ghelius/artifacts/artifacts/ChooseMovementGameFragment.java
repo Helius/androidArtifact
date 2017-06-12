@@ -53,6 +53,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
     private BaseGameStatistic sessionStatistic;
     private String locale;
     private UserData userData;
+    private GameDataProvider gameDataProvider;
 
     enum ButtonState {Normal, True, False};
 
@@ -255,10 +256,11 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         init();
     }
 
-    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Movement> movements) {
+    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
+        this.gameDataProvider = gameDataProvider;
         this.userData = userData;
-        this.pictures = pictures;
-        this.movements = movements;
+        this.pictures = gameDataProvider.getPictures();
+        this.movements = gameDataProvider.getMovements();
     }
 
     private void playGame(int gameIndex) {
@@ -308,7 +310,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
             ChooseMovementGame game = new ChooseMovementGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
-                game.movement_variant.add(getMovementById(game.picture.movement_id));
+                game.movement_variant.add(gameDataProvider.getMovementById(game.picture.movement_id));
                 int movement_count = 3;
                 while (movement_count > 0) {
                     Movement a = movements.get(rnd.nextInt(movements.size()));
@@ -326,15 +328,6 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         return games;
     }
 
-
-    private Movement getMovementById (int id) {
-        for (Movement a : movements) {
-            if (a.id == id) {
-                return a;
-            }
-        }
-        return null;
-    }
 
     class ChooseMovementGame {
         Picture picture;

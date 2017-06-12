@@ -27,10 +27,10 @@ public class GalleryFragment extends Fragment {
     private ArrayList<Movement> movements;
     private String locale;
 
-    public void init(ArrayList<Author> authors, ArrayList<Picture> pictures, ArrayList<Movement> movements) {
-        this.authors = authors;
-        this.pictures = pictures;
-        this.movements = movements;
+    public void init(GameDataProvider gameDataProvider) {
+        this.authors = gameDataProvider.getFullAuthors();
+        this.pictures = gameDataProvider.getFullPictures();
+        this.movements = gameDataProvider.getFullMovements();
     }
 
     @Override

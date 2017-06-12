@@ -163,10 +163,10 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     }
 
 
-    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Author> authors) {
+    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
         this.userData = userData;
-        this.pictures = pictures;
-        this.authors = authors;
+        this.pictures = gameDataProvider.getPictures();
+        this.authors = gameDataProvider.getAuthors();
     }
 
     private void playGame (int index) {

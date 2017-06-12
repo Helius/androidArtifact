@@ -50,6 +50,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     private BaseGameStatistic sessionStatistic;
     private String locale;
     private UserData userData;
+    private GameDataProvider gameDataProvider;
 
     enum ButtonState {Normal, True, False};
 
@@ -253,10 +254,11 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         init();
     }
 
-    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Author> authors) {
+    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
+        this.gameDataProvider = gameDataProvider;
         this.userData = userData;
-        this.pictures = pictures;
-        this.authors = authors;
+        this.pictures = gameDataProvider.getPictures();
+        this.authors = gameDataProvider.getAuthors();
     }
 
     private void playGame(int gameIndex) {
@@ -301,7 +303,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
             ChooseAuthorGame game = new ChooseAuthorGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
-                game.authors_variant.add(getAuthorById(game.picture.author));
+                game.authors_variant.add(gameDataProvider.getAuthorById(game.picture.author));
                 int author_count = 3;
                 while (author_count > 0) {
                     Author a = authors.get(rnd.nextInt(authors.size()));
@@ -317,16 +319,6 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         games.get(0).loadPicture();
         games.get(1).loadPicture();
         return games;
-    }
-
-
-    private Author getAuthorById (int id) {
-        for (Author a : authors) {
-            if (a.id == id) {
-                return a;
-            }
-        }
-        return null;
     }
 
     class ChooseAuthorGame {

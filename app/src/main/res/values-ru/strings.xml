@@ -28,4 +28,6 @@
     <string name="pic_by_level_count">Картин по уровням %1$d, %2$d, %3$d</string>
     <string name="undefined_movements_name">Без направления</string>
     <string name="author_name_hint">Введите имя художника</string>
+    <string name="internet_dialog_title">Интернет соединение</string>
+    <string name="internet_dialog_message">Извините, для работы приложения нужно интернет соединение</string>
 </resources>

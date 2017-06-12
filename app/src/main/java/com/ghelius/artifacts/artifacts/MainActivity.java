@@ -2,7 +2,11 @@ package com.ghelius.artifacts.artifacts;
 
 
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -11,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,11 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -50,16 +52,9 @@ public class MainActivity extends AppCompatActivity
     private FirebaseDatabase mDatabase;
     private StorageReference mStorageRef;
 
-    private ArrayList<Picture> pictures_leveled = new ArrayList<>();
-    private ArrayList<Movement> movements_leveled = new ArrayList<>();
-    private ArrayList<Author> authors_leveled = new ArrayList<>();
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
-    private JSONObject db_data = null;
-    private GameDataProvider = null;
-    private ArrayList<Movement> movements;
-    private ArrayList<Picture> pictures;
-    private ArrayList<Author> authors;
+    private GameDataProvider gameDataProvider = null;
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -96,7 +91,7 @@ public class MainActivity extends AppCompatActivity
             galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
             if (galleryFragment == null) {
                 galleryFragment = new GalleryFragment();
-                galleryFragment.init(authors, pictures, movements);
+                galleryFragment.init(gameDataProvider);
                 final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.main_menu_fragment);
                 getSupportFragmentManager().beginTransaction()
@@ -143,7 +138,7 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(getUserData(), pictures_leveled, authors_leveled);
+                            chooseAuthorGameFragment.setServerResources(getUserData(), gameDataProvider);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -155,7 +150,7 @@ public class MainActivity extends AppCompatActivity
                     case 1:
                         if (typeAuthorGameFragment == null) {
                             typeAuthorGameFragment = new TypeAuthorGameFragment();
-                            typeAuthorGameFragment.setServerResources(getUserData(), pictures_leveled, authors_leveled);
+                            typeAuthorGameFragment.setServerResources(getUserData(), gameDataProvider);
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -165,7 +160,7 @@ public class MainActivity extends AppCompatActivity
                     case 2:
                         if (choosePaintGameFragment == null) {
                             choosePaintGameFragment = new ChoosePaintGameFragment();
-                            choosePaintGameFragment.setServerResources(getUserData(), pictures_leveled, authors_leveled);
+                            choosePaintGameFragment.setServerResources(getUserData(), gameDataProvider);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -176,7 +171,7 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                         if (chooseMovementGameFragment == null) {
                             chooseMovementGameFragment = new ChooseMovementGameFragment();
-                            chooseMovementGameFragment.setServerResources(getUserData(), pictures_leveled, movements_leveled);
+                            chooseMovementGameFragment.setServerResources(getUserData(), gameDataProvider);
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -238,31 +233,9 @@ public class MainActivity extends AppCompatActivity
         });
 
         mDatabase = FirebaseDatabase.getInstance();
-//        loadPictData();
-//        loadAuthorData();
-//        loadMovementsData();
 
+        FirebaseStorage.getInstance().setMaxDownloadRetryTimeMillis(10000);
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference fileRef = mStorageRef.child("out_db.json");
-
-        final long ONE_MEGABYTE = 1024 * 1024;
-        fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                try {
-                    db_data = new JSONObject(new String(bytes));
-                    dbReadyForStart();
-                } catch (JSONException e) {
-                    //TODO: show no internet dialog here!
-                    e.printStackTrace();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Log.e(TAG, "Can't download db_data");
-            }
-        });
 
 
         findViewById(R.id.main_progress_fade).setVisibility(View.VISIBLE);
@@ -272,6 +245,59 @@ public class MainActivity extends AppCompatActivity
         if (chooseLevelDialog != null) {
             chooseLevelDialog.init(getUserData());
         }
+        startLoadingData();
+    }
+
+    private void startLoadingData() {
+        if (!hasInternet()) {
+            showInternetDialog();
+            return;
+        }
+        final long ONE_MEGABYTE = 1024 * 1024;
+        StorageReference fileRef = mStorageRef.child("out_db.json");
+        fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                try {
+                    gameDataProvider = new GameDataProvider(bytes);
+                    dbReadyForStart();
+                } catch (JSONException e) {
+                    Log.d(TAG, "Can't parse json db");
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e(TAG,"can't download db from storage");
+            }
+        });
+    }
+
+    private boolean hasInternet () {
+        ConnectivityManager cm = (ConnectivityManager)getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null) {
+            return activeNetwork.isConnectedOrConnecting();
+        }
+        return false;
+    }
+
+
+    private void showInternetDialog() {
+        final AppCompatActivity activity = this;
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle(getString(R.string.internet_dialog_title));
+        alertDialog.setMessage(getString(R.string.internet_dialog_message));
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        activity.finish();
+                    }
+                });
+        alertDialog.show();
     }
 
     private UserData getUserData () {
@@ -302,75 +328,11 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 void onLevelChanged() {
                     updateSideBarInfo();
-                    updateGameData(db_data);
+                    gameDataProvider.setLevel(getLevel());
                 }
             };
         }
         return userData;
-    }
-
-    private void updateGameData(JSONObject db_data) {
-        Log.d(TAG, "start updating game data");
-        pictures = new ArrayList<>();
-        try {
-            JSONArray array = db_data.getJSONObject("content").getJSONArray("pictures");
-            for (int i = 0; i < array.length(); i++) {
-                pictures.add(new Picture(array.getJSONObject(i)));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        authors = new ArrayList<>();
-        try {
-            JSONArray array = db_data.getJSONObject("content").getJSONArray("authors");
-            for (int i = 0; i < array.length(); i++) {
-                authors.add(new Author(array.getJSONObject(i)));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        movements = new ArrayList<>();
-        try {
-            JSONArray array = db_data.getJSONObject("content").getJSONArray("movements");
-            for (int i = 0; i < array.length(); i++) {
-                movements.add(new Movement(array.getJSONObject(i)));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        pictures_leveled.clear();
-        for (Picture p: pictures) {
-            if (p.level <= userData.getLevel() + 1) {
-                pictures_leveled.add(p);
-            }
-        }
-        authors_leveled.clear();
-        for(Author a: authors) {
-            for(Picture p: pictures_leveled) {
-                if (p.author == a.id) {
-                    authors_leveled.add(a);
-                    break;
-                }
-            }
-        }
-        movements_leveled.clear();
-        for(Movement m: movements) {
-            for(Picture p: pictures_leveled) {
-                if (m.id == p.movement_id) {
-                    movements_leveled.add(m);
-                    break;
-                }
-            }
-        }
-        Log.d(TAG, "data for level: "
-                + pictures_leveled.size() + ", " +
-                + authors_leveled.size()  + ", " +
-                + movements_leveled.size()+ ", "
-        );
-        Log.d(TAG, "stop updating game data");
     }
 
     private void updateSideBarInfo() {
@@ -434,85 +396,11 @@ public class MainActivity extends AppCompatActivity
         toggle.onConfigurationChanged(newConfig);
     }
 
-    // game stuff ~~~
-
-//    private void loadPictData() {
-//        DatabaseReference dbRef = mDatabase.getReference("content").child("pictures");
-//
-//        dbRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                // This method is called once with the initial value and again
-//                // whenever data at this location is updated.
-//
-//                GenericTypeIndicator<ArrayList<Picture>> t = new GenericTypeIndicator<ArrayList<Picture>>() {
-//                };
-//                pictures = dataSnapshot.getValue(t);
-//                picturesReady = true;
-//                dbReadyForStart();
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError error) {
-//                // Failed to read value
-//                Log.w(TAG, "Failed to read value.", error.toException());
-//            }
-//        });
-//    }
-//
-//    private void loadMovementsData() {
-//        DatabaseReference dbRef = mDatabase.getReference("content").child("movements");
-//
-//        dbRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                // This method is called once with the initial value and again
-//                // whenever data at this location is updated.
-//
-//                GenericTypeIndicator<ArrayList<Movement>> t = new GenericTypeIndicator<ArrayList<Movement>>() {
-//                };
-//                movements = dataSnapshot.getValue(t);
-//                movementsReady = true;
-//                dbReadyForStart();
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError error) {
-//                // Failed to read value
-//                Log.w(TAG, "Failed to read value.", error.toException());
-//            }
-//        });
-//    }
-//
-//    private void loadAuthorData() {
-//        DatabaseReference dbRef1 = mDatabase.getReference("content").child("authors");
-//
-//        dbRef1.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                // This method is called once with the initial value and again
-//                // whenever data at this location is updated.
-//
-//                GenericTypeIndicator<ArrayList<Author>> t = new GenericTypeIndicator<ArrayList<Author>>() {
-//                };
-//                authors = dataSnapshot.getValue(t);
-//                authorReady = true;
-//                dbReadyForStart();
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError error) {
-//                // Failed to read value
-//                Log.w(TAG, "Failed to read value.", error.toException());
-//            }
-//        });
-//    }
 
     private void dbReadyForStart() {
             //TODO: now we can enable game buttons
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
 //            DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
 //            scoresRef.keepSynced(true);
-            updateGameData(db_data);
     }
 }

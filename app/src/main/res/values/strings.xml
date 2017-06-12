@@ -30,4 +30,6 @@
     <string name="pic_by_level_count">Pics by level %1$d, %2$d, %3$d</string>
     <string name="undefined_movements_name">Without</string>
     <string name="author_name_hint">Type author name</string>
+    <string name="internet_dialog_title">Internet connection</string>
+    <string name="internet_dialog_message">Sorry, we need internet access to start app</string>
 </resources>

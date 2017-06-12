@@ -64,6 +64,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
     private boolean fullShowed = false;
     private Drawable background;
     private UserData userData;
+    private GameDataProvider gameDataProvider;
 
     enum ButtonState {Normal, True, Hide, False}
 
@@ -433,10 +434,11 @@ public class SizeChangeAnimation extends Animation {
         Log.d(TAG,"onCreate");
     }
 
-    public void setServerResources(UserData userData, ArrayList<Picture> pictures, ArrayList<Author> authors) {
+    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
+        this.gameDataProvider = gameDataProvider;
         this.userData = userData;
-        this.pictures = pictures;
-        this.authors = authors;
+        this.pictures = gameDataProvider.getPictures();
+        this.authors = gameDataProvider.getAuthors();
     }
 
     private void playGame(int gameIndex) {
@@ -506,7 +508,7 @@ public class SizeChangeAnimation extends Animation {
             ChoosePaintGame game = new ChoosePaintGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture_variant.add(tmp_pic.remove(rnd.nextInt(tmp_pic.size())));
-                game.author = getAuthorById(game.picture_variant.get(0).author);
+                game.author = gameDataProvider.getAuthorById(game.picture_variant.get(0).author);
 
 
                 int pic_count = 3;
@@ -524,15 +526,6 @@ public class SizeChangeAnimation extends Animation {
         return games;
     }
 
-
-    private Author getAuthorById (int id) {
-        for (Author a : authors) {
-            if (a.id == id) {
-                return a;
-            }
-        }
-        return null;
-    }
 
     class ChoosePaintGame {
         Author author;
