@@ -168,7 +168,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(userData.getGameStatistic(TAG), sessionStatistic, userData.getLevel());
+        dialog.init(sessionStatistic, userData, TAG);
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -225,7 +225,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+                    dialog.init(sessionStatistic, userData, TAG);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

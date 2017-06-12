@@ -30,5 +30,9 @@
     <string name="author_name_hint">Введите имя художника</string>
     <string name="internet_dialog_title">Интернет-соединение</string>
     <string name="internet_dialog_message">Извините, для работы приложения нужно интернет-соединение</string>
-    <string name="game_finished_dialog_title">Неплохо!</string>
+    <string name="game_finished_dialog_title_high">Отлично!</string>
+    <string name="game_finished_dialog_title_mid">Неплохо!</string>
+    <string name="game_finished_dialog_title_low">Старайтесь еще!</string>
+    <string name="rize_level_dialog_title">Отличные результаты на уровне %1$s!</string>
+    <string name="rize_level_dialog_text">Не желаете попробовать уровень %1$s?</string>
 </resources>

@@ -32,5 +32,9 @@
     <string name="author_name_hint">Type author name</string>
     <string name="internet_dialog_title">Internet connection</string>
     <string name="internet_dialog_message">Sorry, we need internet access to start app</string>
-    <string name="game_finished_dialog_title">Well done!</string>
+    <string name="game_finished_dialog_title_high">Excellent!</string>
+    <string name="game_finished_dialog_title_mid">Not bad!</string>
+    <string name="game_finished_dialog_title_low">Keep on trying!</string>
+    <string name="rize_level_dialog_title">Excellent results on %1$s level!</string>
+    <string name="rize_level_dialog_text">Do you want try next level %1$s?</string>
 </resources>

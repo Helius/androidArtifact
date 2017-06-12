@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
             if (chooseLevelDialog == null) {
                 chooseLevelDialog = new ChooseLevelDialog();
             }
+            logEvent("OpenLevelDialogWith", String.valueOf(userData.getLevel()));
             chooseLevelDialog.init(getUserData());
             chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
         } else if (id == R.id.nav_settings) {

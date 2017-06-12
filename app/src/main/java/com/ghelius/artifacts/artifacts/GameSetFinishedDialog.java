@@ -2,6 +2,7 @@ package com.ghelius.artifacts.artifacts;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
 
     private int trueCount;
     private int from;
+    private UserData userData;
+    private String gameTag;
 
 
     public interface DialogEventListener {
@@ -37,7 +40,17 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDialog().setTitle(R.string.game_finished_dialog_title);
+        int rating = (10*trueCount)/from;
+
+        String title;
+        if (rating < 4) {
+            getDialog().setTitle(R.string.game_finished_dialog_title_low);
+        } else if (rating >= 4 && rating < 9) {
+            getDialog().setTitle(R.string.game_finished_dialog_title_mid);
+        } else {
+            getDialog().setTitle(R.string.game_finished_dialog_title_high);
+        }
+
         View v = inflater.inflate(R.layout.game_finished_dialog, null);
         Button moreButton = (Button)v.findViewById(R.id.more_button);
         moreButton.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +78,46 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
         return v;
     }
 
-    public void init(BaseGameStatistic sessionStatistic, BaseGameStatistic totalStatistic, int level) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        BaseGameStatistic statistic = userData.getGameStatistic(gameTag);
+        if ((10*statistic.trueAttempt)/(statistic.trueAttempt + statistic.falseAttempt) > 7
+                && (trueCount * 10) / from >= 8 ) {
+            if (userData.getLevel() < userData.getMaxLevel()) {
+                //TODO: eventLog to analytics
+                showRizeLevelDialog();
+            }
+        }
+    }
+
+    public void init(BaseGameStatistic sessionStatistic, UserData userData, String gameTag) {
         this.trueCount = sessionStatistic.trueAttempt;
         this.from = sessionStatistic.trueAttempt + sessionStatistic.falseAttempt;
+        this.userData = userData;
+        this.gameTag = gameTag;
+    }
+
+
+    private void showRizeLevelDialog() {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle(getString(R.string.rize_level_dialog_title, userData.getLevelName(userData.getLevel(), getActivity().getApplicationContext())));
+        alertDialog.setMessage(getString(R.string.rize_level_dialog_text, userData.getLevelName(userData.getLevel() + 1, getActivity().getApplicationContext())));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        userData.setLevel(userData.getLevel()+1);
+                        //logEvent("UserAcceptLevelUp", String.valueOf(getLevel()));
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO: eventLog to analytics
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 }

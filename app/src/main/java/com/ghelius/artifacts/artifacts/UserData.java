@@ -1,5 +1,7 @@
 package com.ghelius.artifacts.artifacts;
 
+import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -129,4 +131,18 @@ public abstract class UserData {
         saveUserData(data);
     }
 
+    public String getLevelName(int level, Context context) {
+        switch (level) {
+            case 0:
+                return context.getString(R.string.level_0_text);
+            case 1:
+                return context.getString(R.string.level_1_text);
+            default:
+                return context.getString(R.string.level_2_text);
+        }
+    }
+
+    public int getMaxLevel() {
+        return 2;
+    }
 }

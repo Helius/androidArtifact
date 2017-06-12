@@ -94,7 +94,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+        dialog.init(sessionStatistic, userData, TAG);
         dialog.setEventListener(this);
 
         View v = inflater.inflate(R.layout.fragment_type_author_game, container, false);
@@ -104,7 +104,6 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         for(Author a: authors) {
             suggestList.add(a.name_ru);
             suggestList.add(a.name_en);
-            Log.d(TAG, a.name_en + " " + a.name_ru);
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, suggestList);
         mEditText.setAdapter(adapter);
@@ -182,7 +181,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
                 games.get(index + 1).loadPicture();
             }
         } else {
-            dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+            dialog.init(sessionStatistic, userData, TAG);
             dialog.show(getActivity().getSupportFragmentManager(), "dialog");
         }
     }

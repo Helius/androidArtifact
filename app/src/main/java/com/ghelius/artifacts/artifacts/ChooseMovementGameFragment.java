@@ -171,7 +171,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+        dialog.init(sessionStatistic, userData, TAG);
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -227,7 +227,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+                    dialog.init(sessionStatistic, userData, TAG);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

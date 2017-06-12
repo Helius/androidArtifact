@@ -230,7 +230,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+        dialog.init(sessionStatistic, userData, TAG);
         dialog.setEventListener(this);
 
         fullImage = (ImageView) view.findViewById(R.id.full_image);
@@ -404,7 +404,7 @@ public class SizeChangeAnimation extends Animation {
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
+                    dialog.init(sessionStatistic, userData, TAG);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }
@@ -482,7 +482,10 @@ public class SizeChangeAnimation extends Animation {
                                 if (b.cachedBitmap != null) {
                                     i++;
                                     if (i == 4) {
-                                        View v = getView().findViewById(R.id.progress_view);
+                                        View v = getView();
+                                        if (v != null) {
+                                            v = v.findViewById(R.id.progress_view);
+                                        }
                                         if (v != null) {
                                             v.setVisibility(View.INVISIBLE);
                                         }
