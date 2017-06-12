@@ -3,12 +3,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ImageView
+    <com.ghelius.artifacts.artifacts.SquareImageView
         android:id="@+id/icon"
         android:background="@color/colorPrimary"
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
-        android:layout_height="160dp" />
+        android:layout_height="match_parent" />
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
