@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -54,7 +55,6 @@ public class MainActivity extends AppCompatActivity
 
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
-    private GameDataProvider gameDataProvider = null;
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -91,13 +91,13 @@ public class MainActivity extends AppCompatActivity
             galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
             if (galleryFragment == null) {
                 galleryFragment = new GalleryFragment();
-                galleryFragment.init(gameDataProvider);
                 final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.main_menu_fragment);
                 getSupportFragmentManager().beginTransaction()
                         .hide(mainMenuFragment)
                         .replace(R.id.main_fragment_holder, galleryFragment)
                         .addToBackStack("gallery").commit();
+                galleryFragment.init(mainMenuFragment.getGameDataProvider());
             }
         }
 
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(getUserData(), gameDataProvider);
+                            chooseAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity
                     case 1:
                         if (typeAuthorGameFragment == null) {
                             typeAuthorGameFragment = new TypeAuthorGameFragment();
-                            typeAuthorGameFragment.setServerResources(getUserData(), gameDataProvider);
+                            typeAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity
                     case 2:
                         if (choosePaintGameFragment == null) {
                             choosePaintGameFragment = new ChoosePaintGameFragment();
-                            choosePaintGameFragment.setServerResources(getUserData(), gameDataProvider);
+                            choosePaintGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                         if (chooseMovementGameFragment == null) {
                             chooseMovementGameFragment = new ChooseMovementGameFragment();
-                            chooseMovementGameFragment.setServerResources(getUserData(), gameDataProvider);
+                            chooseMovementGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -233,6 +233,8 @@ public class MainActivity extends AppCompatActivity
         });
 
         mDatabase = FirebaseDatabase.getInstance();
+//        DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
+//        scoresRef.keepSynced(true);
 
         FirebaseStorage.getInstance().setMaxDownloadRetryTimeMillis(10000);
         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -245,12 +247,16 @@ public class MainActivity extends AppCompatActivity
         if (chooseLevelDialog != null) {
             chooseLevelDialog.init(getUserData());
         }
-        startLoadingData();
+        loadGameData(mainMenuFragment);
     }
 
-    private void startLoadingData() {
+    private void loadGameData(final MainMenuFragment holder) {
         if (!hasInternet()) {
             showInternetDialog();
+            return;
+        }
+        if (holder.getGameDataProvider() != null) {
+            findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
             return;
         }
         final long ONE_MEGABYTE = 1024 * 1024;
@@ -259,8 +265,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(byte[] bytes) {
                 try {
-                    gameDataProvider = new GameDataProvider(bytes);
-                    dbReadyForStart();
+                    holder.setGameDataProvider(new GameDataProvider(bytes));
+                    findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.d(TAG, "Can't parse json db");
                 }
@@ -328,7 +334,9 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 void onLevelChanged() {
                     updateSideBarInfo();
-                    gameDataProvider.setLevel(getLevel());
+                    final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+                            .findFragmentById(R.id.main_menu_fragment);
+                    mainMenuFragment.getGameDataProvider().setLevel(getLevel());
                 }
             };
         }
@@ -396,11 +404,4 @@ public class MainActivity extends AppCompatActivity
         toggle.onConfigurationChanged(newConfig);
     }
 
-
-    private void dbReadyForStart() {
-            //TODO: now we can enable game buttons
-            findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
-//            DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
-//            scoresRef.keepSynced(true);
-    }
 }
