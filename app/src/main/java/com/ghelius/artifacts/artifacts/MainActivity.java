@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -39,6 +40,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "mainActivity";
+    private FirebaseAnalytics mFirebaseAnalytics;
     UserData userData;
     ChooseLevelDialog chooseLevelDialog;
     StatisticFragment statisticFragment;
@@ -56,6 +58,17 @@ public class MainActivity extends AppCompatActivity
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
 
+    public void logEvent(String event) {
+        logEvent(event, null);
+    }
+
+    public void logEvent(String event, String value) {
+        Bundle bundle = new Bundle();
+        if (value != null && value.length() > 0) {
+            bundle.putString("value", value);
+        }
+        mFirebaseAnalytics.logEvent(event, bundle);
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -109,6 +122,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         setContentView(R.layout.activity_main);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -145,7 +162,7 @@ public class MainActivity extends AppCompatActivity
                                 .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
                                 .addToBackStack("game").commit();
-
+                        logEvent("ChooseAuthorGameStarted");
                         break;
                     case 1:
                         if (typeAuthorGameFragment == null) {
@@ -156,6 +173,7 @@ public class MainActivity extends AppCompatActivity
                                 .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, typeAuthorGameFragment)
                                 .addToBackStack("game").commit();
+                        logEvent("TypeAuthorGameStarted");
                         break;
                     case 2:
                         if (choosePaintGameFragment == null) {
@@ -167,6 +185,7 @@ public class MainActivity extends AppCompatActivity
                                 .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, choosePaintGameFragment)
                                 .addToBackStack("game").commit();
+                        logEvent("ChoosePaintGameStarted");
                         break;
                     case 3:
                         if (chooseMovementGameFragment == null) {
@@ -178,6 +197,7 @@ public class MainActivity extends AppCompatActivity
                                 .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, chooseMovementGameFragment)
                                 .addToBackStack("game").commit();
+                        logEvent("ChooseMovementGameStarted");
                         break;
                     default:
                         Toast.makeText(getApplicationContext(), "Sorry! not implemented yet!", Toast.LENGTH_SHORT).show();
@@ -253,6 +273,7 @@ public class MainActivity extends AppCompatActivity
     private void loadGameData(final MainMenuFragment holder) {
         if (!hasInternet()) {
             showInternetDialog();
+            logEvent("NoInternetDialogShowed");
             return;
         }
         if (holder.getGameDataProvider() != null) {
@@ -269,12 +290,14 @@ public class MainActivity extends AppCompatActivity
                     findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.d(TAG, "Can't parse json db");
+                    logEvent("LoadDbDataError");
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Log.e(TAG,"can't download db from storage");
+                logEvent("FailToDownloadDbData");
             }
         });
     }
@@ -337,6 +360,7 @@ public class MainActivity extends AppCompatActivity
                     final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
                             .findFragmentById(R.id.main_menu_fragment);
                     mainMenuFragment.getGameDataProvider().setLevel(getLevel());
+                    logEvent("LevelChangedTo", String.valueOf(getLevel()));
                 }
             };
         }
@@ -402,6 +426,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         toggle.onConfigurationChanged(newConfig);
+        logEvent("ScreenOrientation", newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? "Landscape" : "Portrait");
     }
 
 }

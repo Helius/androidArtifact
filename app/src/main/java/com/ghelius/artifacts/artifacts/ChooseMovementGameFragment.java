@@ -196,10 +196,10 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
             return;
         buttonBlocked = true;
         int timeout = 500;
-        sessionStatistic.addAttempt();
+        boolean result = false;
         if (games.get(gameIndex).picture.movement_id == games.get(gameIndex).movement_variant.get(ind).id) {
             // Right )
-            sessionStatistic.addRight();
+            result = true;
             mButtons.get(ind).state = ButtonState.True;
         } else {
             // Fail (
@@ -212,6 +212,8 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
                 }
             }
         }
+        sessionStatistic.addAttempt(result);
+        userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
         mButtonAdapter.update(ind);
 
         Handler h = new Handler();
@@ -226,7 +228,6 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
                     playGame(++gameIndex);
                 } else {
                     dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
-                    userData.updateGameStatistic(TAG, sessionStatistic);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

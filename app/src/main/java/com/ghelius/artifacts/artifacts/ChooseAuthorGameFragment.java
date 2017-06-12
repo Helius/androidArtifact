@@ -193,11 +193,11 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
             return;
         buttonBlocked = true;
         int timeout = 500;
+        boolean result = false;
 
-        sessionStatistic.addAttempt();
         if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
             // Right )
-            sessionStatistic.addRight();
+            result = true;
             mButtons.get(ind).state = ButtonState.True;
         } else {
             // Fail (
@@ -210,6 +210,8 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                 }
             }
         }
+        sessionStatistic.addAttempt(result);
+        userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
         mButtonAdapter.update(ind);
 
         Handler h = new Handler();
@@ -224,7 +226,6 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                     playGame(++gameIndex);
                 } else {
                     dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
-                    userData.updateGameStatistic(TAG, sessionStatistic);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

@@ -6,12 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by eugene on 26.04.17.
- */
 
 public abstract class UserData {
 
+    private static final String TrueKey = "true";
+    private static final String FalseKey = "false";
     JSONObject data = null;
 
     abstract boolean saveUserData(JSONObject data);
@@ -43,13 +42,21 @@ public abstract class UserData {
         } catch (JSONException e) {
             return new BaseGameStatistic();
         }
-        int totalCount = gameStat.optInt("total", 0);
-        int rightCount = gameStat.optInt("right", 0);
-        return new BaseGameStatistic(totalCount, rightCount);
+        int trueCount = gameStat.optInt(TrueKey, 0);
+        int falseCount = gameStat.optInt(FalseKey, 0);
+        return new BaseGameStatistic(trueCount, falseCount);
 
     }
 
-    void updateGameStatistic(String gameKey, BaseGameStatistic statistic) {
+    void updateGameStatistic(String gameKey, Picture pic, boolean result) {
+        updateLocalGameStatistic(gameKey, result);
+        pushToOnlineDb();
+    }
+
+    private void pushToOnlineDb() {
+    }
+
+    void updateLocalGameStatistic(String gameKey, boolean result) {
         JSONObject stats;
         JSONObject level;
         JSONObject gameStat;
@@ -81,13 +88,16 @@ public abstract class UserData {
 
         try {
             gameStat = level.getJSONObject(gameKey);
-            int totalCount = gameStat.optInt("total", 0);
-            int rightCount = gameStat.optInt("right", 0);
-            totalCount += statistic.totalAttempt;
-            rightCount += statistic.successfullAttempt;
+            int trueCount = gameStat.optInt(TrueKey, 0);
+            int falseCount = gameStat.optInt(FalseKey, 0);
+            if (result) {
+                trueCount++;
+            } else {
+                falseCount++;
+            }
             try {
-                gameStat.put("total", totalCount);
-                gameStat.put("right", rightCount);
+                gameStat.put(TrueKey, trueCount);
+                gameStat.put(FalseKey, falseCount);
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.e("UserData", "Something wrong with JSON object, can't put object:"
@@ -96,8 +106,13 @@ public abstract class UserData {
         } catch (JSONException e) {
             gameStat = new JSONObject();
             try {
-                gameStat.put("total", statistic.totalAttempt);
-                gameStat.put("right", statistic.successfullAttempt);
+                if (result) {
+                    gameStat.put(TrueKey, 1);
+                    gameStat.put(FalseKey, 0);
+                } else {
+                    gameStat.put(TrueKey, 0);
+                    gameStat.put(FalseKey, 1);
+                }
             } catch (JSONException e1) {
                 e1.printStackTrace();
                 Log.e("UserData", "Something wrong with JSON object, can't put object:"

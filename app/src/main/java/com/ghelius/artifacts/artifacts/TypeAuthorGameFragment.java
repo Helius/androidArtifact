@@ -29,6 +29,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
@@ -140,16 +141,18 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     }
 
     private void checkResult() {
-        sessionStatistic.addAttempt();
+        boolean result = false;
         if (mEditText.getText().toString().equals(games.get(gameIndex).author.name_ru) ||
                 mEditText.getText().toString().equals(games.get(gameIndex).author.name_en)) {
-            sessionStatistic.addRight();
+            result = true;
             playGame(++gameIndex);
         } else {
-            //TODO: wrong! try again! (3 times)
-            Log.d(TAG, "wrong! try again (" + games.get(gameIndex).author.name_ru);
             mImageView.setImageBitmap(null);
-            authorHint.setText(games.get(gameIndex).author.name_ru);
+            if (Locale.getDefault().getLanguage().equals("ru")) {
+                authorHint.setText(games.get(gameIndex).author.name_ru);
+            } else {
+                authorHint.setText(games.get(gameIndex).author.name_en);
+            }
             Handler h = new Handler();
             h.postDelayed(new Runnable() {
                 @Override
@@ -158,7 +161,8 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
                 }
             }, 1200);
         }
-
+        sessionStatistic.addAttempt(result);
+        userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
         mEditText.getText().clear();
     }
 
@@ -179,7 +183,6 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
             }
         } else {
             dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
-            userData.updateGameStatistic(TAG, sessionStatistic);
             dialog.show(getActivity().getSupportFragmentManager(), "dialog");
         }
     }

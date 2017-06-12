@@ -20,7 +20,7 @@
     <string name="level_2_text">Эксперт</string>
     <string name="level_0_text">Начинающий</string>
     <string name="select_level_dialog_title">Измените уровень</string>
-    <string name="statistics_title">Статистика</string>
+    <string name="statistics_title">Статистика для уровня %1$s</string>
     <string name="gallery">Галерея</string>
     <string name="authors_count">%1$d Художников</string>
     <string name="picture_level_text">Уровень %1$d</string>
@@ -30,4 +30,5 @@
     <string name="author_name_hint">Введите имя художника</string>
     <string name="internet_dialog_title">Интернет-соединение</string>
     <string name="internet_dialog_message">Извините, для работы приложения нужно интернет-соединение</string>
+    <string name="game_finished_dialog_title">Неплохо!</string>
 </resources>

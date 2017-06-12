@@ -358,11 +358,10 @@ public class SizeChangeAnimation extends Animation {
 
         buttonBlocked = true;
         int timeout = 800;
-
-        sessionStatistic.addAttempt();
+        boolean result = false;
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
             // Right )
-            sessionStatistic.addRight();
+            result = true;
             author_view.setBackgroundResource(R.drawable.choose_button_true_background_shape);
             for(ChooseButton button : mButtons) {
                 if(button.author_id == games.get(gameIndex).author.id) {
@@ -389,6 +388,9 @@ public class SizeChangeAnimation extends Animation {
             }
             timeout = 1500;
         }
+        userData.updateGameStatistic(TAG, games.get(gameIndex).picture_variant.get(ind), result);
+
+        sessionStatistic.addAttempt(result);
         mButtonAdapter.update(ind);
 
         Handler h = new Handler();
@@ -403,7 +405,6 @@ public class SizeChangeAnimation extends Animation {
                     playGame(++gameIndex);
                 } else {
                     dialog.init(sessionStatistic, userData.getGameStatistic(TAG), userData.getLevel());
-                    userData.updateGameStatistic(TAG, sessionStatistic);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

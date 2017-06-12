@@ -37,7 +37,7 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        getDialog().setTitle("Title!");
+        getDialog().setTitle(R.string.game_finished_dialog_title);
         View v = inflater.inflate(R.layout.game_finished_dialog, null);
         Button moreButton = (Button)v.findViewById(R.id.more_button);
         moreButton.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +66,7 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     }
 
     public void init(BaseGameStatistic sessionStatistic, BaseGameStatistic totalStatistic, int level) {
-        this.trueCount = sessionStatistic.successfullAttempt;
-        this.from = sessionStatistic.totalAttempt;
+        this.trueCount = sessionStatistic.trueAttempt;
+        this.from = sessionStatistic.trueAttempt + sessionStatistic.falseAttempt;
     }
 }
