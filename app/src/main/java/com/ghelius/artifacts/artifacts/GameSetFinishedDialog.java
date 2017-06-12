@@ -82,8 +82,8 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     public void onResume() {
         super.onResume();
         BaseGameStatistic statistic = userData.getGameStatistic(gameTag);
-        if ((10*statistic.trueAttempt)/(statistic.trueAttempt + statistic.falseAttempt) > 7
-                && (trueCount * 10) / from >= 8 ) {
+        if (/*((10*statistic.trueAttempt)/(statistic.trueAttempt + statistic.falseAttempt) > 7)
+                &&*/ ((trueCount * 10) / from > 8) ) {
             if (userData.getLevel() < userData.getMaxLevel()) {
                 //TODO: eventLog to analytics
                 showRizeLevelDialog();
