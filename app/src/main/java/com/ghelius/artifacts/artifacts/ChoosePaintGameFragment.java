@@ -118,7 +118,12 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
             final ChooseButton button = mButtons.get(i);
             final ImageView pic = (ImageView) view.findViewById(R.id.picture);
             final View failMark = view.findViewById(R.id.fail_mark);
-            pic.setImageBitmap(mButtons.get(i).cachedBitmap);
+            if (mButtons.get(i).cachedBitmap == null) {
+                pic.setImageResource(R.drawable.picture_dashed_placeholder);
+            } else {
+                pic.setImageBitmap(mButtons.get(i).cachedBitmap);
+            }
+
             switch (button.state) {
                 case True:
                     view.setVisibility(View.VISIBLE);
@@ -146,9 +151,6 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
 
         void update(int i) {
             Log.d(TAG, "update grid");
-            for (ChooseButton button : mButtons) {
-                button.url = null;
-            }
             notifyDataSetChanged();
         }
     }
@@ -362,7 +364,7 @@ public class SizeChangeAnimation extends Animation {
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
             // Right )
             result = true;
-            author_view.setBackgroundResource(R.drawable.choose_button_true_background_shape);
+//            author_view.setBackgroundResource(R.drawable.choose_button_true_background_shape);
             for(ChooseButton button : mButtons) {
                 if(button.author_id == games.get(gameIndex).author.id) {
                     button.state = True;
@@ -467,6 +469,8 @@ public class SizeChangeAnimation extends Animation {
             v.setVisibility(View.VISIBLE);
         }
         for (final ChooseButton b : mButtons) {
+            b.cachedBitmap = null;
+
 
             Glide.with(getActivity())
                     .using(new FirebaseImageLoader())
@@ -495,6 +499,7 @@ public class SizeChangeAnimation extends Animation {
                         }
                     });
         }
+        mButtonAdapter.update(0);
     }
 
     ArrayList<ChoosePaintGame> createNewGame(int count)
