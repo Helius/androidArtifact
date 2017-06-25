@@ -125,7 +125,6 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         });
         loader = v.findViewById(R.id.progress_view);
         authorHint = (TextView)v.findViewById(R.id.author_name_hint);
-        playGame(gameIndex);
 
 
         return v;
@@ -137,14 +136,16 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(mEditText, InputMethodManager.SHOW_IMPLICIT);
         getActivity().setTitle(R.string.game_1_title);
+        playGame(gameIndex);
     }
 
     private void checkResult() {
         boolean result = false;
+        int timeout = 1200;
         if (mEditText.getText().toString().equals(games.get(gameIndex).author.name_ru) ||
                 mEditText.getText().toString().equals(games.get(gameIndex).author.name_en)) {
             result = true;
-            playGame(++gameIndex);
+            timeout = 1;
         } else {
             mImageView.setImageBitmap(null);
             if (Locale.getDefault().getLanguage().equals("ru")) {
@@ -152,17 +153,18 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
             } else {
                 authorHint.setText(games.get(gameIndex).author.name_en);
             }
-            Handler h = new Handler();
-            h.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    playGame(++gameIndex);
-                }
-            }, 1200);
         }
         sessionStatistic.addAttempt(result);
         userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
         mEditText.getText().clear();
+
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                playGame(++gameIndex);
+            }
+        }, timeout);
     }
 
 
@@ -175,9 +177,9 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     private void playGame (int index) {
         loader.setVisibility(View.VISIBLE);
         authorHint.setText("");
-        if (gameIndex < gameCount ) {
+        if (index < games.size()) {
             games.get(index).loadPicture();
-            if (index + 1 < gameCount) {
+            if (index + 1 < games.size()) {
                 games.get(index + 1).loadPicture();
             }
         } else {
@@ -239,7 +241,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
             picture = pic.get(rnd.nextInt(pic.size()));
         }
 
-        public void loadPicture() {
+        void loadPicture() {
             Activity a = getActivity();
             if (a == null)
                 return;
