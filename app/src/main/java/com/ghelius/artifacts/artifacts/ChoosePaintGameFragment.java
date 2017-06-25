@@ -117,7 +117,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
 //            Log.d(TAG, "getView " + i);
             final ChooseButton button = mButtons.get(i);
             final ImageView pic = (ImageView) view.findViewById(R.id.picture);
-            final View failMark = view.findViewById(R.id.fail_mark);
+            final ImageView failMark = (ImageView) view.findViewById(R.id.fail_mark);
             if (mButtons.get(i).cachedBitmap == null) {
                 pic.setImageResource(R.drawable.picture_dashed_placeholder);
             } else {
@@ -127,21 +127,20 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
             switch (button.state) {
                 case True:
                     view.setVisibility(View.VISIBLE);
-                    failMark.setVisibility(View.INVISIBLE);
+                    failMark.setVisibility(View.VISIBLE);
+                    failMark.setImageResource(R.drawable.tick);
                     break;
                 case False:
-                    //pic.setAlpha(50);
                     view.setVisibility(View.VISIBLE);
                     failMark.setVisibility(View.VISIBLE);
+                    failMark.setImageResource(R.drawable.cross);
                     break;
                 case Hide:
-                    //pic.setAlpha(0);
                     view.setVisibility(View.INVISIBLE);
                     failMark.setVisibility(View.INVISIBLE);
                     break;
                 case Normal:
                 default:
-                    //pic.setAlpha(255);
                     view.setVisibility(View.VISIBLE);
                     failMark.setVisibility(View.INVISIBLE);
                     break;
