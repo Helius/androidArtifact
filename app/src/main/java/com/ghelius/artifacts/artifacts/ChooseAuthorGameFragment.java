@@ -264,7 +264,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
-            Log.d(TAG, "play game " + gameIndex);
+//            Log.d(TAG, "play game " + gameIndex);
             ChooseAuthorGame game = games.get(gameIndex);
             game.loadPicture();
             mButtons.clear();
@@ -291,7 +291,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
     ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
-        Log.d(TAG, "create new " + count + "games");
+//        Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
@@ -331,7 +331,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(600,600) {
             @Override
             public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-                Log.d(TAG, "helius: image " + id + "loaded from ??");
+//                Log.d(TAG, "helius: image " + id + "loaded from ??");
                 if (id == gameIndex) {
                     mImageView.setImageBitmap(bitmap);
                     showButtonBlock(true);

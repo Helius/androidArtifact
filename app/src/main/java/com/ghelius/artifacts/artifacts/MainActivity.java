@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         } else if (id == R.id.nav_view) {
-            Log.d(TAG, "pressed nav_view");
+//            Log.d(TAG, "pressed nav_view");
 //        } else if (id == R.id.nav_gallery) {
 //            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
 //            if (galleryFragment == null) {
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 JSONObject loadUserData() {
                     String data = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("userData", "");
-                    Log.d(TAG, data);
+//                    Log.d(TAG, data);
                     JSONObject result;
                     try {
                         result = new JSONObject(data);

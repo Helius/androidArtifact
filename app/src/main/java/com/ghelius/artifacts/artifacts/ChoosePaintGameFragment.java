@@ -149,7 +149,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         }
 
         void update(int i) {
-            Log.d(TAG, "update grid");
+//            Log.d(TAG, "update grid");
             notifyDataSetChanged();
         }
     }
@@ -239,7 +239,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         View backgroundView = view.findViewById(R.id.full_image_fade_background);
         background = backgroundView.getBackground();
         background.setAlpha(0);
-        Log.d(TAG,"onCreateView");
+//        Log.d(TAG,"onCreateView");
 
         return view;
     }
@@ -341,7 +341,7 @@ public class SizeChangeAnimation extends Animation {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG,"onStart");
+//        Log.d(TAG,"onStart");
     }
 
     @Override
@@ -349,7 +349,7 @@ public class SizeChangeAnimation extends Animation {
         super.onResume();
         playGame(gameIndex);
         getActivity().setTitle(R.string.game_2_title);
-        Log.d(TAG,"onResume");
+//        Log.d(TAG,"onResume");
     }
 
     private void buttonSelected(int ind) {
@@ -433,7 +433,7 @@ public class SizeChangeAnimation extends Animation {
         setRetainInstance(true);
         games = createNewGame(gameCount);
         init();
-        Log.d(TAG,"onCreate");
+//        Log.d(TAG,"onCreate");
     }
 
     public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
@@ -445,7 +445,7 @@ public class SizeChangeAnimation extends Animation {
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
-            Log.d(TAG, "play game " + gameIndex);
+//            Log.d(TAG, "play game " + gameIndex);
             ChoosePaintGame game = games.get(gameIndex);
             mButtons.clear();
             for (Picture pic : game.picture_variant) {
@@ -503,7 +503,7 @@ public class SizeChangeAnimation extends Animation {
 
     ArrayList<ChoosePaintGame> createNewGame(int count)
     {
-        Log.d(TAG, "create new " + count + "games");
+//        Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChoosePaintGame> games = new ArrayList<>();

@@ -222,7 +222,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
          SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(600,600) {
             @Override
             public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-                Log.d(TAG, "helius: image " + id + "loaded from ??");
+//                Log.d(TAG, "helius: image " + id + "loaded from ??");
                 if (id == gameIndex) {
                     loader.setVisibility(View.GONE);
                     mImageView.setImageBitmap(bitmap);

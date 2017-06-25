@@ -266,7 +266,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
-            Log.d(TAG, "play game " + gameIndex);
+//            Log.d(TAG, "play game " + gameIndex);
             ChooseMovementGame game = games.get(gameIndex);
             game.loadPicture();
             mButtons.clear();
@@ -293,7 +293,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
 
     ArrayList<ChooseMovementGame> createNewGame(int count)
     {
-        Log.d(TAG, "create new " + count + "games");
+//        Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseMovementGame> games = new ArrayList<>();
@@ -339,7 +339,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(300,300) {
             @Override
             public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-                Log.d(TAG, "helius: image " + id + "loaded from ??");
+//                Log.d(TAG, "helius: image " + id + "loaded from ??");
                 if (id == gameIndex) {
                     mImageView.setImageBitmap(bitmap);
                     showButtonBlock(true);

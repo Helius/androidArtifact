@@ -25,7 +25,7 @@ public class GameDataProvider {
     public GameDataProvider(byte[] bytes) throws JSONException {
         JSONObject db_data = new JSONObject(new String(bytes));
 
-        Log.d(TAG, "start updating game data");
+//        Log.d(TAG, "start updating game data");
         pictures = new ArrayList<>();
         try {
             JSONArray array = db_data.getJSONObject("content").getJSONArray("pictures");
@@ -84,12 +84,12 @@ public class GameDataProvider {
                 }
             }
         }
-        Log.d(TAG, "data for level: "
-                + pictures_leveled.size() + ", " +
-                + authors_leveled.size()  + ", " +
-                + movements_leveled.size()+ ", "
-        );
-        Log.d(TAG, "stop updating game data");
+//        Log.d(TAG, "data for level: "
+//                + pictures_leveled.size() + ", " +
+//                + authors_leveled.size()  + ", " +
+//                + movements_leveled.size()+ ", "
+//        );
+//        Log.d(TAG, "stop updating game data");
 
     }
 
