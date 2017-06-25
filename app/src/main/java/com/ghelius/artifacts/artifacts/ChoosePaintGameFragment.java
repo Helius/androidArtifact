@@ -389,7 +389,7 @@ public class SizeChangeAnimation extends Animation {
             }
             timeout = 1500;
         }
-        userData.updateGameStatistic(TAG, games.get(gameIndex).picture_variant.get(ind), result);
+        userData.updateGameStatistic(getContext(), games.get(gameIndex).picture_variant.get(ind), result, TAG);
 
         sessionStatistic.addAttempt(result);
         mButtonAdapter.update(ind);

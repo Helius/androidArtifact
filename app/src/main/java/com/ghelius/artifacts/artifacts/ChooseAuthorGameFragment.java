@@ -211,7 +211,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
             }
         }
         sessionStatistic.addAttempt(result);
-        userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
+        userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
         mButtonAdapter.update(ind);
 
         Handler h = new Handler();

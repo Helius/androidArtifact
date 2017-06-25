@@ -213,7 +213,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
             }
         }
         sessionStatistic.addAttempt(result);
-        userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
+        userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
         mButtonAdapter.update(ind);
 
         Handler h = new Handler();

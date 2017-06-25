@@ -1,12 +1,17 @@
 package com.ghelius.artifacts.artifacts;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static android.R.attr.value;
 
 
 public abstract class UserData {
@@ -50,9 +55,20 @@ public abstract class UserData {
 
     }
 
-    void updateGameStatistic(String gameKey, Picture pic, boolean result) {
+    void updateGameStatistic(Context context, Picture pic, boolean result, String gameKey) {
         updateLocalGameStatistic(gameKey, result);
         pushToOnlineDb();
+        sendToAnalytics(context, gameKey, pic, result);
+    }
+
+    private void sendToAnalytics(Context context, String gameKey, Picture pic, boolean result) {
+        FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(context);
+        Bundle bundle = new Bundle();
+        bundle.putString("game", gameKey);
+        bundle.putString("pic", pic.path);
+        bundle.putBoolean("result", result);
+
+        analytics.logEvent("UserAttempt", bundle);
     }
 
     private void pushToOnlineDb() {

@@ -156,7 +156,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
             }
         }
         sessionStatistic.addAttempt(result);
-        userData.updateGameStatistic(TAG, games.get(gameIndex).picture, result);
+        userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
         mEditText.getText().clear();
 
         Handler h = new Handler();

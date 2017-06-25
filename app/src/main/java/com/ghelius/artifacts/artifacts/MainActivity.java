@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity
     public void logEvent(String event, String value) {
         Bundle bundle = new Bundle();
         if (value != null && value.length() > 0) {
-            bundle.putString("value", value);
+            bundle.putString("aValue", value);
         }
         mFirebaseAnalytics.logEvent(event, bundle);
     }
