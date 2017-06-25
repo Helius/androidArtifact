@@ -43,19 +43,7 @@ public class StatisticFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_statistic, container, false);
         TextView t = (TextView) v.findViewById(R.id.statistic_label);
-        String levelName;
-        switch (userData.getLevel()) {
-            case 0:
-                levelName = getString(R.string.level_0_text);
-                break;
-            case 1:
-                levelName = getString(R.string.level_0_text);
-                break;
-            default:
-                levelName = getString(R.string.level_0_text);
-                break;
-        }
-        t.setText(getString(R.string.statistics_title, levelName));
+        t.setText(getString(R.string.statistics_title, userData.getLevelName(userData.getLevel(), getContext())));
         ListView listView = (ListView) v.findViewById(R.id.statistic_listview);
 
 

@@ -147,7 +147,8 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
             result = true;
             timeout = 1;
         } else {
-            mImageView.setImageBitmap(null);
+//            mImageView.setImageBitmap(null);
+            authorHint.setVisibility(View.VISIBLE);
             if (Locale.getDefault().getLanguage().equals("ru")) {
                 authorHint.setText(games.get(gameIndex).author.name_ru);
             } else {
@@ -177,6 +178,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     private void playGame (int index) {
         loader.setVisibility(View.VISIBLE);
         authorHint.setText("");
+        authorHint.setVisibility(View.INVISIBLE);
         if (index < games.size()) {
             games.get(index).loadPicture();
             if (index + 1 < games.size()) {

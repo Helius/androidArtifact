@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity
             logEvent("OpenLevelDialogWith", String.valueOf(userData.getLevel()));
             chooseLevelDialog.init(getUserData());
             chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
-        } else if (id == R.id.nav_settings) {
-            Log.d(TAG, "pressed nav_settings");
+//        } else if (id == R.id.nav_settings) {
+//            Log.d(TAG, "pressed nav_settings");
         } else if (id == R.id.nav_statistics) {
             statisticFragment = (StatisticFragment) getSupportFragmentManager().findFragmentByTag("statistics");
             if (statisticFragment == null) {
@@ -101,18 +101,18 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_view) {
             Log.d(TAG, "pressed nav_view");
-        } else if (id == R.id.nav_gallery) {
-            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
-            if (galleryFragment == null) {
-                galleryFragment = new GalleryFragment();
-                final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.main_menu_fragment);
-                getSupportFragmentManager().beginTransaction()
-                        .hide(mainMenuFragment)
-                        .replace(R.id.main_fragment_holder, galleryFragment)
-                        .addToBackStack("gallery").commit();
-                galleryFragment.init(mainMenuFragment.getGameDataProvider());
-            }
+//        } else if (id == R.id.nav_gallery) {
+//            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
+//            if (galleryFragment == null) {
+//                galleryFragment = new GalleryFragment();
+//                final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+//                        .findFragmentById(R.id.main_menu_fragment);
+//                getSupportFragmentManager().beginTransaction()
+//                        .hide(mainMenuFragment)
+//                        .replace(R.id.main_fragment_holder, galleryFragment)
+//                        .addToBackStack("gallery").commit();
+//                galleryFragment.init(mainMenuFragment.getGameDataProvider());
+//            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
