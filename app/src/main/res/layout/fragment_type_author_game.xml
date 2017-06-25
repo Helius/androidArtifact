@@ -39,7 +39,7 @@
         android:id="@+id/text_input"
         android:layout_weight="0"
         android:completionThreshold="1"
-        android:imeOptions="actionDone"
+        android:imeOptions="actionDone|flagNoExtractUi"
         android:hint="@string/author_name_hint"
 
         android:inputType="text"
