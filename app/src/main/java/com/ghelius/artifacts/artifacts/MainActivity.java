@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                         .addToBackStack("statistic").commit();
             }
 
-        } else if (id == R.id.nav_view) {
+//        } else if (id == R.id.nav_view) {
 //            Log.d(TAG, "pressed nav_view");
 //        } else if (id == R.id.nav_gallery) {
 //            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
