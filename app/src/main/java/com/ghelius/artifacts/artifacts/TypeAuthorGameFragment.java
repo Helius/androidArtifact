@@ -29,6 +29,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Random;
 
@@ -192,18 +193,25 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
 
     private ArrayList<Game> createNewGame(int num)
     {
+        gameIndex = 0;
+        sessionStatistic = new BaseGameStatistic();
         ArrayList<Game> games = new ArrayList<>();
+        ArrayList<Author> tmp_authors = new ArrayList<>();
+
+        tmp_authors.addAll(authors);
+        Collections.shuffle(tmp_authors);
+
         for (int i = 0; i < num; ++i) {
             // create game with random author
-            games.add(new Game(authors.get(rnd.nextInt(authors.size())), i));
+            int index = rnd.nextInt(tmp_authors.size());
+            games.add(new Game(tmp_authors.get(index), i));
+            tmp_authors.remove(index);
         }
         return games;
     }
 
     @Override
     public void moreButtonPressed() {
-        gameIndex = 0;
-        sessionStatistic = new BaseGameStatistic();
         games = createNewGame(gameCount);
         playGame(gameIndex);
     }

@@ -40,7 +40,11 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        int rating = (10*trueCount)/from;
+        int rating = 0;
+
+        if (from != 0) {
+            rating = (10*trueCount)/from;
+        }
 
         String title;
         if (rating < 4) {
@@ -82,8 +86,7 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     public void onResume() {
         super.onResume();
         BaseGameStatistic statistic = userData.getGameStatistic(gameTag);
-        if (/*((10*statistic.trueAttempt)/(statistic.trueAttempt + statistic.falseAttempt) > 7)
-                &&*/ ((trueCount * 10) / from > 8) ) {
+        if ( (from != 0) && ((trueCount * 10) / from) > 8 ) {
             if (userData.getLevel() < userData.getMaxLevel()) {
                 //TODO: eventLog to analytics
                 showRizeLevelDialog();
