@@ -37,4 +37,5 @@
     <string name="game_finished_dialog_title_low">Keep on trying!</string>
     <string name="rize_level_dialog_title">Excellent results on %1$s level!</string>
     <string name="rize_level_dialog_text">Do you want try next level %1$s?</string>
+    <string name="about">About us</string>
 </resources>

@@ -4,9 +4,11 @@ package com.ghelius.artifacts.artifacts;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -98,6 +100,9 @@ public class MainActivity extends AppCompatActivity
                         .replace(R.id.main_fragment_holder, statisticFragment)
                         .addToBackStack("statistic").commit();
             }
+        } else if (id == R.id.nav_about) {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Helius/androidArtifact"));
+            startActivity(i);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
