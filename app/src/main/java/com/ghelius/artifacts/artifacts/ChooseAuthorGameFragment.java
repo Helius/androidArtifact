@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -168,7 +167,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData, TAG);
+        dialog.init(sessionStatistic, userData);
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -225,7 +224,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData, TAG);
+                    dialog.init(sessionStatistic, userData);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

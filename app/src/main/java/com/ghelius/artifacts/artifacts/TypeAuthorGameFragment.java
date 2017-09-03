@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,7 +94,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData, TAG);
+        dialog.init(sessionStatistic, userData);
         dialog.setEventListener(this);
 
         View v = inflater.inflate(R.layout.fragment_type_author_game, container, false);
@@ -186,7 +185,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
                 games.get(index + 1).loadPicture();
             }
         } else {
-            dialog.init(sessionStatistic, userData, TAG);
+            dialog.init(sessionStatistic, userData);
             dialog.show(getActivity().getSupportFragmentManager(), "dialog");
         }
     }

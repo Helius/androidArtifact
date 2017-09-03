@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,7 +170,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData, TAG);
+        dialog.init(sessionStatistic, userData);
         dialog.setEventListener(this);
         locale = Locale.getDefault().getLanguage();
 
@@ -227,7 +226,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData, TAG);
+                    dialog.init(sessionStatistic, userData);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

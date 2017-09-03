@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -74,7 +73,6 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         Picture picture;
         ButtonState state;
         int author_id;
-        String url;
         Bitmap cachedBitmap;
 
         ChooseButton(Picture picture, int author_id) {
@@ -231,7 +229,7 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();
         }
-        dialog.init(sessionStatistic, userData, TAG);
+        dialog.init(sessionStatistic, userData);
         dialog.setEventListener(this);
 
         fullImage = (ImageView) view.findViewById(R.id.full_image);
@@ -405,7 +403,7 @@ public class SizeChangeAnimation extends Animation {
                     showButtonBlock(false);
                     playGame(++gameIndex);
                 } else {
-                    dialog.init(sessionStatistic, userData, TAG);
+                    dialog.init(sessionStatistic, userData);
                     dialog.show(getActivity().getSupportFragmentManager(), "dialog");
                 }
             }

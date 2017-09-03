@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.test.espresso.matcher.PreferenceMatchers;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,7 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     private int trueCount;
     private int from;
     private UserData userData;
-    private String gameTag;
+    private final static String levelRiseDismissKey = "userDismissLevelDialog";
 
 
     public interface DialogEventListener {
@@ -90,34 +89,35 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
         super.onResume();
         if (from == 0)
             return;
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        boolean userHasDismissedDialog = p.getBoolean(levelRiseDismissKey, false);
 
-        if (userData.getLevel() < userData.getMaxLevel()) {
+
+        if (!userHasDismissedDialog && (userData.getLevel() < userData.getMaxLevel())) {
             final String key = "SuccessSessionCount";
-            SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
             int cnt = p.getInt(key, 0) + 1;
 
             if((trueCount * 10) / from > 8) {
                 //TODO: eventLog to analytics
                 if (cnt == 3) {
                     cnt = 0;
-                    showRizeLevelDialog();
+                    showRiseLevelDialog();
                 }
             } else {
                 cnt = 0;
             }
-            p.edit().putInt(key, cnt);
+            p.edit().putInt(key, cnt).apply();
         }
     }
 
-    public void init(BaseGameStatistic sessionStatistic, UserData userData, String gameTag) {
+    public void init(BaseGameStatistic sessionStatistic, UserData userData) {
         this.trueCount = sessionStatistic.trueAttempt;
         this.from = sessionStatistic.trueAttempt + sessionStatistic.falseAttempt;
         this.userData = userData;
-        this.gameTag = gameTag;
     }
 
 
-    private void showRizeLevelDialog() {
+    private void showRiseLevelDialog() {
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
         alertDialog.setTitle(getString(R.string.rize_level_dialog_title, userData.getLevelName(userData.getLevel(), getActivity().getApplicationContext())));
         alertDialog.setMessage(getString(R.string.rize_level_dialog_text, userData.getLevelName(userData.getLevel() + 1, getActivity().getApplicationContext())));
@@ -134,6 +134,8 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
                     public void onClick(DialogInterface dialog, int which) {
                         //TODO: eventLog to analytics
                         dialog.dismiss();
+                        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+                        p.edit().putBoolean(levelRiseDismissKey, true).apply();
                     }
                 });
         alertDialog.show();
