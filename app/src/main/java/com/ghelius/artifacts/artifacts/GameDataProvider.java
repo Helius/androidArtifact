@@ -33,6 +33,7 @@ public class GameDataProvider {
         }
 
         authors = new ArrayList<>();
+
         try {
             JSONArray array = db_data.getJSONObject("content").getJSONArray("authors");
             for (int i = 0; i < array.length(); i++) {
