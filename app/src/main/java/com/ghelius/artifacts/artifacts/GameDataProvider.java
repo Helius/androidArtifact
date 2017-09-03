@@ -83,8 +83,10 @@ public class GameDataProvider {
     }
 
     public void setLevel(int level) {
-        this.level = level;
-        createFilteredCollections();
+        if (this.level != level) {
+            this.level = level;
+            createFilteredCollections();
+        }
     }
 
     public ArrayList<Movement> getMovements() {
