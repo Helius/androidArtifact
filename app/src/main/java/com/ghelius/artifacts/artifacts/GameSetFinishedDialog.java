@@ -1,7 +1,10 @@
 package com.ghelius.artifacts.artifacts;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.test.espresso.matcher.PreferenceMatchers;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,12 +88,24 @@ public class GameSetFinishedDialog extends android.support.v4.app.DialogFragment
     @Override
     public void onResume() {
         super.onResume();
-        BaseGameStatistic statistic = userData.getGameStatistic(gameTag);
-        if ( (from != 0) && ((trueCount * 10) / from) > 8 ) {
-            if (userData.getLevel() < userData.getMaxLevel()) {
+        if (from == 0)
+            return;
+
+        if (userData.getLevel() < userData.getMaxLevel()) {
+            final String key = "SuccessSessionCount";
+            SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+            int cnt = p.getInt(key, 0) + 1;
+
+            if((trueCount * 10) / from > 8) {
                 //TODO: eventLog to analytics
-                showRizeLevelDialog();
+                if (cnt == 3) {
+                    cnt = 0;
+                    showRizeLevelDialog();
+                }
+            } else {
+                cnt = 0;
             }
+            p.edit().putInt(key, cnt);
         }
     }
 
