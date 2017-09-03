@@ -98,21 +98,6 @@ public class MainActivity extends AppCompatActivity
                         .replace(R.id.main_fragment_holder, statisticFragment)
                         .addToBackStack("statistic").commit();
             }
-
-//        } else if (id == R.id.nav_view) {
-//            Log.d(TAG, "pressed nav_view");
-//        } else if (id == R.id.nav_gallery) {
-//            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
-//            if (galleryFragment == null) {
-//                galleryFragment = new GalleryFragment();
-//                final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
-//                        .findFragmentById(R.id.main_menu_fragment);
-//                getSupportFragmentManager().beginTransaction()
-//                        .hide(mainMenuFragment)
-//                        .replace(R.id.main_fragment_holder, galleryFragment)
-//                        .addToBackStack("gallery").commit();
-//                galleryFragment.init(mainMenuFragment.getGameDataProvider());
-//            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -287,7 +272,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(byte[] bytes) {
                 try {
-                    holder.setGameDataProvider(new GameDataProvider(bytes));
+                    holder.setGameDataProvider(new GameDataProvider(bytes, userData.getLevel()));
                     findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.d(TAG, "Can't parse json db");
@@ -344,7 +329,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 JSONObject loadUserData() {
                     String data = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("userData", "");
-//                    Log.d(TAG, data);
                     JSONObject result;
                     try {
                         result = new JSONObject(data);

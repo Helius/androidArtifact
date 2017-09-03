@@ -1,10 +1,5 @@
 package com.ghelius.artifacts.artifacts;
 
-
-import android.util.Log;
-
-import com.google.firebase.storage.FirebaseStorage;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,10 +17,11 @@ public class GameDataProvider {
     private ArrayList<Picture> pictures_leveled = new ArrayList<>();
     private int level = 0;
 
-    public GameDataProvider(byte[] bytes) throws JSONException {
+    public GameDataProvider(byte[] bytes, int level) throws JSONException {
+        this.level = level;
         JSONObject db_data = new JSONObject(new String(bytes));
 
-//        Log.d(TAG, "start updating game data");
+
         pictures = new ArrayList<>();
         try {
             JSONArray array = db_data.getJSONObject("content").getJSONArray("pictures");
@@ -84,17 +80,6 @@ public class GameDataProvider {
                 }
             }
         }
-//        Log.d(TAG, "data for level: "
-//                + pictures_leveled.size() + ", " +
-//                + authors_leveled.size()  + ", " +
-//                + movements_leveled.size()+ ", "
-//        );
-//        Log.d(TAG, "stop updating game data");
-
-    }
-
-    public int getLevel() {
-        return level;
     }
 
     public void setLevel(int level) {
