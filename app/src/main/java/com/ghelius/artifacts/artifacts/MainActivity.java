@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
             chooseLevelDialog.init(getUserData());
             chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
 //        } else if (id == R.id.nav_settings) {
-//            Log.d(TAG, "pressed nav_settings");
+
         } else if (id == R.id.nav_statistics) {
             statisticFragment = (StatisticFragment) getSupportFragmentManager().findFragmentByTag("statistics");
             if (statisticFragment == null) {
@@ -351,6 +351,15 @@ public class MainActivity extends AppCompatActivity
                             .findFragmentById(R.id.main_menu_fragment);
                     mainMenuFragment.getGameDataProvider().setLevel(getLevel());
                     logEvent("LevelChangedTo", String.valueOf(getLevel()));
+                    if (chooseAuthorGameFragment != null)
+                        chooseAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                    if (chooseMovementGameFragment != null)
+                        chooseMovementGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                    if (choosePaintGameFragment != null)
+                        choosePaintGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                    if (typeAuthorGameFragment != null)
+                        typeAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+
                 }
             };
         }
