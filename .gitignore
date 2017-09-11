@@ -54,3 +54,10 @@ captures/
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
 app/google-services.json
+.idea/misc.xml
+*.swo
+*.swp
+tools/*.json
+*.json
+.idea/vcs.xml
+tools/.ropeproject

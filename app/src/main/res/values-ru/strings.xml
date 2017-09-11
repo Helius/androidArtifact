@@ -36,4 +36,5 @@
     <string name="rize_level_dialog_title">Отличные результаты на уровне %1$s!</string>
     <string name="rize_level_dialog_text">Не желаете попробовать уровень %1$s?</string>
     <string name="about">О приложении</string>
+    <string name="favorites">Избранное</string>
 </resources>

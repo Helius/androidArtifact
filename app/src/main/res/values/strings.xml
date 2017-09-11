@@ -38,4 +38,5 @@
     <string name="rize_level_dialog_title">Excellent results on %1$s level!</string>
     <string name="rize_level_dialog_text">Do you want try next level %1$s?</string>
     <string name="about">About us</string>
+    <string name="favorites">Favorites</string>
 </resources>

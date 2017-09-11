@@ -25,13 +25,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity
 
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
+    private ImageView sbInfoButton;
 
     public void logEvent(String event) {
         logEvent(event, null);
@@ -86,8 +87,9 @@ public class MainActivity extends AppCompatActivity
             logEvent("OpenLevelDialogWith", String.valueOf(userData.getLevel()));
             chooseLevelDialog.init(getUserData());
             chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
+        } else if (id == R.id.nav_favorites) {
+        //TODO: open favorites screen with list and zero-screen
 //        } else if (id == R.id.nav_settings) {
-
         } else if (id == R.id.nav_statistics) {
             statisticFragment = (StatisticFragment) getSupportFragmentManager().findFragmentByTag("statistics");
             if (statisticFragment == null) {
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity
         View headerLayout = navigationView.getHeaderView(0);
 
         sbMainText = (TextView) headerLayout.findViewById(R.id.side_bar_main_text);
+        sbInfoButton = (ImageView) findViewById(R.id.action_bar_info_button);
 
 
         final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
@@ -148,7 +151,6 @@ public class MainActivity extends AppCompatActivity
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
                             chooseAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
                         }
-
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
                                 .replace(R.id.main_fragment_holder, chooseAuthorGameFragment)
@@ -229,6 +231,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
                     arrowForwardAnimation.start();
+                    sbInfoButton.setVisibility(View.VISIBLE);
                 } else {
                     toggle.syncState();
                     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -239,6 +242,7 @@ public class MainActivity extends AppCompatActivity
                     });
                     arrowBackAnimation.start();
                     setTitle(R.string.app_name);
+                    sbInfoButton.setVisibility(View.INVISIBLE);
                 }
             }
         });
