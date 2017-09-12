@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity
 
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
-    private ImageView sbInfoButton;
 
     public void logEvent(String event) {
         logEvent(event, null);
@@ -137,7 +136,6 @@ public class MainActivity extends AppCompatActivity
         View headerLayout = navigationView.getHeaderView(0);
 
         sbMainText = (TextView) headerLayout.findViewById(R.id.side_bar_main_text);
-        sbInfoButton = (ImageView) findViewById(R.id.action_bar_info_button);
 
 
         final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
@@ -231,7 +229,6 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
                     arrowForwardAnimation.start();
-                    sbInfoButton.setVisibility(View.VISIBLE);
                 } else {
                     toggle.syncState();
                     toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -242,7 +239,6 @@ public class MainActivity extends AppCompatActivity
                     });
                     arrowBackAnimation.start();
                     setTitle(R.string.app_name);
-                    sbInfoButton.setVisibility(View.INVISIBLE);
                 }
             }
         });

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,16 +24,12 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Random;
 
 
-public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
+public class ChooseAuthorGameFragment extends BaseGameFragment {
 
     public static final String TAG = "ChooseAuthor";
-
-    private ArrayList<Picture> pictures;
-    private ArrayList<Author> authors;
 
     private StorageReference mStorageRef;
     private ImageView mImageView;
@@ -43,13 +38,6 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     private ArrayList<ChooseButton> mButtons;
     private ButtonAdapter mButtonAdapter;
     private ArrayList<ChooseAuthorGame> games = null;
-    private int gameIndex;
-    GameSetFinishedDialog dialog;
-    private int gameCount = 10;
-    private BaseGameStatistic sessionStatistic;
-    private String locale;
-    private UserData userData;
-    private GameDataProvider gameDataProvider;
 
     enum ButtonState {Normal, True, False};
 
@@ -120,7 +108,6 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
 
     private void init () {
-        gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         rnd = new Random(System.currentTimeMillis());
         mButtons = new ArrayList<>();
@@ -147,6 +134,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
@@ -163,20 +151,8 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         if (games == null) {
             games = createNewGame(gameCount);
         }
-        dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-        if (dialog == null) {
-            dialog = new GameSetFinishedDialog();
-        }
-        dialog.init(sessionStatistic, userData);
-        dialog.setEventListener(this);
-        locale = Locale.getDefault().getLanguage();
 
         return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -249,17 +225,10 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        setRetainInstance(true);
         games = createNewGame(gameCount);
         init();
     }
 
-    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
-        this.gameDataProvider = gameDataProvider;
-        this.userData = userData;
-        this.pictures = gameDataProvider.getPictures();
-        this.authors = gameDataProvider.getAuthors();
-    }
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
@@ -296,7 +265,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();
-        tmp_pic.addAll(pictures);
+        tmp_pic.addAll(gameDataProvider.getPictures());
         Collections.shuffle(tmp_pic);
 
         for (int i = 0; i < count; i++) {
@@ -306,7 +275,7 @@ public class ChooseAuthorGameFragment extends Fragment implements GameSetFinishe
                 game.authors_variant.add(gameDataProvider.getAuthorById(game.picture.author));
                 int author_count = 3;
                 while (author_count > 0) {
-                    Author a = authors.get(rnd.nextInt(authors.size()));
+                    Author a = gameDataProvider.getAuthors().get(rnd.nextInt(gameDataProvider.getAuthors().size()));
                     if (!game.authors_variant.contains(a)) {
                         game.authors_variant.add(a);
                         author_count--;
