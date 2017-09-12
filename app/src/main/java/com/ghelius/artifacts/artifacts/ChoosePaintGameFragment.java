@@ -309,18 +309,12 @@ public class SizeChangeAnimation extends Animation {
         view.requestLayout();
     }
 }
-    @Override
-    public void onStart() {
-        super.onStart();
-//        Log.d(TAG,"onStart");
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         playGame(gameIndex);
         getActivity().setTitle(R.string.game_2_title);
-//        Log.d(TAG,"onResume");
     }
 
     private void buttonSelected(int ind) {

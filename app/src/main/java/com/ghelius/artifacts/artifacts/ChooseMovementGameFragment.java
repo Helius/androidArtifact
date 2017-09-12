@@ -87,11 +87,6 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         playGame(gameIndex);
