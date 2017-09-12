@@ -40,33 +40,22 @@ import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonStat
 import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.True;
 
 
-public class ChoosePaintGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
+public class ChoosePaintGameFragment extends BaseGameFragment{
 
     public static final String TAG = "ChoosePaint";
 
-    private ArrayList<Picture> pictures;
-    private ArrayList<Author> authors;
-
-    private StorageReference mStorageRef;
     private TextView author_view;
     private Random rnd;
     private boolean buttonBlocked;
     private ArrayList<ChooseButton> mButtons;
     private ButtonAdapter mButtonAdapter;
     private ArrayList<ChoosePaintGame> games = null;
-    private int gameIndex;
     GameSetFinishedDialog dialog;
     ImageView fullImage;
-    private int gameCount = 10;
-    BaseGameStatistic sessionStatistic;
-    private String locale;
     private boolean fullShowed = false;
     private Drawable background;
-    private UserData userData;
-    private GameDataProvider gameDataProvider;
 
     enum ButtonState {Normal, True, Hide, False}
-
 
 
     private class ChooseButton {
@@ -184,7 +173,6 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        locale = Locale.getDefault().getLanguage();
         View view = inflater.inflate(R.layout.fragment_choose_paint_game, container, false);
         final GridView mGridView = (GridView) view.findViewById(R.id.paint_grid);
         author_view = (TextView) view.findViewById(R.id.author);
@@ -225,12 +213,6 @@ public class ChoosePaintGameFragment extends Fragment implements GameSetFinished
         if (games == null) {
             games = createNewGame(gameCount);
         }
-        dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-        if (dialog == null) {
-            dialog = new GameSetFinishedDialog();
-        }
-        dialog.init(sessionStatistic, userData);
-        dialog.setEventListener(this);
 
         fullImage = (ImageView) view.findViewById(R.id.full_image);
 
@@ -420,25 +402,16 @@ public class SizeChangeAnimation extends Animation {
     @Override
     public void finishButtonPressed() {
         // delete games here, when we will return, we create new one, instead using existing
+        super.finishButtonPressed();
         games = null;
-        getActivity().getSupportFragmentManager().popBackStack();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        setRetainInstance(true);
         games = createNewGame(gameCount);
         init();
 //        Log.d(TAG,"onCreate");
-    }
-
-    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
-        this.gameDataProvider = gameDataProvider;
-        this.userData = userData;
-        this.pictures = gameDataProvider.getPictures();
-        this.authors = gameDataProvider.getAuthors();
     }
 
     private void playGame(int gameIndex) {
@@ -507,19 +480,19 @@ public class SizeChangeAnimation extends Animation {
         ArrayList<ChoosePaintGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();
-        tmp_pic.addAll(pictures);
+        tmp_pic.addAll(dataProvider.getPictures());
         Collections.shuffle(tmp_pic);
 
         for (int i = 0; i < count; i++) {
             ChoosePaintGame game = new ChoosePaintGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture_variant.add(tmp_pic.remove(rnd.nextInt(tmp_pic.size())));
-                game.author = gameDataProvider.getAuthorById(game.picture_variant.get(0).author);
+                game.author = dataProvider.getAuthorById(game.picture_variant.get(0).author);
 
 
                 int pic_count = 3;
                 while (pic_count > 0) {
-                    Picture pic = pictures.get(rnd.nextInt(pictures.size()));
+                    Picture pic = dataProvider.getPictures().get(rnd.nextInt(dataProvider.getPictures().size()));
                     if (!game.picture_variant.contains(pic) && game.author.id != pic.author) {
                         game.picture_variant.add(pic);
                         pic_count--;

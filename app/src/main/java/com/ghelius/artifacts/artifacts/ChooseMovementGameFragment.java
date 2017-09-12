@@ -32,27 +32,16 @@ import java.util.Locale;
 import java.util.Random;
 
 
-public class ChooseMovementGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener{
+public class ChooseMovementGameFragment extends BaseGameFragment {
 
     public static final String TAG = "ChooseMovements";
 
-    private ArrayList<Picture> pictures;
-    private ArrayList<Movement> movements;
-
-    private StorageReference mStorageRef;
     private ImageView mImageView;
     private Random rnd;
     private boolean buttonBlocked;
     private ArrayList<ChooseButton> mButtons;
     private ButtonAdapter mButtonAdapter;
     private ArrayList<ChooseMovementGame> games = null;
-    private int gameIndex;
-    GameSetFinishedDialog dialog;
-    private int gameCount = 10;
-    private BaseGameStatistic sessionStatistic;
-    private String locale;
-    private UserData userData;
-    private GameDataProvider gameDataProvider;
 
     enum ButtonState {Normal, True, False};
 
@@ -166,13 +155,6 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         if (games == null) {
             games = createNewGame(gameCount);
         }
-        dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-        if (dialog == null) {
-            dialog = new GameSetFinishedDialog();
-        }
-        dialog.init(sessionStatistic, userData);
-        dialog.setEventListener(this);
-        locale = Locale.getDefault().getLanguage();
 
         return view;
     }
@@ -242,26 +224,17 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
 
     @Override
     public void finishButtonPressed() {
-        // delete games here, when we will return, we create new one, instead using existing
+        super.finishButtonPressed();
         games = null;
-        getActivity().getSupportFragmentManager().popBackStack();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        setRetainInstance(true);
         games = createNewGame(gameCount);
         init();
     }
 
-    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
-        this.gameDataProvider = gameDataProvider;
-        this.userData = userData;
-        this.pictures = gameDataProvider.getPictures();
-        this.movements = gameDataProvider.getMovements();
-    }
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
@@ -298,7 +271,7 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
         ArrayList<ChooseMovementGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();
-        for (Picture pic: pictures) {
+        for (Picture pic: dataProvider.getPictures()) {
             if (pic.movement_id != 0) {
                 tmp_pic.add(pic);
             }
@@ -310,10 +283,10 @@ public class ChooseMovementGameFragment extends Fragment implements GameSetFinis
             ChooseMovementGame game = new ChooseMovementGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
-                game.movement_variant.add(gameDataProvider.getMovementById(game.picture.movement_id));
+                game.movement_variant.add(dataProvider.getMovementById(game.picture.movement_id));
                 int movement_count = 3;
                 while (movement_count > 0) {
-                    Movement a = movements.get(rnd.nextInt(movements.size()));
+                    Movement a = dataProvider.getMovements().get(rnd.nextInt(dataProvider.getMovements().size()));
                     if (!game.movement_variant.contains(a)) {
                         game.movement_variant.add(a);
                         movement_count--;

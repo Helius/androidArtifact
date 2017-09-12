@@ -8,8 +8,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Locale;
 
@@ -18,7 +19,8 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     private View historyButton = null;
     private GameHistory gameHistory = new GameHistory();
 
-    public GameDataProvider gameDataProvider = null;
+    public StorageReference mStorageRef;
+    public GameDataProvider dataProvider = null;
     public GameSetFinishedDialog dialog;
     public UserData userData = null;
     public BaseGameStatistic sessionStatistic;
@@ -31,7 +33,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     }
 
     public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
-        this.gameDataProvider = gameDataProvider;
+        this.dataProvider = gameDataProvider;
         this.userData = userData;
     }
 
@@ -60,6 +62,8 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        sessionStatistic = new BaseGameStatistic();
     }
 
     @Override
@@ -117,6 +121,6 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
 
     @Override
     public void finishButtonPressed() {
-
+        getActivity().getSupportFragmentManager().popBackStack();
     }
 }

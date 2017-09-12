@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,24 +31,16 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Random;
 
-public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
+public class TypeAuthorGameFragment extends BaseGameFragment {
 
     public static final String TAG = "TypeAuthor";
 
-    private ArrayList<Picture> pictures;
-    private ArrayList<Author> authors;
     private ArrayList<Game> games;
-    private int gameCount = 10;
-    private int gameIndex = 0;
     private ImageView mImageView;
     Random rnd;
-    private StorageReference mStorageRef;
     AutoCompleteTextView mEditText;
     private View loader;
-    GameSetFinishedDialog dialog;
-    BaseGameStatistic sessionStatistic;
     private TextView authorHint;
-    private UserData userData;
 
     public TypeAuthorGameFragment() {
         // Required empty public constructor
@@ -75,33 +66,24 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        setRetainInstance(true);
         games = createNewGame(gameCount);
-        sessionStatistic = new BaseGameStatistic();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
         if (games == null) {
             sessionStatistic = new BaseGameStatistic();
             games = createNewGame(gameCount);
         }
 
-        dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-        if (dialog == null) {
-            dialog = new GameSetFinishedDialog();
-        }
-        dialog.init(sessionStatistic, userData);
-        dialog.setEventListener(this);
-
         View v = inflater.inflate(R.layout.fragment_type_author_game, container, false);
         mImageView = (ImageView) v.findViewById(R.id.main_pic);
         mEditText = (AutoCompleteTextView) v.findViewById(R.id.text_input);
         ArrayList<String> suggestList = new ArrayList<>();
-        for(Author a: authors) {
+        for(Author a: dataProvider.getAuthors()) {
             suggestList.add(a.name_ru);
             suggestList.add(a.name_en);
         }
@@ -169,12 +151,6 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
     }
 
 
-    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
-        this.userData = userData;
-        this.pictures = gameDataProvider.getPictures();
-        this.authors = gameDataProvider.getAuthors();
-    }
-
     private void playGame (int index) {
         loader.setVisibility(View.VISIBLE);
         authorHint.setText("");
@@ -197,7 +173,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
         ArrayList<Game> games = new ArrayList<>();
         ArrayList<Author> tmp_authors = new ArrayList<>();
 
-        tmp_authors.addAll(authors);
+        tmp_authors.addAll(dataProvider.getAuthors());
         Collections.shuffle(tmp_authors);
 
         for (int i = 0; i < num; ++i) {
@@ -217,8 +193,8 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
 
     @Override
     public void finishButtonPressed() {
+        super.finishButtonPressed();
         games = null;
-        getActivity().getSupportFragmentManager().popBackStack();
     }
 
     class Game {
@@ -242,7 +218,7 @@ public class TypeAuthorGameFragment extends Fragment implements GameSetFinishedD
             this.id = id;
             ArrayList<Picture> pic = new ArrayList<>();
             // find random picture of given author
-            for (Picture p : pictures) {
+            for (Picture p : dataProvider.getPictures()) {
                 if (p.author == author.id) {
                     pic.add(p);
                 }

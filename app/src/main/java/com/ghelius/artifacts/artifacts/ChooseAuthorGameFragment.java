@@ -31,7 +31,6 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
 
     public static final String TAG = "ChooseAuthor";
 
-    private StorageReference mStorageRef;
     private ImageView mImageView;
     private Random rnd;
     private boolean buttonBlocked;
@@ -217,14 +216,13 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     @Override
     public void finishButtonPressed() {
         // delete games here, when we will return, we create new one, instead using existing
+        super.finishButtonPressed();
         games = null;
-        getActivity().getSupportFragmentManager().popBackStack();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStorageRef = FirebaseStorage.getInstance().getReference();
         games = createNewGame(gameCount);
         init();
     }
@@ -265,17 +263,17 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
 
         ArrayList<Picture> tmp_pic = new ArrayList<>();
-        tmp_pic.addAll(gameDataProvider.getPictures());
+        tmp_pic.addAll(dataProvider.getPictures());
         Collections.shuffle(tmp_pic);
 
         for (int i = 0; i < count; i++) {
             ChooseAuthorGame game = new ChooseAuthorGame(i);
             if (tmp_pic.size() > 0) {
                 game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
-                game.authors_variant.add(gameDataProvider.getAuthorById(game.picture.author));
+                game.authors_variant.add(dataProvider.getAuthorById(game.picture.author));
                 int author_count = 3;
                 while (author_count > 0) {
-                    Author a = gameDataProvider.getAuthors().get(rnd.nextInt(gameDataProvider.getAuthors().size()));
+                    Author a = dataProvider.getAuthors().get(rnd.nextInt(dataProvider.getAuthors().size()));
                     if (!game.authors_variant.contains(a)) {
                         game.authors_variant.add(a);
                         author_count--;
