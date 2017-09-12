@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     tools:context="com.ghelius.artifacts.artifacts.ChooseAuthorGameFragment">
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <RelativeLayout
             android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp">
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/main_pic"
                 android:layout_width="match_parent"
@@ -25,18 +25,19 @@
                 app:cpv_animAutostart="true"
                 app:cpv_indeterminate="true" />
         </RelativeLayout>
-        <GridView
-            android:id="@+id/choose_button_grid_view"
-            android:numColumns="4"
-            android:horizontalSpacing="10dp"
-            android:verticalSpacing="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="14dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </GridView>
+            <GridView
+                android:id="@+id/choose_button_grid_view"
+                android:numColumns="1"
+                android:verticalSpacing="20dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+
+                android:layout_gravity="center_vertical"
+
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                >
+            </GridView>
 
     </LinearLayout>
 
