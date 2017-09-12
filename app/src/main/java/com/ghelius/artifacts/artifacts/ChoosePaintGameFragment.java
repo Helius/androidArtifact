@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,19 +25,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Random;
-
-import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.False;
-import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.Hide;
-import static com.ghelius.artifacts.artifacts.ChoosePaintGameFragment.ButtonState.True;
-
 
 public class ChoosePaintGameFragment extends BaseGameFragment{
 
@@ -56,7 +47,6 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
     private Drawable background;
 
     enum ButtonState {Normal, True, Hide, False}
-
 
     private class ChooseButton {
         Picture picture;
@@ -172,6 +162,7 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_paint_game, container, false);
         final GridView mGridView = (GridView) view.findViewById(R.id.paint_grid);
@@ -346,10 +337,10 @@ public class SizeChangeAnimation extends Animation {
 //            author_view.setBackgroundResource(R.drawable.choose_button_true_background_shape);
             for(ChooseButton button : mButtons) {
                 if(button.author_id == games.get(gameIndex).author.id) {
-                    button.state = True;
+                    button.state = ButtonState.True;
                 }
                 else {
-                    button.state = Hide;
+                    button.state = ButtonState.Hide;
                 }
             }
         } else {
@@ -357,13 +348,13 @@ public class SizeChangeAnimation extends Animation {
 //            author_view.setBackgroundResource(R.drawable.choose_button_false_background_shape);
             for(ChooseButton button : mButtons) {
                 if(button.author_id == games.get(gameIndex).author.id) {
-                    button.state = True;
+                    button.state = ButtonState.True;
                 }
                 else {
                     if (mButtons.indexOf(button) == ind) {
-                        button.state = False;
+                        button.state = ButtonState.False;
                     } else {
-                        button.state = Hide;
+                        button.state = ButtonState.Hide;
                     }
                 }
             }

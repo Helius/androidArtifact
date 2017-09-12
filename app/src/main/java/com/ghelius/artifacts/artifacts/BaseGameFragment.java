@@ -19,6 +19,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     private View historyButton = null;
     private GameHistory gameHistory = new GameHistory();
 
+
     public StorageReference mStorageRef;
     public GameDataProvider dataProvider = null;
     public GameSetFinishedDialog dialog;
@@ -27,6 +28,8 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     public String locale;
     public int gameIndex = 0;
     public int gameCount = 10;
+
+
 
     public BaseGameFragment() {
         // Required empty public constructor
@@ -37,7 +40,6 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
         this.userData = userData;
     }
 
-
     public void addToHistory(GameHistory.GameHistoryItem item) {
         gameHistory.addItem(item);
         if (gameHistory.size() > 0) {
@@ -46,6 +48,8 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
             enableHistoryButton(false);
         }
     }
+
+
 
 
     private void enableHistoryButton(boolean enable) {

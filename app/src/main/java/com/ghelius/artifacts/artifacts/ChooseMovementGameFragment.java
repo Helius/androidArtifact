@@ -2,33 +2,26 @@ package com.ghelius.artifacts.artifacts;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Random;
 
 
@@ -39,76 +32,9 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
     private ImageView mImageView;
     private Random rnd;
     private boolean buttonBlocked;
-    private ArrayList<ChooseButton> mButtons;
-    private ButtonAdapter mButtonAdapter;
+    private ArrayList<TextButton> mButtons;
+    private TextButtonAdapter mTextButtonAdapter;
     private ArrayList<ChooseMovementGame> games = null;
-
-    enum ButtonState {Normal, True, False};
-
-    private class ChooseButton {
-        String text;
-        ButtonState state;
-        int movement_id;
-
-        ChooseButton(String text, int movement_id) {
-            this.text = text;
-            this.state = ButtonState.Normal;
-            this.movement_id = movement_id;
-        }
-    }
-
-
-    private class ButtonAdapter extends BaseAdapter {
-        private final LayoutInflater mInflater;
-        private ArrayList<ChooseButton> mButtons;
-
-        ButtonAdapter(Context context, ArrayList<ChooseButton> buttons) {
-            mButtons = buttons;
-            this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
-
-        @Override
-        public int getCount() {
-            return mButtons.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            if (view == null) {
-                view = mInflater.inflate(R.layout.choose_button_item, viewGroup, false);
-            }
-            TextView text = (TextView) view.findViewById(R.id.text);
-            ChooseButton button = mButtons.get(i);
-            text.setText(button.text);
-            switch (button.state) {
-                case True:
-                    text.setBackgroundResource(R.drawable.choose_button_true_background_shape);
-                    break;
-                case False:
-                    text.setBackgroundResource(R.drawable.choose_button_false_background_shape);
-                    break;
-                default:
-                    text.setBackgroundResource(0);
-                    break;
-            }
-
-            return view;
-        }
-
-        void update(int i) {
-            notifyDataSetChanged();
-        }
-    }
 
 
     private void init () {
@@ -139,13 +65,14 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_movement_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
         GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
         mButtons = new ArrayList<>();
-        mButtonAdapter = new ButtonAdapter(getActivity().getApplicationContext(), mButtons);
-        mGridView.setAdapter(mButtonAdapter);
+        mTextButtonAdapter = new TextButtonAdapter(getActivity().getApplicationContext(), mButtons);
+        mGridView.setAdapter(mTextButtonAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -181,21 +108,21 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         if (games.get(gameIndex).picture.movement_id == games.get(gameIndex).movement_variant.get(ind).id) {
             // Right )
             result = true;
-            mButtons.get(ind).state = ButtonState.True;
+            mButtons.get(ind).state = TextButton.State.True;
         } else {
             // Fail (
             timeout = 1500;
-            mButtons.get(ind).state = ButtonState.False;
+            mButtons.get(ind).state = TextButton.State.False;
 
-            for(ChooseButton button : mButtons) {
-                if(button.movement_id == games.get(gameIndex).picture.movement_id) {
-                    button.state = ButtonState.True;
+            for(TextButton button : mButtons) {
+                if(button.id == games.get(gameIndex).picture.movement_id) {
+                    button.state = TextButton.State.True;
                 }
             }
         }
         sessionStatistic.addAttempt(result);
         userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
-        mButtonAdapter.update(ind);
+        mTextButtonAdapter.update(ind);
 
         Handler h = new Handler();
 
@@ -244,12 +171,12 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
             mButtons.clear();
             for (Movement movement : game.movement_variant) {
                 if (locale.equals("ru")) {
-                    mButtons.add(new ChooseButton(movement.name_ru, movement.id));
+                    mButtons.add(new TextButton(movement.name_ru, movement.id));
                 } else {
-                    mButtons.add(new ChooseButton(movement.name_en, movement.id));
+                    mButtons.add(new TextButton(movement.name_en, movement.id));
                 }
             }
-            mButtonAdapter.update(0);
+            mTextButtonAdapter.update(0);
 
             if (gameIndex + 1 < games.size()) {
                 games.get(gameIndex + 1).loadPicture();
@@ -257,7 +184,7 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         } else { // we played all game and now just show last one
             ChooseMovementGame game = games.get(gameIndex-1);
             game.loadPicture();
-            mButtonAdapter.update(0);
+            mTextButtonAdapter.update(0);
         }
     }
 
