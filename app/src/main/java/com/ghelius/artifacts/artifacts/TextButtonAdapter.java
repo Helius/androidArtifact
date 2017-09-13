@@ -9,17 +9,31 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by eugene on 13.09.17.
- */
 
 class TextButtonAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
     private ArrayList<TextButton> mButtons;
 
-    TextButtonAdapter(Context context, ArrayList<TextButton> buttons) {
-        mButtons = buttons;
-        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    TextButtonAdapter(Context context) {
+        mButtons = new ArrayList<>();
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public TextButton getButton(int i) {
+        return mButtons.get(i);
+    }
+
+    public void addNewButton(TextButton button) {
+        mButtons.add(button);
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<TextButton> getButtons() {
+        return mButtons;
+    }
+
+    public void clearButton() {
+        mButtons.clear();
     }
 
     @Override
@@ -35,6 +49,10 @@ class TextButtonAdapter extends BaseAdapter {
     @Override
     public long getItemId(int i) {
         return 0;
+    }
+
+    void update() {
+        notifyDataSetChanged();
     }
 
     @Override
@@ -58,9 +76,5 @@ class TextButtonAdapter extends BaseAdapter {
         }
 
         return view;
-    }
-
-    void update(int i) {
-        notifyDataSetChanged();
     }
 }

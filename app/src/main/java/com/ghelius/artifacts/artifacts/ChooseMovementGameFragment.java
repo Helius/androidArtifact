@@ -32,8 +32,7 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
     private ImageView mImageView;
     private Random rnd;
     private boolean buttonBlocked;
-    private ArrayList<TextButton> mButtons;
-    private TextButtonAdapter mTextButtonAdapter;
+    private TextButtonAdapter mAdapter;
     private ArrayList<ChooseMovementGame> games = null;
 
 
@@ -41,7 +40,6 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         sessionStatistic = new BaseGameStatistic();
         gameIndex = 0;
         rnd = new Random(System.currentTimeMillis());
-        mButtons = new ArrayList<>();
         buttonBlocked = false;
     }
 
@@ -70,9 +68,8 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         View view = inflater.inflate(R.layout.fragment_choose_movement_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
         GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
-        mButtons = new ArrayList<>();
-        mTextButtonAdapter = new TextButtonAdapter(getActivity().getApplicationContext(), mButtons);
-        mGridView.setAdapter(mTextButtonAdapter);
+        mAdapter = new TextButtonAdapter(getContext());
+        mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -103,13 +100,13 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         if (games.get(gameIndex).picture.movement_id == games.get(gameIndex).movement_variant.get(ind).id) {
             // Right )
             result = true;
-            mButtons.get(ind).state = TextButton.State.True;
+            mAdapter.getButton(ind).state = TextButton.State.True;
         } else {
             // Fail (
             timeout = 1500;
-            mButtons.get(ind).state = TextButton.State.False;
+            mAdapter.getButton(ind).state = TextButton.State.False;
 
-            for(TextButton button : mButtons) {
+            for(TextButton button : mAdapter.getButtons()) {
                 if(button.id == games.get(gameIndex).picture.movement_id) {
                     button.state = TextButton.State.True;
                 }
@@ -117,7 +114,7 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         }
         sessionStatistic.addAttempt(result);
         userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
-        mTextButtonAdapter.update(ind);
+        mAdapter.update();
 
         Handler h = new Handler();
 
@@ -163,15 +160,15 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
 //            Log.d(TAG, "play game " + gameIndex);
             ChooseMovementGame game = games.get(gameIndex);
             game.loadPicture();
-            mButtons.clear();
+            mAdapter.clearButton();
             for (Movement movement : game.movement_variant) {
                 if (locale.equals("ru")) {
-                    mButtons.add(new TextButton(movement.name_ru, movement.id));
+                    mAdapter.addNewButton(new TextButton(movement.name_ru, movement.id));
                 } else {
-                    mButtons.add(new TextButton(movement.name_en, movement.id));
+                    mAdapter.addNewButton(new TextButton(movement.name_en, movement.id));
                 }
             }
-            mTextButtonAdapter.update(0);
+            mAdapter.update();
 
             if (gameIndex + 1 < games.size()) {
                 games.get(gameIndex + 1).loadPicture();
@@ -179,7 +176,7 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         } else { // we played all game and now just show last one
             ChooseMovementGame game = games.get(gameIndex-1);
             game.loadPicture();
-            mTextButtonAdapter.update(0);
+            mAdapter.update();
         }
     }
 

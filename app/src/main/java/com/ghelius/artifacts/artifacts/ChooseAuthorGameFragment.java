@@ -29,8 +29,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     private ImageView mImageView;
     private Random rnd;
     private boolean buttonBlocked;
-    private ArrayList<TextButton> mButtons;
-    private TextButtonAdapter mTextButtonAdapter = null;
+    private TextButtonAdapter mAdapter = null;
     private ArrayList<ChooseAuthorGame> games = null;
 
 
@@ -38,7 +37,6 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     private void init () {
         sessionStatistic = new BaseGameStatistic();
         rnd = new Random(System.currentTimeMillis());
-        mButtons = new ArrayList<>();
         buttonBlocked = false;
     }
 
@@ -67,9 +65,8 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
         GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
-        mButtons = new ArrayList<>();
-        mTextButtonAdapter = new TextButtonAdapter(getActivity().getApplicationContext(), mButtons);
-        mGridView.setAdapter(mTextButtonAdapter);
+        mAdapter = new TextButtonAdapter(getActivity().getApplicationContext());
+        mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -97,17 +94,16 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         buttonBlocked = true;
         int timeout = 500;
         boolean result = false;
-
         if (games.get(gameIndex).picture.author == games.get(gameIndex).authors_variant.get(ind).id) {
             // Right )
             result = true;
-            mButtons.get(ind).state = TextButton.State.True;
+            mAdapter.getButton(ind).state = TextButton.State.True;
         } else {
             // Fail (
             timeout = 1500;
-            mButtons.get(ind).state = TextButton.State.False;
+            mAdapter.getButton(ind).state = TextButton.State.False;
 
-            for(TextButton button : mButtons) {
+            for(TextButton button : mAdapter.getButtons()) {
                 if(button.id == games.get(gameIndex).picture.author) {
                     button.state = TextButton.State.True;
                 }
@@ -115,7 +111,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         }
         sessionStatistic.addAttempt(result);
         userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
-        mTextButtonAdapter.update(ind);
+        mAdapter.update();
 
         Handler h = new Handler();
 
@@ -161,15 +157,15 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         if (gameIndex < games.size()) {
             ChooseAuthorGame game = games.get(gameIndex);
             game.loadPicture();
-            mButtons.clear();
+            mAdapter.clearButton();
             for (Author author : game.authors_variant) {
                 if (locale.equals("ru")) {
-                    mButtons.add(new TextButton(author.name_ru, author.id));
+                    mAdapter.addNewButton(new TextButton(author.name_ru, author.id));
                 } else {
-                    mButtons.add(new TextButton(author.name_en, author.id));
+                    mAdapter.addNewButton(new TextButton(author.name_en, author.id));
                 }
             }
-            mTextButtonAdapter.update(0);
+            mAdapter.update();
 
             if (gameIndex + 1 < games.size()) {
                 games.get(gameIndex + 1).loadPicture();
@@ -177,7 +173,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         } else { // we played all game and now just show last one
             ChooseAuthorGame game = games.get(gameIndex-1);
             game.loadPicture();
-            mTextButtonAdapter.update(0);
+            mAdapter.update();
         }
     }
 
