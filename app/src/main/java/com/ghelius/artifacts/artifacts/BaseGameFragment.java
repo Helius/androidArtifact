@@ -16,8 +16,9 @@ import java.util.Locale;
 
 public abstract class BaseGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
 
+    private HistoryList historyFragment;
     private View historyButton = null;
-    private GameHistory gameHistory = new GameHistory();
+    private GameHistory gameHistory;
 
 
     public StorageReference mStorageRef;
@@ -38,6 +39,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
         this.dataProvider = gameDataProvider;
         this.userData = userData;
+        gameHistory = new GameHistory(gameDataProvider);
     }
 
     public void addToHistory(GameHistory.GameHistoryItem item) {
@@ -47,6 +49,10 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
         } else {
             enableHistoryButton(false);
         }
+    }
+
+    public void clearHistory() {
+        gameHistory.clear();
     }
 
 
@@ -59,7 +65,17 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     }
 
     private void openHistory() {
-        //TODO: open history
+
+        historyFragment = (HistoryList) getActivity().getSupportFragmentManager().findFragmentByTag("history");
+        if (historyFragment == null) {
+            historyFragment = new HistoryList();
+        }
+        historyFragment.init(gameHistory);
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_fragment_holder, historyFragment)
+                .addToBackStack("history").commit();
+
     }
 
     @Override
@@ -99,6 +115,11 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
                         openHistory();
                     }
                 });
+                if(gameHistory.size() > 0) {
+                    historyButton.setVisibility(View.VISIBLE);
+                } else {
+                    historyButton.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }

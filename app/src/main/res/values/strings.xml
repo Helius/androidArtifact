@@ -26,7 +26,7 @@
     <string name="gallery">Gallery</string>
     <string name="authors_count">%1$d Artists</string>
     <string name="picture_level_text">Level %1$d</string>
-    <string name="movements_count" >Pictures by level 1:%1$d, 2:%2$d, 3:%3$d</string>
+    <string name="movements_count">Pictures by level 1:%1$d, 2:%2$d, 3:%3$d</string>
     <string name="pic_by_level_count">Pics by level %1$d, %2$d, %3$d</string>
     <string name="undefined_movements_name">Without</string>
     <string name="author_name_hint">Type author name</string>
@@ -39,4 +39,5 @@
     <string name="rize_level_dialog_text">Do you want try next level %1$s?</string>
     <string name="about">About us</string>
     <string name="favorites">Favorites</string>
+    <string name="history_title">History</string>
 </resources>

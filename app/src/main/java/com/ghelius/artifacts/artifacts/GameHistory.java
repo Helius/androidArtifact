@@ -9,22 +9,47 @@ import java.util.ArrayList;
 
 public class GameHistory {
 
-    ArrayList<GameHistoryItem> items;
+    private final GameDataProvider dataProvider;
+    private ArrayList<GameHistoryItem> items;
+
+    public GameHistoryItem getItem(int i) {
+        return items.get(i);
+    }
 
 
-    public class GameHistoryItem {
-        ArrayList<Picture> pictures;
+    static public class GameHistoryItem {
+        Picture picture;
         boolean success;
+        private Author author;
+        private Movement movement;
 
-        GameHistoryItem(ArrayList<Picture> pictures, boolean success) {
-            this.pictures = pictures;
+        GameHistoryItem(Picture picture, boolean success) {
+            this.picture = picture;
             this.success = success;
+        }
+
+        public Author getAuthor() {
+            return author;
+        }
+
+        public void setAuthor(Author author) {
+            this.author = author;
+        }
+
+        public Movement getMovement() {
+            return movement;
+        }
+
+        public void setMovement(Movement movement) {
+            this.movement = movement;
         }
     }
 
 
     public void addItem(GameHistoryItem item) {
-        items.add(item);
+        item.setAuthor(dataProvider.getAuthorById(item.picture.author));
+        item.setMovement(dataProvider.getMovementById(item.picture.movement_id));
+        items.add(0,item);
     }
 
     public void clear() {
@@ -35,8 +60,9 @@ public class GameHistory {
         return items.size();
     }
 
-    GameHistory() {
+    GameHistory(GameDataProvider gameDataProvider) {
         items = new ArrayList<>();
+        this.dataProvider = gameDataProvider;
     }
 }
 

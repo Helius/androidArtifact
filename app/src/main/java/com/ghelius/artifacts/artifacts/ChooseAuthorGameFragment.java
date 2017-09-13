@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-
 public class ChooseAuthorGameFragment extends BaseGameFragment {
 
     public static final String TAG = "ChooseAuthor";
@@ -109,6 +108,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
                 }
             }
         }
+        addToHistory(new GameHistory.GameHistoryItem(games.get(gameIndex).picture, result));
         sessionStatistic.addAttempt(result);
         userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
         mAdapter.update();
@@ -182,6 +182,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
 //        Log.d(TAG, "create new " + count + "games");
+        clearHistory();
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
