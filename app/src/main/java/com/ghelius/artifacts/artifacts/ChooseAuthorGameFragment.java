@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -168,7 +169,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             mAdapter.update();
 
             if (gameIndex + 1 < games.size()) {
-                games.get(gameIndex + 1).loadPicture();
+                games.get(gameIndex + 1).cachPicture();
             }
         } else { // we played all game and now just show last one
             ChooseAuthorGame game = games.get(gameIndex-1);
@@ -209,7 +210,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             games.add(game);
         }
         games.get(0).loadPicture();
-        games.get(1).loadPicture();
+        games.get(1).cachPicture();
         return games;
     }
 
@@ -218,21 +219,6 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         ArrayList<Author> authors_variant = new ArrayList<>();
         private int id;
 
-
-        SimpleTarget<Bitmap> target = new SimpleTarget<Bitmap>(600,600) {
-            @Override
-            public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-//                Log.d(TAG, "helius: image " + id + "loaded from ??");
-                if (id == gameIndex) {
-                    mImageView.setImageBitmap(bitmap);
-                    showButtonBlock(true);
-                    View v = getView();
-                    if (v != null) {
-                        getView().findViewById(R.id.progress_view).setVisibility(View.GONE);
-                    }
-                }
-            }
-        };
 
         ChooseAuthorGame(int id) {
             this.id = id;
@@ -246,16 +232,28 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             final View v = getView();
             if (v == null)
                 return;
-            if (id == gameIndex) {
-                getView().findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
-            }
+//            if (id == gameIndex) {
+//                getView().findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
+//            }
             Glide.with(a.getApplicationContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(picture.path))
-                    .asBitmap()
-                    .override(600,600)
-                    .fitCenter()
-                    .into(target);
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .override(600, 600)
+                    .into(mImageView)
+            ;
+            showButtonBlock(true);
+        }
+
+        public void cachPicture() {
+            Activity a = getActivity();
+            if (a == null)
+                return;
+
+            Glide.with(a.getApplicationContext())
+                    .using(new FirebaseImageLoader())
+                    .load(mStorageRef.child(picture.path))
+                    .downloadOnly(0,0);
         }
     }
 

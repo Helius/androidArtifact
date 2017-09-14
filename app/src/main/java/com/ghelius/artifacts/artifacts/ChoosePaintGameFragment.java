@@ -22,6 +22,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.MemoryCategory;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -52,7 +56,7 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         Picture picture;
         ButtonState state;
         int author_id;
-        Bitmap cachedBitmap;
+        Drawable cachedBitmap;
 
         ChooseButton(Picture picture, int author_id) {
             this.picture = picture;
@@ -95,11 +99,15 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
             final ChooseButton button = mButtons.get(i);
             final ImageView pic = (ImageView) view.findViewById(R.id.picture);
             final ImageView failMark = (ImageView) view.findViewById(R.id.fail_mark);
-            if (mButtons.get(i).cachedBitmap == null) {
-                pic.setImageResource(R.drawable.picture_dashed_placeholder);
-            } else {
-                pic.setImageBitmap(mButtons.get(i).cachedBitmap);
-            }
+            pic.setImageResource(R.drawable.picture_dashed_placeholder);
+                    Glide.with(getContext())
+                    .using(new FirebaseImageLoader())
+                    .load(mStorageRef.child(button.picture.path))
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .override(300, 300)
+                    .into(pic);
+//                pic.setImageBitmap(mButtons.get(i).cachedBitmap);
+
 
             switch (button.state) {
                 case True:
@@ -139,7 +147,7 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         sessionStatistic = new BaseGameStatistic();
         rnd = new Random(System.currentTimeMillis());
         mButtons = new ArrayList<>();
-        buttonBlocked = false;
+//        buttonBlocked = false;
     }
 
     public ChoosePaintGameFragment() {
@@ -152,18 +160,24 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         View v = getView();
         if (v == null)
             return;
-        if (show) {
+//        if (show) {
 //            v.findViewById(R.id.choose_button_grid_view).setVisibility(View.VISIBLE);
-        } else {
+//        } else {
 //            v.findViewById(R.id.choose_button_grid_view).setVisibility(View.INVISIBLE);
-        }
-        buttonBlocked = false;
+//        }
+//        buttonBlocked = false;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
+
+        Glide.get(getContext()).setMemoryCategory(MemoryCategory.HIGH);
+        GlideBuilder b = new GlideBuilder(getContext());
+        b.setMemoryCache(new LruResourceCache(100000000));
+
+
         View view = inflater.inflate(R.layout.fragment_choose_paint_game, container, false);
         final GridView mGridView = (GridView) view.findViewById(R.id.paint_grid);
         author_view = (TextView) view.findViewById(R.id.author);
@@ -225,14 +239,15 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
             return;
         }
         fullShowed = false;
+        fullImage.setVisibility(View.INVISIBLE);
 
-        int width  = fullImage.getMeasuredWidth();
-        int height  = fullImage.getMeasuredHeight();
-        SizeChangeAnimation anim = new SizeChangeAnimation(fullImage);
-        anim.setHeights(width, 0);
-        anim.setWidths(height, 0);
-        anim.setDuration(100);
-        fullImage.startAnimation(anim);
+//        int width  = fullImage.getMeasuredWidth();
+//        int height  = fullImage.getMeasuredHeight();
+//        SizeChangeAnimation anim = new SizeChangeAnimation(fullImage);
+//        anim.setHeights(width, 0);
+//        anim.setWidths(height, 0);
+//        anim.setDuration(100);
+//        fullImage.startAnimation(anim);
 
         ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(background,
                 PropertyValuesHolder.ofInt("alpha", 160, 0));
@@ -245,18 +260,24 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         Activity a = getActivity();
         if (a == null)
             return;
-
-        fullShowed = true;
-        fullImage.setVisibility(View.VISIBLE);
-        fullImage.setImageBitmap(mButtons.get(i).cachedBitmap);
         View layout = getView().findViewById(R.id.choose_pict_root_layout);
         int width  = layout.getMeasuredWidth();
         int height  = layout.getMeasuredHeight();
+
+        fullShowed = true;
+        fullImage.setVisibility(View.VISIBLE);
+        Glide.with(getContext())
+                .using(new FirebaseImageLoader())
+                .load(mStorageRef.child(mButtons.get(i).picture.path))
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .override(width, height)
+                .into(fullImage);
+
         SizeChangeAnimation anim = new SizeChangeAnimation(fullImage);
         anim.setHeights(10, width);
         anim.setWidths(10, height);
         anim.setDuration(150);
-        fullImage.startAnimation(anim);
+//        fullImage.startAnimation(anim);
 
         ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(background,
                 PropertyValuesHolder.ofInt("alpha", 0, 160));
@@ -319,10 +340,10 @@ public class SizeChangeAnimation extends Animation {
 
     private void buttonSelected(int ind) {
 
-        if (buttonBlocked || getView().findViewById(R.id.progress_view).getVisibility() == View.VISIBLE)
+        if (/*buttonBlocked || */getView().findViewById(R.id.progress_view).getVisibility() == View.VISIBLE)
             return;
 
-        buttonBlocked = true;
+//        buttonBlocked = true;
         int timeout = 800;
         boolean result = false;
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
@@ -419,44 +440,53 @@ public class SizeChangeAnimation extends Animation {
     }
 
     void loadAllImages() {
-        View v = getView().findViewById(R.id.progress_view);
-        if (v != null) {
-            v.setVisibility(View.VISIBLE);
-        }
-        for (final ChooseButton b : mButtons) {
-            b.cachedBitmap = null;
-
-
-            Glide.with(getActivity())
-                    .using(new FirebaseImageLoader())
-                    .load(mStorageRef.child(b.picture.path))
-                    .asBitmap()
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
-                            b.cachedBitmap = resource;
-                            mButtonAdapter.update(0);
-                            int i = 0;
-                            for (final ChooseButton b: mButtons) {
-                                if (b.cachedBitmap != null) {
-                                    i++;
-                                    if (i == 4) {
-                                        View v = getView();
-                                        if (v != null) {
-                                            v = v.findViewById(R.id.progress_view);
-                                        }
-                                        if (v != null) {
-                                            v.setVisibility(View.INVISIBLE);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-        }
+//        View v = getView();
+//        if (v != null) {
+//            View p = v.findViewById(R.id.progress_view);
+//            if (p != null) {
+//                p.setVisibility(View.INVISIBLE);
+//            }
+//        }
+//        View v = getView().findViewById(R.id.progress_view);
+//        if (v != null) {
+//            v.setVisibility(View.VISIBLE);
+//        }
+//        for (final ChooseButton b : mButtons) {
+//            b.cachedBitmap = null;
+//
+//            Glide.with(getActivity())
+//                    .using(new FirebaseImageLoader())
+//                    .load(mStorageRef.child(b.picture.path))
+//                    .asBitmap()
+//                    .override(100,100)
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .into(b.cachedBitmap)
+////                    .into(new SimpleTarget<Bitmap>() {
+////                        @Override
+////                        public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
+////                            b.cachedBitmap = resource;
+////                            mButtonAdapter.update(0);
+////                            int i = 0;
+////                            for (final ChooseButton b: mButtons) {
+////                                if (b.cachedBitmap != null) {
+////                                    i++;
+////                                    if (i == 4) {
+////                                        View v = getView();
+////                                        if (v != null) {
+////                                            v = v.findViewById(R.id.progress_view);
+////                                        }
+////                                        if (v != null) {
+////                                            v.setVisibility(View.INVISIBLE);
+////                                        }
+////                                    }
+////                                }
+////                            }
+////                        }
+////                    }
+//                    );
+//        }
         mButtonAdapter.update(0);
     }
-
     ArrayList<ChoosePaintGame> createNewGame(int count)
     {
 //        Log.d(TAG, "create new " + count + "games");

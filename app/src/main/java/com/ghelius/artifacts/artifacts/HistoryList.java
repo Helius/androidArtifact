@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -54,20 +55,30 @@ public class HistoryList extends Fragment {
             return 0;
         }
 
+        class ViewHolder {
+            ImageView image;
+        }
+
         @Override
         public View getView(int i, View view, final ViewGroup viewGroup) {
+            ViewHolder viewHolder;
             GameHistory.GameHistoryItem item = history.getItem(i);
             if (view == null) {
                 view = mInflater.inflate(R.layout.history_item, viewGroup, false);
+                viewHolder = new ViewHolder();
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
             }
-            ImageView pic = (ImageView) view.findViewById(R.id.hist_image);
+            viewHolder.image = (ImageView) view.findViewById(R.id.hist_image);
             TextView author_name = (TextView) view.findViewById(R.id.hist_pic_name);
 
             author_name.setText(item.getAuthor().name_ru + ", 1937");
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(item.picture.path))
-                    .into(pic);
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(viewHolder.image);
             return view;
         }
     }

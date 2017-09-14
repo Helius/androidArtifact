@@ -23,6 +23,7 @@
                 android:layout_height="40dp"
                 app:cpv_color="@color/cpv_default_color"
                 app:cpv_animAutostart="true"
+                android:visibility="invisible"
                 app:cpv_indeterminate="true" />
         </RelativeLayout>
         <GridView
