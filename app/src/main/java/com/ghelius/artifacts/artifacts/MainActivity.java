@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
             logEvent("OpenLevelDialogWith", String.valueOf(userData.getLevel()));
             chooseLevelDialog.init(getUserData());
             chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
-        } else if (id == R.id.nav_favorites) {
+//        } else if (id == R.id.nav_favorites) {
         //TODO: open favorites screen with list and zero-screen
         } else if (id == R.id.nav_history) {
             HistoryFragment historyFragment = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("history");
