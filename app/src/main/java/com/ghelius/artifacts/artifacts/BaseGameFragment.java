@@ -16,7 +16,7 @@ import java.util.Locale;
 
 public abstract class BaseGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
 
-    private HistoryList historyFragment;
+    private HistoryFragment historyFragment;
     private View historyButton = null;
     private GameHistory gameHistory;
 
@@ -39,7 +39,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
         this.dataProvider = gameDataProvider;
         this.userData = userData;
-        gameHistory = new GameHistory(gameDataProvider);
+        gameHistory = GameHistory.instance();
     }
 
     public void addToHistory(GameHistory.GameHistoryItem item) {
@@ -66,11 +66,10 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
 
     private void openHistory() {
 
-        historyFragment = (HistoryList) getActivity().getSupportFragmentManager().findFragmentByTag("history");
+        historyFragment = (HistoryFragment) getActivity().getSupportFragmentManager().findFragmentByTag("history");
         if (historyFragment == null) {
-            historyFragment = new HistoryList();
+            historyFragment = new HistoryFragment();
         }
-        historyFragment.init(gameHistory);
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main_fragment_holder, historyFragment)

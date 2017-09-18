@@ -4,6 +4,7 @@ package com.ghelius.artifacts.artifacts;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,27 +23,21 @@ import com.google.firebase.storage.StorageReference;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HistoryList extends Fragment {
+public class HistoryFragment extends Fragment {
 
-    private GameHistory history;
     private StorageReference mStorageRef;
     private Adapter mAdapter;
 
     private class Adapter extends BaseAdapter {
         private final LayoutInflater mInflater;
-        private final GameHistory history;
 
-        Adapter(Context context, GameHistory history) {
-            this.history = history;
+        Adapter(Context context) {
             this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         @Override
         public int getCount() {
-            if (history != null) {
-                return history.size();
-            }
-            return 0;
+            return GameHistory.instance().size();
         }
 
         @Override
@@ -57,38 +52,40 @@ public class HistoryList extends Fragment {
 
         class ViewHolder {
             ImageView image;
+            TextView author_name;
         }
 
         @Override
         public View getView(int i, View view, final ViewGroup viewGroup) {
             ViewHolder viewHolder;
-            GameHistory.GameHistoryItem item = history.getItem(i);
+            GameHistory.GameHistoryItem item = GameHistory.instance().getItem(i);
             if (view == null) {
+                Log.d("helius:", "view is null, recreate all for " + i);
                 view = mInflater.inflate(R.layout.history_item, viewGroup, false);
+                view.setDrawingCacheEnabled(true);
                 viewHolder = new ViewHolder();
+                viewHolder.image = (ImageView) view.findViewById(R.id.hist_image);
+                viewHolder.author_name = (TextView) view.findViewById(R.id.hist_pic_name);
                 view.setTag(viewHolder);
             } else {
+                Log.d("helius:", "view ok, obtain data for " + i);
                 viewHolder = (ViewHolder) view.getTag();
             }
-            viewHolder.image = (ImageView) view.findViewById(R.id.hist_image);
-            TextView author_name = (TextView) view.findViewById(R.id.hist_pic_name);
 
-            author_name.setText(item.getAuthor().name_ru + ", 1937");
+            Log.d("helius:", "setup data for " + i);
+            viewHolder.author_name.setText("Алексей Саврасов" + ", 1937");
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
-                    .load(mStorageRef.child(item.picture.path))
+                    .load(mStorageRef.child(item.img_path))
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .override(2000,2000)
                     .into(viewHolder.image);
             return view;
         }
     }
 
-    public HistoryList() {
+    public HistoryFragment() {
         // Required empty public constructor
-    }
-
-    public void init(GameHistory gameHistory) {
-        history = gameHistory;
     }
 
     @Override
@@ -100,7 +97,7 @@ public class HistoryList extends Fragment {
         ListView list = (ListView) v.findViewById(R.id.history_list);
         list.setDivider(null);
         list.setDividerHeight(0);
-        mAdapter = new Adapter(getContext(), history);
+        mAdapter = new Adapter(getContext());
         list.setAdapter(mAdapter);
         setRetainInstance(true);
         return v;

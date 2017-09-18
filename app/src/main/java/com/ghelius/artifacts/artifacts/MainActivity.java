@@ -25,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,7 +87,19 @@ public class MainActivity extends AppCompatActivity
             chooseLevelDialog.show(getSupportFragmentManager(), "level_dialog");
         } else if (id == R.id.nav_favorites) {
         //TODO: open favorites screen with list and zero-screen
-//        } else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_history) {
+
+            HistoryFragment historyFragment = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("history");
+            if (historyFragment == null) {
+                historyFragment = new HistoryFragment();
+            }
+            final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.main_menu_fragment);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .hide(mainMenuFragment)
+                    .replace(R.id.main_fragment_holder, historyFragment)
+                    .addToBackStack("history").commit();
         } else if (id == R.id.nav_statistics) {
             statisticFragment = (StatisticFragment) getSupportFragmentManager().findFragmentByTag("statistics");
             if (statisticFragment == null) {
