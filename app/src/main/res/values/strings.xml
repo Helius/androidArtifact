@@ -22,7 +22,7 @@
     <string name="level_2_text">Expert</string>
     <string name="level_0_text">Beginner</string>
     <string name="select_level_dialog_title">Select level</string>
-    <string name="statistics_title">Statistic for level %1$s</string>
+    <string name="statistics_title">Statistic for %1$s level</string>
     <string name="gallery">Gallery</string>
     <string name="authors_count">%1$d Artists</string>
     <string name="picture_level_text">Level %1$d</string>
@@ -40,4 +40,6 @@
     <string name="about">About us</string>
     <string name="favorites">Favorites</string>
     <string name="history_title">History</string>
+    <string name="you_hit_from">\u0020from\u0020</string>
+    <string name="you_hit">You hit\u0020</string>
 </resources>

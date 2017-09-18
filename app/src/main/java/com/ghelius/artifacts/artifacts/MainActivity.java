@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_favorites) {
         //TODO: open favorites screen with list and zero-screen
         } else if (id == R.id.nav_history) {
-
             HistoryFragment historyFragment = (HistoryFragment) getSupportFragmentManager().findFragmentByTag("history");
             if (historyFragment == null) {
                 historyFragment = new HistoryFragment();

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -42,42 +43,8 @@ public class StatisticFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_statistic, container, false);
-        TextView t = (TextView) v.findViewById(R.id.statistic_label);
-        t.setText(getString(R.string.statistics_title, userData.getLevelName(userData.getLevel(), getContext())));
         ListView listView = (ListView) v.findViewById(R.id.statistic_listview);
 
-
-//        your_array_list = new ArrayList<String>();
-//
-//        your_array_list.add(ChooseAuthorGameFragment.TAG + ": "
-//                + userData.getGameStatistic(ChooseAuthorGameFragment.TAG).trueAttempt
-//                + " / "+
-//                + (userData.getGameStatistic(ChooseAuthorGameFragment.TAG).trueAttempt
-//                + userData.getGameStatistic(ChooseAuthorGameFragment.TAG).falseAttempt)
-//        );
-//        your_array_list.add(TypeAuthorGameFragment.TAG + ": "
-//                + userData.getGameStatistic(TypeAuthorGameFragment.TAG).trueAttempt
-//                + " / "+
-//                + (userData.getGameStatistic(TypeAuthorGameFragment.TAG).trueAttempt
-//                + userData.getGameStatistic(TypeAuthorGameFragment.TAG).falseAttempt)
-//        );
-//        your_array_list.add(ChoosePaintGameFragment.TAG + ": "
-//                + userData.getGameStatistic(ChoosePaintGameFragment.TAG).trueAttempt
-//                + " / "+
-//                + (userData.getGameStatistic(ChoosePaintGameFragment.TAG).trueAttempt
-//                + userData.getGameStatistic(ChoosePaintGameFragment.TAG).falseAttempt)
-//        );
-//        your_array_list.add(ChooseMovementGameFragment.TAG + ": "
-//                + userData.getGameStatistic(ChooseMovementGameFragment.TAG).trueAttempt
-//                + " / "+
-//                + (userData.getGameStatistic(ChooseMovementGameFragment.TAG).trueAttempt
-//                + userData.getGameStatistic(ChooseMovementGameFragment.TAG).falseAttempt)
-//        );
-
-//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-//                getActivity().getApplicationContext(),
-//                R.layout.simple_expandable_list_item_my,
-//                your_array_list );
         listView.setAdapter(new StatisticItemAdapter(getActivity().getApplicationContext(), userData));
         return v;
     }
@@ -120,6 +87,7 @@ public class StatisticFragment extends Fragment {
             TextView trueCount = (TextView) view.findViewById(R.id.true_count);
             TextView totalCount = (TextView) view.findViewById(R.id.total_count);
             TextView percent = (TextView) view.findViewById(R.id.stat_percent);
+            RatingBar bar = (RatingBar) view.findViewById(R.id.ratingBar);
 
             String gameTag;
 
@@ -150,12 +118,20 @@ public class StatisticFragment extends Fragment {
             int falseValue = userData.getGameStatistic(gameTag).falseAttempt;
             trueCount.setText(String.valueOf(trueValue));
             totalCount.setText(String.valueOf(trueValue + falseValue));
+            bar.setRating(0);
             if (trueValue + falseValue > 0) {
                 percent.setText(String.valueOf((100 * trueValue) / (trueValue + falseValue)) + "%");
+                float rating = (float) trueValue / (trueValue + falseValue);
+                bar.setRating(rating * 5);
             }
 
             return view;
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(getString(R.string.statistics_title, userData.getLevelName(userData.getLevel(), getContext())));
+    }
 }

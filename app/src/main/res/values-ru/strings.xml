@@ -38,4 +38,7 @@
     <string name="about">О приложении</string>
     <string name="favorites">Избранное</string>
     <string name="history_title">История</string>
+    <string name="you_hit_from">\u0020из\u0020</string>
+    <string name="you_hit">Вы угадали\u0020</string>
+    <string name="statistic_title">Statistic</string>
 </resources>
