@@ -60,7 +60,6 @@ public class HistoryFragment extends Fragment {
             ViewHolder viewHolder;
             GameHistory.GameHistoryItem item = GameHistory.instance().getItem(i);
             if (view == null) {
-                Log.d("helius:", "view is null, recreate all for " + i);
                 view = mInflater.inflate(R.layout.history_item, viewGroup, false);
                 view.setDrawingCacheEnabled(true);
                 viewHolder = new ViewHolder();
@@ -68,11 +67,9 @@ public class HistoryFragment extends Fragment {
                 viewHolder.author_name = (TextView) view.findViewById(R.id.hist_pic_name);
                 view.setTag(viewHolder);
             } else {
-                Log.d("helius:", "view ok, obtain data for " + i);
                 viewHolder = (ViewHolder) view.getTag();
             }
 
-            Log.d("helius:", "setup data for " + i);
             viewHolder.author_name.setText("Алексей Саврасов" + ", 1937");
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
@@ -107,5 +104,6 @@ public class HistoryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle(R.string.history_title);
+        getView().findViewById(R.id.history_empty_view).setVisibility(mAdapter.getCount() > 0 ? View.INVISIBLE : View.VISIBLE);
     }
 }

@@ -183,7 +183,6 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
 //        Log.d(TAG, "create new " + count + "games");
-        clearHistory();
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();

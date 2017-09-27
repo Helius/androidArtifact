@@ -57,7 +57,7 @@ public abstract class UserData {
 
     void updateGameStatistic(Context context, Picture pic, boolean result, String gameKey) {
         updateLocalGameStatistic(gameKey, result);
-        pushToOnlineDb();
+
         sendToAnalytics(context, gameKey, pic, result);
     }
 
@@ -69,9 +69,6 @@ public abstract class UserData {
         bundle.putBoolean("result", result);
 
         analytics.logEvent("UserAttempt", bundle);
-    }
-
-    private void pushToOnlineDb() {
     }
 
     void updateLocalGameStatistic(String gameKey, boolean result) {

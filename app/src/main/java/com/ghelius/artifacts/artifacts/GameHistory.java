@@ -11,6 +11,7 @@ public class GameHistory {
 
     private ArrayList<GameHistoryItem> items;
     private static GameHistory history;
+    private static final int HistoryCount = 30;
 
     static public class GameHistoryItem {
         String img_path;
@@ -28,10 +29,9 @@ public class GameHistory {
 
     public void addItem(GameHistoryItem item) {
         items.add(0,item);
-    }
-
-    public void clear() {
-        items.clear();
+        if (history.size() > HistoryCount) {
+            items.remove(history.size()-1);
+        }
     }
 
     public int size() {

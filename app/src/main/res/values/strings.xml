@@ -42,4 +42,5 @@
     <string name="history_title">History</string>
     <string name="you_hit_from">\u0020from\u0020</string>
     <string name="you_hit">You hit\u0020</string>
+    <string name="favorites_empty_msg">There you can find your 30 last viewed pictures</string>
 </resources>

@@ -51,12 +51,6 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
         }
     }
 
-    public void clearHistory() {
-        gameHistory.clear();
-    }
-
-
-
 
     private void enableHistoryButton(boolean enable) {
         if (historyButton != null) {

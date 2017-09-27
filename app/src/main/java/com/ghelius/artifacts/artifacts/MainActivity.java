@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity
 
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
+    private String uid;
 
     public void logEvent(String event) {
         logEvent(event, null);
@@ -124,6 +126,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        uid = Settings.Secure.getString(this.getContentResolver(),
+            Settings.Secure.ANDROID_ID);
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
