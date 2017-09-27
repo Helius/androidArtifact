@@ -112,6 +112,7 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
                 }
             }
         }
+        addToHistory(new GameHistory.GameHistoryItem(games.get(gameIndex).picture, result));
         sessionStatistic.addAttempt(result);
         userData.updateGameStatistic(getContext(), games.get(gameIndex).picture, result, TAG);
         mAdapter.update();

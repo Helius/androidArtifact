@@ -375,6 +375,9 @@ public class SizeChangeAnimation extends Animation {
             }
             timeout = 1500;
         }
+        for(ChooseButton button: mButtons) {
+            addToHistory(new GameHistory.GameHistoryItem(button.picture, result));
+        }
         userData.updateGameStatistic(getContext(), games.get(gameIndex).picture_variant.get(ind), result, TAG);
 
         sessionStatistic.addAttempt(result);
