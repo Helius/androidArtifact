@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -126,8 +127,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        uid = Settings.Secure.getString(this.getContentResolver(),
-            Settings.Secure.ANDROID_ID);
+        uid = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        GameHistory.instance().load(p.getString("history", "{}"));
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -273,6 +276,13 @@ public class MainActivity extends AppCompatActivity
             chooseLevelDialog.init(getUserData());
         }
         loadGameData(mainMenuFragment);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        p.edit().putString("history",GameHistory.instance().save()).commit();
     }
 
     private void loadGameData(final MainMenuFragment holder) {
