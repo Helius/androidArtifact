@@ -19,12 +19,15 @@ import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Locale;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class HistoryFragment extends Fragment {
 
+    private final String locale;
     private StorageReference mStorageRef;
     private Adapter mAdapter;
 
@@ -52,7 +55,10 @@ public class HistoryFragment extends Fragment {
 
         class ViewHolder {
             ImageView image;
-            TextView author_name;
+            TextView author;
+            TextView pic_name;
+            TextView movement;
+            TextView year;
         }
 
         @Override
@@ -64,13 +70,43 @@ public class HistoryFragment extends Fragment {
                 view.setDrawingCacheEnabled(true);
                 viewHolder = new ViewHolder();
                 viewHolder.image = (ImageView) view.findViewById(R.id.hist_image);
-                viewHolder.author_name = (TextView) view.findViewById(R.id.hist_pic_name);
+                viewHolder.author = (TextView) view.findViewById(R.id.hist_author);
+                viewHolder.year = (TextView) view.findViewById(R.id.hist_year);
+                viewHolder.pic_name = (TextView) view.findViewById(R.id.hist_pic_name);
+                viewHolder.movement = (TextView) view.findViewById(R.id.hist_movement);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
             }
 
-            viewHolder.author_name.setText("Алексей Саврасов" + ", 1937");
+            //Picture p = GameDataProvider.instance().getPictureByPath(item.img_path);
+            Picture p = GameDataProvider.instance().getPictureByPath("Винсент Ван Гог/1_10_the_starry_night.jpg");
+            Author a = GameDataProvider.instance().getAuthorById(p.author);
+
+            if (locale.equals("ru")) {
+                viewHolder.author.setText(a.name_ru);
+            } else {
+                viewHolder.author.setText(a.name_en);
+            }
+            viewHolder.year.setVisibility(p.year != null ? View.VISIBLE : View.GONE);
+            viewHolder.year.setText(", " + p.year);
+
+            viewHolder.pic_name.setVisibility(p.name.get(locale) != null ? View.VISIBLE : View.INVISIBLE);
+            viewHolder.pic_name.setText(p.name.get(locale));
+            if (p.movement_id != 0) {
+                if (locale.equals("ru")) {
+                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(p.movement_id).name_ru + ", " + p.holder.get(locale));
+                } else {
+                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(p.movement_id).name_en +", "+ p.holder.get(locale));
+                }
+            } else {
+                if (locale.equals("ru")) {
+                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(a.movement_id).name_ru + p.holder.get(locale));
+                } else {
+                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(a.movement_id).name_en + p.holder.get(locale));
+                }
+            }
+
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(item.img_path))
@@ -83,6 +119,7 @@ public class HistoryFragment extends Fragment {
 
     public HistoryFragment() {
         // Required empty public constructor
+        locale = Locale.getDefault().getLanguage();
     }
 
     @Override

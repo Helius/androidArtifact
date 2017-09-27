@@ -34,10 +34,10 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
 
     public BaseGameFragment() {
         // Required empty public constructor
+        dataProvider = GameDataProvider.instance();
     }
 
-    public void setServerResources(UserData userData, GameDataProvider gameDataProvider) {
-        this.dataProvider = gameDataProvider;
+    public void setServerResources(UserData userData) {
         this.userData = userData;
         gameHistory = GameHistory.instance();
     }

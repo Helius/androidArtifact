@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         if (chooseAuthorGameFragment == null) {
                             chooseAuthorGameFragment = new ChooseAuthorGameFragment();
-                            chooseAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                            chooseAuthorGameFragment.setServerResources(getUserData());
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                     case 1:
                         if (typeAuthorGameFragment == null) {
                             typeAuthorGameFragment = new TypeAuthorGameFragment();
-                            typeAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                            typeAuthorGameFragment.setServerResources(getUserData());
                         }
                         getSupportFragmentManager().beginTransaction()
                                 .hide(mainMenuFragment)
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity
                     case 2:
                         if (choosePaintGameFragment == null) {
                             choosePaintGameFragment = new ChoosePaintGameFragment();
-                            choosePaintGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                            choosePaintGameFragment.setServerResources(getUserData());
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity
                     case 3:
                         if (chooseMovementGameFragment == null) {
                             chooseMovementGameFragment = new ChooseMovementGameFragment();
-                            chooseMovementGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                            chooseMovementGameFragment.setServerResources(getUserData());
                         }
 
                         getSupportFragmentManager().beginTransaction()
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity
         if (chooseLevelDialog != null) {
             chooseLevelDialog.init(getUserData());
         }
-        loadGameData(mainMenuFragment);
+        loadGameData();
     }
 
     @Override
@@ -285,23 +285,23 @@ public class MainActivity extends AppCompatActivity
         p.edit().putString("history",GameHistory.instance().save()).commit();
     }
 
-    private void loadGameData(final MainMenuFragment holder) {
+    private void loadGameData() {
         if (!hasInternet()) {
             showInternetDialog();
             logEvent("NoInternetDialogShowed");
             return;
         }
-        if (holder.getGameDataProvider() != null) {
+        if (GameDataProvider.instance().initialized()) {
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
             return;
         }
         final long ONE_MEGABYTE = 1024 * 1024;
-        StorageReference fileRef = mStorageRef.child("out_db.json");
+        StorageReference fileRef = mStorageRef.child("out_db.1.json");
         fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 try {
-                    holder.setGameDataProvider(new GameDataProvider(bytes, userData.getLevel()));
+                    GameDataProvider.instance().initialize(bytes, userData.getLevel());
                     findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
                 } catch (JSONException e) {
                     Log.d(TAG, "Can't parse json db");
@@ -371,18 +371,16 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 void onLevelChanged() {
                     updateSideBarInfo();
-                    final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
-                            .findFragmentById(R.id.main_menu_fragment);
-                    mainMenuFragment.getGameDataProvider().setLevel(getLevel());
+                    GameDataProvider.instance().setLevel(getLevel());
                     logEvent("LevelChangedTo", String.valueOf(getLevel()));
                     if (chooseAuthorGameFragment != null)
-                        chooseAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                        chooseAuthorGameFragment.setServerResources(getUserData());
                     if (chooseMovementGameFragment != null)
-                        chooseMovementGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                        chooseMovementGameFragment.setServerResources(getUserData());
                     if (choosePaintGameFragment != null)
-                        choosePaintGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                        choosePaintGameFragment.setServerResources(getUserData());
                     if (typeAuthorGameFragment != null)
-                        typeAuthorGameFragment.setServerResources(getUserData(), mainMenuFragment.getGameDataProvider());
+                        typeAuthorGameFragment.setServerResources(getUserData());
 
                 }
             };

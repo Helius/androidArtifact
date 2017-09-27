@@ -20,15 +20,6 @@ public class MainMenuFragment extends Fragment {
 
     ArrayList<GameEntry> mGameEntries;
     MainMenuListener mListener;
-    private GameDataProvider gameDataProvider = null;
-
-    public GameDataProvider getGameDataProvider() {
-        return gameDataProvider;
-    }
-
-    public void setGameDataProvider(GameDataProvider gameDataProvider) {
-        this.gameDataProvider = gameDataProvider;
-    }
 
     public interface MainMenuListener {
         void menuClicked(int number, GameEntry entry);

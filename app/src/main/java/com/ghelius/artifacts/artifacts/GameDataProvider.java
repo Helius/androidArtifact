@@ -16,8 +16,17 @@ public class GameDataProvider {
     private ArrayList<Author> authors_leveled = new ArrayList<>();
     private ArrayList<Picture> pictures_leveled = new ArrayList<>();
     private int level = 0;
+    private static GameDataProvider instance_;
+    private boolean initialized = false;
 
-    public GameDataProvider(byte[] bytes, int level) throws JSONException {
+    public static GameDataProvider instance() {
+        if (instance_ == null) {
+            instance_ = new GameDataProvider();
+        }
+        return instance_;
+    }
+
+    public void initialize(byte[] bytes, int level) throws JSONException {
         this.level = level;
         JSONObject db_data = new JSONObject(new String(bytes));
 
@@ -54,6 +63,7 @@ public class GameDataProvider {
         }
 
         createFilteredCollections();
+        initialized = true;
     }
 
     void createFilteredCollections() {
@@ -130,5 +140,18 @@ public class GameDataProvider {
 
     public ArrayList<Movement> getFullMovements() {
         return movements;
+    }
+
+    public boolean initialized() {
+        return initialized;
+    }
+
+    public final Picture getPictureByPath(String img_path) {
+        for (final Picture pic: pictures) {
+            if (pic.path.equals(img_path)) {
+                return pic;
+            }
+        }
+        return null;
     }
 }
