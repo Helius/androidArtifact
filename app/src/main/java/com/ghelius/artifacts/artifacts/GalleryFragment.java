@@ -117,11 +117,7 @@ public class GalleryFragment extends Fragment {
             if (view == null) {
                 view = mInflater.inflate(R.layout.gallery_author_item, viewGroup, false);
             }
-            if (locale.equals("ru")) {
-                ((TextView) view.findViewById(R.id.gallery_author_name)).setText(authors.get(i).name_ru);
-            } else {
-                ((TextView) view.findViewById(R.id.gallery_author_name)).setText(authors.get(i).name_en);
-            }
+            ((TextView) view.findViewById(R.id.gallery_author_name)).setText(authors.get(i).getName());
             int pictures_count = 0;
             int level_1_cnt = 0;
             int level_2_cnt = 0;
@@ -145,11 +141,7 @@ public class GalleryFragment extends Fragment {
             String movement_name = "Not defined";
             for(Movement m: movements) {
                 if (authors.get(i).movement_id == m.id) {
-                    if (locale.equals("ru")) {
-                        movement_name = m.name_ru;
-                    } else {
-                        movement_name = m.name_en;
-                    }
+                    movement_name = m.getName();
                     break;
                 }
             }

@@ -163,11 +163,7 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
             game.loadPicture();
             mAdapter.clearButton();
             for (Movement movement : game.movement_variant) {
-                if (locale.equals("ru")) {
-                    mAdapter.addNewButton(new TextButton(movement.name_ru, movement.id));
-                } else {
-                    mAdapter.addNewButton(new TextButton(movement.name_en, movement.id));
-                }
+                mAdapter.addNewButton(new TextButton(movement.getName(), movement.id));
             }
             mAdapter.update();
 

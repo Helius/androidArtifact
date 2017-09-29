@@ -160,11 +160,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             game.loadPicture();
             mAdapter.clearButton();
             for (Author author : game.authors_variant) {
-                if (locale.equals("ru")) {
-                    mAdapter.addNewButton(new TextButton(author.name_ru, author.id));
-                } else {
-                    mAdapter.addNewButton(new TextButton(author.name_en, author.id));
-                }
+                mAdapter.addNewButton(new TextButton(author.getName(), author.id));
             }
             mAdapter.update();
 

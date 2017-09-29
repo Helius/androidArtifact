@@ -53,8 +53,6 @@ public class StatisticFragment extends Fragment {
 
         LayoutInflater mInflater;
         private UserData userData = null;
-        String locale = Locale.getDefault().getLanguage();
-
 
         private StatisticItemAdapter(Context context, UserData userData) {
             this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

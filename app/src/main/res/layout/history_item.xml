@@ -33,17 +33,19 @@
                     android:textColor="#000000"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
-                <TextView
-                    android:id="@+id/hist_info"
-
-                    android:layout_marginLeft="5dp"
-                    android:textColor="#e62034ac"
-                    android:textSize="7pt"
-                    android:gravity="right"
-                    android:text="Info"
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="0dp">
+                    <ImageView
+                        android:id="@+id/history_info_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_gravity="right"
+                        android:src="@drawable/ic_info_outline_black_24dp" />
+                </LinearLayout>
 
             </LinearLayout>
             <LinearLayout
@@ -52,16 +54,15 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/hist_author"
-                    android:textColor="#88000000"
+                    android:textColor="#A8000000"
                     android:textSize="7pt"
-                    android:text="asdfasdf"
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/hist_year"
-                    android:textColor="#88000000"
+                    android:textColor="#A8000000"
                     android:textSize="7pt"
 
                     android:layout_width="wrap_content"
@@ -70,13 +71,13 @@
 
             <TextView
                 android:id="@+id/hist_movement"
-                android:textColor="#88000000"
+                android:textColor="#A8000000"
                 android:textSize="6pt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/hist_holder"
-                android:textColor="#88000000"
+                android:textColor="#A8000000"
                 android:textSize="6pt"
                 android:paddingBottom="20dp"
                 android:layout_width="wrap_content"

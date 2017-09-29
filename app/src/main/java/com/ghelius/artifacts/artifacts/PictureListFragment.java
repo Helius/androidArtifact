@@ -64,11 +64,7 @@ public class PictureListFragment extends Fragment {
             String name = getString(R.string.undefined_movements_name);
             for (Movement m: movements) {
                 if (m.id == collected_id) {
-                    if (locale.equals("ru"))
-                        name = m.name_ru;
-                    else
-                        name = m.name_en;
-                    break;
+                    name = m.getName();
                 }
             }
             movements_str += name + ": " + mov_map.get(collected_id) + " ";

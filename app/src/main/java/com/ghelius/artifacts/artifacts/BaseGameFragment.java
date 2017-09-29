@@ -26,7 +26,6 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     public GameSetFinishedDialog dialog;
     public UserData userData = null;
     public BaseGameStatistic sessionStatistic;
-    public String locale;
     public int gameIndex = 0;
     public int gameCount = 10;
 
@@ -82,8 +81,6 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        locale = Locale.getDefault().getLanguage();
-
         dialog = (GameSetFinishedDialog) getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
         if (dialog == null) {
             dialog = new GameSetFinishedDialog();

@@ -2,6 +2,8 @@ package com.ghelius.artifacts.artifacts;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -27,7 +29,6 @@ import java.util.Locale;
  */
 public class HistoryFragment extends Fragment {
 
-    private final String locale;
     private StorageReference mStorageRef;
     private Adapter mAdapter;
 
@@ -59,12 +60,20 @@ public class HistoryFragment extends Fragment {
             TextView pic_name;
             TextView movement;
             TextView year;
+            View button;
         }
 
         @Override
         public View getView(int i, View view, final ViewGroup viewGroup) {
-            ViewHolder viewHolder;
+            final ViewHolder viewHolder;
             GameHistory.GameHistoryItem item = GameHistory.instance().getItem(i);
+            final Picture p = GameDataProvider.instance().getPictureByPath(item.img_path);
+//            final Picture p = GameDataProvider.instance().getPictureByPath("Винсент Ван Гог/1_10_the_starry_night.jpg");
+            if (p == null) {
+                return view;
+            }
+            final Author a = GameDataProvider.instance().getAuthorById(p.author);
+
             if (view == null) {
                 view = mInflater.inflate(R.layout.history_item, viewGroup, false);
                 view.setDrawingCacheEnabled(true);
@@ -74,38 +83,53 @@ public class HistoryFragment extends Fragment {
                 viewHolder.year = (TextView) view.findViewById(R.id.hist_year);
                 viewHolder.pic_name = (TextView) view.findViewById(R.id.hist_pic_name);
                 viewHolder.movement = (TextView) view.findViewById(R.id.hist_movement);
+                viewHolder.button = view.findViewById(R.id.history_info_button);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
             }
 
-            //Picture p = GameDataProvider.instance().getPictureByPath(item.img_path);
-            Picture p = GameDataProvider.instance().getPictureByPath("Винсент Ван Гог/1_10_the_starry_night.jpg");
-            Author a = GameDataProvider.instance().getAuthorById(p.author);
-
-            if (locale.equals("ru")) {
-                viewHolder.author.setText(a.name_ru);
+            if (p.getLink() != null && !p.getLink().isEmpty()) {
+                viewHolder.button.setVisibility(View.VISIBLE);
+                viewHolder.button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(p.getLink()));
+                        startActivity(i);
+                    }
+                });
             } else {
-                viewHolder.author.setText(a.name_en);
+                viewHolder.button.setVisibility(View.GONE);
             }
-            viewHolder.year.setVisibility(p.year != null ? View.VISIBLE : View.GONE);
-            viewHolder.year.setText(", " + p.year);
 
-            viewHolder.pic_name.setVisibility(p.name.get(locale) != null ? View.VISIBLE : View.INVISIBLE);
-            viewHolder.pic_name.setText(p.name.get(locale));
+            viewHolder.author.setText(a.getName());
+
+            if (p.year != null && !p.year.isEmpty()) {
+                viewHolder.year.setVisibility(View.VISIBLE);
+                viewHolder.year.setText(", " + p.year);
+            } else {
+                viewHolder.year.setVisibility(View.GONE);
+            }
+
+
+            if (p.getName() != null && !p.getName().isEmpty()) {
+                viewHolder.pic_name.setVisibility(View.VISIBLE);
+                viewHolder.pic_name.setText(p.getName());
+            } else {
+                viewHolder.pic_name.setVisibility(View.GONE);
+            }
+
+            String movement_str;
             if (p.movement_id != 0) {
-                if (locale.equals("ru")) {
-                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(p.movement_id).name_ru + ", " + p.holder.get(locale));
-                } else {
-                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(p.movement_id).name_en +", "+ p.holder.get(locale));
-                }
+                movement_str = GameDataProvider.instance().getMovementById(p.movement_id).getName();
             } else {
-                if (locale.equals("ru")) {
-                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(a.movement_id).name_ru + p.holder.get(locale));
-                } else {
-                    viewHolder.movement.setText(GameDataProvider.instance().getMovementById(a.movement_id).name_en + p.holder.get(locale));
-                }
+                movement_str = GameDataProvider.instance().getMovementById(GameDataProvider.instance().getAuthorById(p.author).movement_id).getName();
             }
+            if (!p.getHolder().isEmpty()) {
+                movement_str += ", " + p.getHolder();
+            }
+            viewHolder.movement.setText(movement_str);
 
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
@@ -119,7 +143,6 @@ public class HistoryFragment extends Fragment {
 
     public HistoryFragment() {
         // Required empty public constructor
-        locale = Locale.getDefault().getLanguage();
     }
 
     @Override

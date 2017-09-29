@@ -33,12 +33,15 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -260,9 +263,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mDatabase = FirebaseDatabase.getInstance();
-//        DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("content");
-//        scoresRef.keepSynced(true);
+        DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("user_rating1");
+        scoresRef.keepSynced(true);
 
         FirebaseStorage.getInstance().setMaxDownloadRetryTimeMillis(10000);
         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -348,10 +350,14 @@ public class MainActivity extends AppCompatActivity
         if (userData == null) {
             userData = new UserData() {
                 @Override
-                boolean saveUserData(JSONObject data) {
+                boolean saveUserData(final JSONObject data) {
                     PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).
                             edit().putString("userData", data.toString()).
                             apply();
+//                    DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("user_rating");
+//                    HashMap<String, JSONObject> map = new HashMap<>();
+//                    map.put(uid, data);
+//                    scoresRef.setValue(map);
                     return true;
                 }
 

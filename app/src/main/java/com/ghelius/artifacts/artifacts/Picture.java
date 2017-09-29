@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Created by eugene on 29.11.16.
@@ -19,9 +20,9 @@ public class Picture  {
     public int movement_id;
     public String path;
     public String year;
-    public HashMap<String, String> name;
-    public HashMap<String, String> link;
-    public HashMap<String, String> holder;
+    private HashMap<String, String> name = new HashMap<>();
+    private HashMap<String, String> link = new HashMap<>();
+    private HashMap<String, String> holder = new HashMap<>();
 
     HashMap parseLangArray(JSONArray arr) {
         HashMap map = new HashMap<String, String>();
@@ -38,6 +39,16 @@ public class Picture  {
             }
         }
         return map;
+    }
+
+    public String getName() {
+        return name.get(Locale.getDefault().getLanguage().equals("ru") ? "ru" : "en");
+    }
+    public String getLink() {
+        return link.get(Locale.getDefault().getLanguage().equals("ru") ? "ru" : "en");
+    }
+    public String getHolder() {
+        return holder.get(Locale.getDefault().getLanguage().equals("ru") ? "ru" : "en");
     }
 
     public Picture(JSONObject jsonObject) throws JSONException {

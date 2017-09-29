@@ -431,11 +431,7 @@ public class SizeChangeAnimation extends Animation {
             for (Picture pic : game.picture_variant) {
                 mButtons.add(new ChooseButton(pic, pic.author));
             }
-            if (locale.equals("ru")) {
-                author_view.setText(game.author.name_ru);
-            } else {
-                author_view.setText(game.author.name_en);
-            }
+                author_view.setText(game.author.getName());
             author_view.setBackgroundResource(0);
         } else { // we played all game and now just show last one
         }

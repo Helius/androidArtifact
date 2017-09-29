@@ -84,8 +84,8 @@ public class TypeAuthorGameFragment extends BaseGameFragment {
         mEditText = (AutoCompleteTextView) v.findViewById(R.id.text_input);
         ArrayList<String> suggestList = new ArrayList<>();
         for(Author a: dataProvider.getAuthors()) {
-            suggestList.add(a.name_ru);
-            suggestList.add(a.name_en);
+            suggestList.add(a.getName("ru"));
+            suggestList.add(a.getName("en"));
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, suggestList);
         mEditText.setAdapter(adapter);
@@ -124,18 +124,14 @@ public class TypeAuthorGameFragment extends BaseGameFragment {
     private void checkResult() {
         boolean result = false;
         int timeout = 1200;
-        if (mEditText.getText().toString().equals(games.get(gameIndex).author.name_ru) ||
-                mEditText.getText().toString().equals(games.get(gameIndex).author.name_en)) {
+        if (mEditText.getText().toString().equals(games.get(gameIndex).author.getName("ru")) ||
+                mEditText.getText().toString().equals(games.get(gameIndex).author.getName("en"))) {
             result = true;
             timeout = 1;
         } else {
 //            mImageView.setImageBitmap(null);
             authorHint.setVisibility(View.VISIBLE);
-            if (Locale.getDefault().getLanguage().equals("ru")) {
-                authorHint.setText(games.get(gameIndex).author.name_ru);
-            } else {
-                authorHint.setText(games.get(gameIndex).author.name_en);
-            }
+            authorHint.setText(games.get(gameIndex).author.getName());
         }
         addToHistory(new GameHistory.GameHistoryItem(games.get(gameIndex).picture, result));
         sessionStatistic.addAttempt(result);
