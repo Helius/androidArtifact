@@ -2,9 +2,10 @@ package com.ghelius.artifacts.artifacts;
 
 
 import android.app.Activity;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +15,17 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+
+import javax.sql.DataSource;
 
 public class ChooseAuthorGameFragment extends BaseGameFragment {
 
@@ -165,7 +170,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             mAdapter.update();
 
             if (gameIndex + 1 < games.size()) {
-                games.get(gameIndex + 1).cachPicture();
+                games.get(gameIndex + 1).cachePicture();
             }
         } else { // we played all game and now just show last one
             ChooseAuthorGame game = games.get(gameIndex-1);
@@ -205,7 +210,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             games.add(game);
         }
         games.get(0).loadPicture();
-        games.get(1).cachPicture();
+        games.get(1).cachePicture();
         return games;
     }
 
@@ -227,12 +232,27 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             final View v = getView();
             if (v == null)
                 return;
-//            if (id == gameIndex) {
-//                getView().findViewById(R.id.progress_view).setVisibility(View.VISIBLE);
-//            }
+            final View progress_view = getView().findViewById(R.id.progress_view);
+            if(progress_view != null) {
+                progress_view.setVisibility(View.VISIBLE);
+            }
             Glide.with(a.getApplicationContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(picture.path))
+                    .listener(new RequestListener<StorageReference, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            if (progress_view != null) {
+                                progress_view.setVisibility(View.GONE);
+                            }
+                            return false;
+                        }
+                    })
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .override(600, 600)
                     .into(mImageView)
@@ -240,7 +260,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
             showButtonBlock(true);
         }
 
-        public void cachPicture() {
+        public void cachePicture() {
             Activity a = getActivity();
             if (a == null)
                 return;

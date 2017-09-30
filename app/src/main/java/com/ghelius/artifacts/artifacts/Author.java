@@ -28,7 +28,7 @@ public class Author {
     }
 
     public String getName() {
-        return Locale.getDefault().getLanguage().equals("ru") ? name_ru : name_en;
+        return getName(Locale.getDefault().getLanguage());
     }
 
     public String getName(String lang) {

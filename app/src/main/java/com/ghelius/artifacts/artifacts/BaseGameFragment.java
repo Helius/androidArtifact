@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.Locale;
-
 public abstract class BaseGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
 
     private HistoryFragment historyFragment;

@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/hist_author"
-                    android:textColor="#A8000000"
+                    android:textColor="@color/gray_text_color"
                     android:textSize="7pt"
 
                     android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
 
                 <TextView
                     android:id="@+id/hist_year"
-                    android:textColor="#A8000000"
+                    android:textColor="@color/gray_text_color"
                     android:textSize="7pt"
 
                     android:layout_width="wrap_content"
@@ -71,13 +71,13 @@
 
             <TextView
                 android:id="@+id/hist_movement"
-                android:textColor="#A8000000"
+                android:textColor="@color/gray_text_color"
                 android:textSize="6pt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/hist_holder"
-                android:textColor="#A8000000"
+                android:textColor="@color/gray_text_color"
                 android:textSize="6pt"
                 android:paddingBottom="20dp"
                 android:layout_width="wrap_content"

@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,9 +27,11 @@ import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +59,7 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         Picture picture;
         ButtonState state;
         int author_id;
-        Drawable cachedBitmap;
+        public boolean loaded = false;
 
         ChooseButton(Picture picture, int author_id) {
             this.picture = picture;
@@ -103,6 +106,22 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
                     Glide.with(getContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(button.picture.path))
+                    .listener(new RequestListener<StorageReference, GlideDrawable>() {
+
+                        @Override
+                        public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            button.loaded = true;
+                            if(checkButtonsReady()) {
+                                showProgressView(false);
+                            }
+                            return false;
+                        }
+                    })
                     .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .override(300, 300)
                     .into(pic);
@@ -139,7 +158,15 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         }
     }
 
-
+    private void showProgressView(boolean show) {
+        View v = getView();
+        if (v != null) {
+            View progress_view = v.findViewById(R.id.progress_view);
+            if (progress_view != null) {
+                progress_view.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        }
+    }
 
 
     private void init () {
@@ -147,7 +174,7 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
         sessionStatistic = new BaseGameStatistic();
         rnd = new Random(System.currentTimeMillis());
         mButtons = new ArrayList<>();
-//        buttonBlocked = false;
+        buttonBlocked = true;
     }
 
     public ChoosePaintGameFragment() {
@@ -340,10 +367,10 @@ public class SizeChangeAnimation extends Animation {
 
     private void buttonSelected(int ind) {
 
-        if (/*buttonBlocked || */getView().findViewById(R.id.progress_view).getVisibility() == View.VISIBLE)
+        if (!checkButtonsReady())
             return;
 
-//        buttonBlocked = true;
+        buttonBlocked = true;
         int timeout = 800;
         boolean result = false;
         if (games.get(gameIndex).author.id == games.get(gameIndex).picture_variant.get(ind).author) {
@@ -402,6 +429,15 @@ public class SizeChangeAnimation extends Animation {
 
     }
 
+    private boolean checkButtonsReady() {
+        for (ChooseButton b: mButtons) {
+            if (!b.loaded) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void moreButtonPressed() {
         games = createNewGame(gameCount);
@@ -431,8 +467,9 @@ public class SizeChangeAnimation extends Animation {
             for (Picture pic : game.picture_variant) {
                 mButtons.add(new ChooseButton(pic, pic.author));
             }
-                author_view.setText(game.author.getName());
+            author_view.setText(game.author.getName());
             author_view.setBackgroundResource(0);
+            showProgressView(true);
         } else { // we played all game and now just show last one
         }
         loadAllImages();

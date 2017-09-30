@@ -8,4 +8,7 @@
     <color name="red_mark_border">#ff7070</color>
     <color name="green_mark_border">#1ab61a</color>
     <color name="green_mark_body">#b1f9b8</color>
+    <color name="gray_text_color">#a8000000</color>
+    <color name="black">#000000</color>
+
 </resources>

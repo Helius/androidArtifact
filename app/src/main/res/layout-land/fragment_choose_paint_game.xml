@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:textColor="#ff000000"
         android:textSize="12pt"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/paint_grid"

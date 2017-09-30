@@ -29,8 +29,6 @@ import java.util.Locale;
  */
 public class PictureListFragment extends Fragment {
 
-    private String locale;
-    private int authorId;
     private ArrayList<Picture> pictures;
     private StorageReference mStorageRef;
     private ArrayList<Movement> movements;
@@ -47,10 +45,9 @@ public class PictureListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        locale = Locale.getDefault().getLanguage();
         View v = inflater.inflate(R.layout.picture_list_fragment, container, false);
         ListView listView = (ListView) v.findViewById(R.id.picture_list_view);
-        listView.setAdapter(new PictureListAdapter(getActivity().getApplicationContext(), pictures));
+        listView.setAdapter(new PictureListAdapter(getActivity().getApplicationContext()));
 
         String movements_str = "";
         HashMap<Integer, Integer> mov_map = new HashMap<>();
@@ -82,7 +79,7 @@ public class PictureListFragment extends Fragment {
     private class PictureListAdapter extends BaseAdapter {
         private final LayoutInflater mInflater;
 
-        public PictureListAdapter(Context context, ArrayList<Picture> picture) {
+        public PictureListAdapter(Context context) {
             this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 

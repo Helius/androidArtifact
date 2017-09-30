@@ -9,6 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/choose_button_true_background_shape"
-        android:textColor="@color/common_google_signin_btn_text_light_default"
+        android:textColor="@color/gray_text_color"
         android:id="@+id/text" />
 </LinearLayout>
