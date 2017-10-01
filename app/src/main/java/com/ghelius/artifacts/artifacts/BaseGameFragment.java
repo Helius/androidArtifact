@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -56,7 +57,10 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     }
 
     private void openHistory() {
-
+        Bundle bundle = new Bundle();
+        bundle.putString("from", "game");
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+        mFirebaseAnalytics.logEvent("goHistory", bundle);
         historyFragment = (HistoryFragment) getActivity().getSupportFragmentManager().findFragmentByTag("history");
         if (historyFragment == null) {
             historyFragment = new HistoryFragment();

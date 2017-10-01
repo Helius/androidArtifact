@@ -48,7 +48,6 @@ public class ChoosePaintGameFragment extends BaseGameFragment{
     private ArrayList<ChooseButton> mButtons;
     private ButtonAdapter mButtonAdapter;
     private ArrayList<ChoosePaintGame> games = null;
-    GameSetFinishedDialog dialog;
     ImageView fullImage;
     private boolean fullShowed = false;
     private Drawable background;
@@ -456,12 +455,10 @@ public class SizeChangeAnimation extends Animation {
         super.onCreate(savedInstanceState);
         games = createNewGame(gameCount);
         init();
-//        Log.d(TAG,"onCreate");
     }
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
-//            Log.d(TAG, "play game " + gameIndex);
             ChoosePaintGame game = games.get(gameIndex);
             mButtons.clear();
             for (Picture pic : game.picture_variant) {
