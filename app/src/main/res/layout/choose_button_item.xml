@@ -8,6 +8,7 @@
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textSize="16dp"
         android:background="@drawable/choose_button_true_background_shape"
         android:textColor="@color/gray_text_color"
         android:id="@+id/text" />

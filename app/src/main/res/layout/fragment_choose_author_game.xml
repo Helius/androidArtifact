@@ -26,7 +26,7 @@
                 android:visibility="invisible"
                 app:cpv_indeterminate="true" />
         </RelativeLayout>
-        <GridView
+        <com.ghelius.artifacts.artifacts.ExpandableWidthGridView
             android:id="@+id/choose_button_grid_view"
             android:numColumns="2"
             android:horizontalSpacing="10dp"
@@ -37,7 +37,7 @@
             android:paddingRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        </GridView>
+        </com.ghelius.artifacts.artifacts.ExpandableWidthGridView>
 
     </LinearLayout>
 

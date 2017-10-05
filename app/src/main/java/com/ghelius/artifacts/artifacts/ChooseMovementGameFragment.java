@@ -65,9 +65,9 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_choose_movement_game, container, false);
+        View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
-        GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
+        ExpandableWidthGridView mGridView = (ExpandableWidthGridView) view.findViewById(R.id.choose_button_grid_view);
         mAdapter = new TextButtonAdapter(getContext());
         mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -78,6 +78,9 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
         });
         if (games == null) {
             games = createNewGame(gameCount);
+        }
+        if(view.findViewById(R.id.layout_land_marker) != null) {
+            mGridView.setExpanded(true);
         }
 
         return view;
@@ -158,7 +161,6 @@ public class ChooseMovementGameFragment extends BaseGameFragment {
 
     private void playGame(int gameIndex) {
         if (gameIndex < games.size()) {
-//            Log.d(TAG, "play game " + gameIndex);
             ChooseMovementGame game = games.get(gameIndex);
             game.loadPicture();
             mAdapter.clearButton();

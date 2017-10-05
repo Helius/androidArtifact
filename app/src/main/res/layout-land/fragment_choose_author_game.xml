@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     tools:context="com.ghelius.artifacts.artifacts.ChooseAuthorGameFragment">
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <RelativeLayout
             android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp">
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/main_pic"
                 android:layout_width="match_parent"
@@ -25,18 +25,25 @@
                 app:cpv_animAutostart="true"
                 app:cpv_indeterminate="true" />
         </RelativeLayout>
-        <GridView
+        <com.ghelius.artifacts.artifacts.ExpandableWidthGridView
             android:id="@+id/choose_button_grid_view"
-            android:numColumns="4"
+            android:numColumns="1"
             android:horizontalSpacing="10dp"
             android:verticalSpacing="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="14dp"
+            android:layout_gravity="center_vertical"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </GridView>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+        </com.ghelius.artifacts.artifacts.ExpandableWidthGridView>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout_land_marker"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp">
 
     </LinearLayout>
 

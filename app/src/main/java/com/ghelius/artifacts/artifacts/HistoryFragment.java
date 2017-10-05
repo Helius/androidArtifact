@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -53,17 +56,20 @@ public class HistoryFragment extends Fragment {
 
         class ViewHolder {
             ImageView image;
+            ImageView guess_mark;
             TextView author;
             TextView pic_name;
-            TextView movement;
+            TextView holder;
             TextView year;
             View button;
+            public int height = -1;
         }
 
         @Override
         public View getView(int i, View view, final ViewGroup viewGroup) {
             final ViewHolder viewHolder;
             GameHistory.GameHistoryItem item = GameHistory.instance().getItem(i);
+            final boolean guessed = item.success;
             final Picture p = GameDataProvider.instance().getPictureByPath(item.img_path);
 //            final Picture p = GameDataProvider.instance().getPictureByPath("Винсент Ван Гог/1_10_the_starry_night.jpg");
             if (p == null) {
@@ -75,12 +81,17 @@ public class HistoryFragment extends Fragment {
                 view = mInflater.inflate(R.layout.history_item, viewGroup, false);
                 view.setDrawingCacheEnabled(true);
                 viewHolder = new ViewHolder();
-                viewHolder.image = (ImageView) view.findViewById(R.id.hist_image);
-                viewHolder.author = (TextView) view.findViewById(R.id.hist_author);
-                viewHolder.year = (TextView) view.findViewById(R.id.hist_year);
-                viewHolder.pic_name = (TextView) view.findViewById(R.id.hist_pic_name);
-                viewHolder.movement = (TextView) view.findViewById(R.id.hist_movement);
+                viewHolder.image = (ImageView) view.findViewById(R.id.history_image);
+
+                viewHolder.author = (TextView) view.findViewById(R.id.history_line_1);
+
+                viewHolder.pic_name = (TextView) view.findViewById(R.id.history_line_2_first);
+                viewHolder.year = (TextView) view.findViewById(R.id.history_line_2_second);
+
+                viewHolder.holder = (TextView) view.findViewById(R.id.history_line_3_first);
+
                 viewHolder.button = view.findViewById(R.id.history_info_button);
+                viewHolder.guess_mark = (ImageView) view.findViewById(R.id.guessed_mark);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
@@ -100,7 +111,19 @@ public class HistoryFragment extends Fragment {
                 viewHolder.button.setVisibility(View.GONE);
             }
 
-            viewHolder.author.setText(a.getName());
+            if (guessed) {
+                viewHolder.guess_mark.setImageResource(R.drawable.tick);
+            } else {
+                viewHolder.guess_mark.setImageResource(R.drawable.cross);
+            }
+
+            String author_text = a.getName();
+            if (p.movement_id != 0) {
+                author_text += ". " + GameDataProvider.instance().getMovementById(p.movement_id).getName();
+            } else {
+                author_text += ". " + GameDataProvider.instance().getMovementById(GameDataProvider.instance().getAuthorById(p.author).movement_id).getName();
+            }
+            viewHolder.author.setText(author_text);
 
             if (p.year != null && !p.year.isEmpty()) {
                 viewHolder.year.setVisibility(View.VISIBLE);
@@ -117,23 +140,39 @@ public class HistoryFragment extends Fragment {
                 viewHolder.pic_name.setVisibility(View.GONE);
             }
 
-            String movement_str;
-            if (p.movement_id != 0) {
-                movement_str = GameDataProvider.instance().getMovementById(p.movement_id).getName();
+
+            if(p.getHolder() != null && !p.getHolder().isEmpty())
+            {
+                viewHolder.holder.setVisibility(View.VISIBLE);
             } else {
-                movement_str = GameDataProvider.instance().getMovementById(GameDataProvider.instance().getAuthorById(p.author).movement_id).getName();
+                viewHolder.holder.setVisibility(View.GONE);
             }
-            if (!p.getHolder().isEmpty()) {
-                movement_str += ", " + p.getHolder();
-            }
-            viewHolder.movement.setText(movement_str);
+            viewHolder.holder.setText(p.getHolder());
 
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(item.img_path))
+                    .listener(new RequestListener<StorageReference, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            viewHolder.height = viewHolder.image.getMinimumHeight();
+                            return false;
+                        }
+                    })
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .override(2000,2000)
+                    .override(1080,1080)
                     .into(viewHolder.image);
+
+
+            if (viewHolder.height != -1) {
+                view.setMinimumHeight(viewHolder.image.getMinimumHeight());
+            }
+
             return view;
         }
     }
@@ -149,6 +188,8 @@ public class HistoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_history_list, container, false);
         ListView list = (ListView) v.findViewById(R.id.history_list);
+        list.setDrawingCacheEnabled(true);
+        list.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         list.setDivider(null);
         list.setDividerHeight(0);
         mAdapter = new Adapter(getContext());

@@ -69,7 +69,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_choose_author_game, container, false);
         mImageView = (ImageView) view.findViewById(R.id.main_pic);
-        GridView mGridView = (GridView) view.findViewById(R.id.choose_button_grid_view);
+        ExpandableWidthGridView mGridView = (ExpandableWidthGridView) view.findViewById(R.id.choose_button_grid_view);
         mAdapter = new TextButtonAdapter(getActivity().getApplicationContext());
         mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,6 +80,9 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         });
         if (games == null) {
             games = createNewGame(gameCount);
+        }
+        if(view.findViewById(R.id.layout_land_marker) != null) {
+            mGridView.setExpanded(true);
         }
 
         return view;
@@ -193,7 +196,7 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         Collections.shuffle(tmp_pic);
 
         for (int i = 0; i < count; i++) {
-            ChooseAuthorGame game = new ChooseAuthorGame(i);
+            ChooseAuthorGame game = new ChooseAuthorGame();
             if (tmp_pic.size() > 0) {
                 game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
                 game.authors_variant.add(dataProvider.getAuthorById(game.picture.author));
@@ -217,11 +220,8 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     class ChooseAuthorGame {
         Picture picture;
         ArrayList<Author> authors_variant = new ArrayList<>();
-        private int id;
 
-
-        ChooseAuthorGame(int id) {
-            this.id = id;
+        ChooseAuthorGame() {
         }
 
         void loadPicture() {
