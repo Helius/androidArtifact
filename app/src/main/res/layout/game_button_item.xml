@@ -17,7 +17,7 @@
         android:textAlignment="center"
         android:textSize="18sp"
         android:padding="5dp"
-        android:textColor="@color/common_google_signin_btn_text_light"
+        android:textColor="@color/gray_text_color"
         />
 
 </LinearLayout>
