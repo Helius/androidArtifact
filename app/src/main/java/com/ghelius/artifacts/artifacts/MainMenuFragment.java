@@ -4,6 +4,7 @@ package com.ghelius.artifacts.artifacts;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class MainMenuFragment extends Fragment {
 
     ArrayList<GameEntry> mGameEntries;
     MainMenuListener mListener;
+    LinearLayout toast_layout;
 
     public interface MainMenuListener {
         void menuClicked(int number, GameEntry entry);
@@ -52,7 +55,7 @@ public class MainMenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.game_bottons_layout, container, false);
+        final View v = inflater.inflate(R.layout.game_bottons_layout, container, false);
 
         GridView gridView = (GridView) v.findViewById(R.id.main_menu_grid);
         gridView.setAdapter(new MainMenuListAdapter(getActivity().getApplicationContext()));
@@ -65,7 +68,27 @@ public class MainMenuFragment extends Fragment {
             }
         });
 
+        toast_layout = (LinearLayout) v.findViewById(R.id.main_menu_toast);
+        v.findViewById(R.id.toast_close_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideToast();
+            }
+        });
+
         return v;
+    }
+
+
+    public void showToast(String str) {
+        TransitionManager.beginDelayedTransition(toast_layout);
+        ((TextView)toast_layout.findViewById(R.id.toast_text)).setText(str);
+        toast_layout.setVisibility(View.VISIBLE);
+    }
+
+    public void hideToast() {
+        TransitionManager.beginDelayedTransition(toast_layout);
+        toast_layout.setVisibility(View.GONE);
     }
 
     @Override

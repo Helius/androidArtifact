@@ -11,10 +11,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +44,6 @@ import com.google.firebase.storage.StorageReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -400,6 +402,7 @@ public class MainActivity extends AppCompatActivity
         return userData;
     }
 
+
     private void updateSideBarInfo() {
         if (sbMainText != null) {
             String msg;
@@ -463,4 +466,17 @@ public class MainActivity extends AppCompatActivity
         logEvent("ScreenOrientation", newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? "Landscape" : "Portrait");
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final MainMenuFragment mainMenuFragment =
+                        (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.main_menu_fragment);
+                mainMenuFragment.showToast("Мы скучали без Вас! И доабвили новых авторов: Франциско Гойа, Рафаэль Санти, Карл Брюлов и других!");
+            }
+        }, 3000);
+    }
 }
