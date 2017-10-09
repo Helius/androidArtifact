@@ -44,6 +44,8 @@ import com.google.firebase.storage.StorageReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -285,7 +287,12 @@ public class MainActivity extends AppCompatActivity
         if (chooseLevelDialog != null) {
             chooseLevelDialog.init(getUserData());
         }
-        loadGameData();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadGameData();
+            }
+        });
     }
 
     @Override
@@ -306,13 +313,22 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         final long ONE_MEGABYTE = 1024 * 1024;
-        StorageReference fileRef = mStorageRef.child("out_db.1.json");
+        StorageReference fileRef = mStorageRef.child("out_db.2.json");
         fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 try {
                     GameDataProvider.instance().initialize(bytes, userData.getLevel());
                     findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
+                    NewAuthorsDetector d = new NewAuthorsDetector() {
+                        @Override
+                        void result(ArrayList<Author> new_authors) {
+                            final MainMenuFragment mainMenuFragment =
+                                    (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.main_menu_fragment);
+                            mainMenuFragment.showToast(getString(R.string.toast_miss_msg) + " " + Author.authorsToString(new_authors, 3));
+                        }
+                    };
+                    d.detectNewAuthors(getApplicationContext(), GameDataProvider.instance().getFullAuthors());
                 } catch (JSONException e) {
                     Log.d(TAG, "Can't parse json db");
                     logEvent("LoadDbDataError");
@@ -469,14 +485,5 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final MainMenuFragment mainMenuFragment =
-                        (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.main_menu_fragment);
-                mainMenuFragment.showToast("Мы скучали без Вас! И доабвили новых авторов: Франциско Гойа, Рафаэль Санти, Карл Брюлов и других!");
-            }
-        }, 3000);
     }
 }

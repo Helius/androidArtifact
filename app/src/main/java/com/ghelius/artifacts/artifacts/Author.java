@@ -5,12 +5,9 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-
-/**
- * Created by eugene on 01.12.16.
- */
 
 @IgnoreExtraProperties
 public class Author {
@@ -33,5 +30,16 @@ public class Author {
 
     public String getName(String lang) {
         return lang.equals("ru") ? name_ru : name_en;
+    }
+
+    public static String authorsToString(ArrayList<Author> authors, int count) {
+        String res = "";
+        for (int i = 0; i < authors.size() && i < count; ++i) {
+            res += authors.get(i).getName();
+            if (i < authors.size()-1 && i < count-1) {
+                res += ", ";
+            }
+        }
+        return res;
     }
 }
