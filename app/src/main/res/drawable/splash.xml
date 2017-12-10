@@ -3,11 +3,10 @@
 
     <item
         android:drawable="@color/common_google_signin_btn_text_dark_default"/>
-
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/ic_launcher"/>
+            android:src="@drawable/new_year_splash_420"/>
     </item>
 
 </layer-list>
