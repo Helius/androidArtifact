@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         final long ONE_MEGABYTE = 1024 * 1024;
-        StorageReference fileRef = mStorageRef.child("out_db.2.json");
+        StorageReference fileRef = mStorageRef.child("out_db.1.json");
         fileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {

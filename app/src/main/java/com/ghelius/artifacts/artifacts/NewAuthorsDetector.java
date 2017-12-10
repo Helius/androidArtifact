@@ -28,8 +28,6 @@ public abstract class NewAuthorsDetector {
         Params p = new Params();
         p.authors_json = new JSONArray(PreferenceManager.getDefaultSharedPreferences(context).getString("saved_authors", "[]"));
         p.authors_arr = loaded_authors;
-        //Log.d("helius:", "saved " + p.authors_json.length() + ", " + p.authors_json.toString());
-        //Log.d("helius:", "checked " + p.authors_arr.size() + ", " + p.authors_arr.toString());
 
         task.execute(new Params[] {p});
     }
