@@ -1,8 +1,10 @@
 #!/usr/bin/python3
-import os
+
 import sys
 import re
 import json
+import os
+import imghdr
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -12,22 +14,26 @@ RESET = "\033[0;0m"
 BOLD = "\033[;1m"
 REVERSE = "\033[;7m"
 
+author_file = 'author_ext.json'
+
 oldstdout = sys.stdout
 
 warn_out = []
 pic_out = []
 author_out = []
 
+
 def warn(s):
     sys.stdout.write(RED+s+RESET+'\n')
     warn_out.append(RED+s+RESET+'\n')
+
 
 def parsePicFile(s, authorFolder, authorId):
     m = re.match('([0-9])_(([0-9]+)_)?', s)
     try:
         pic = {}
         pic["level"] = int(m.groups()[0])
-        pic["path"] = authorFolder + '/' + s
+        pic["path"] = os.path.join(authorFolder, s)
         pic["author"] = authorId
         if m.groups()[2] != None:
             pic["movement_id"] = int(m.groups()[2])
@@ -36,42 +42,29 @@ def parsePicFile(s, authorFolder, authorId):
         return pic
     except Exception as e:
         warn('warning!: ' + s + ' ' + str(e))
+    return {}
 
 
-def parseAuthorId(s):
-    jauthor = json.loads(s)
-    try:
-        return jauthor["id"]
-    except:
-        warn('Can\'t parse Author ID json for ' + s)
+def tryFillFromName(p, p_f):
+    tmp = parsePicFile(p_f, '', '')
+    if 'level' in tmp:
+        p['level'] = tmp['level']
+    if 'movement_id' in tmp:
+        p['movement_id'] = tmp['movement_id']
+    return p
 
-def collectPic():
-    author_json = {}
-    for dirName, subdirList, fileList in os.walk(rootDir):
-        print('Processing directory: %s' % dirName)
-        authorId = 0
-        if 'author_ext.json' in fileList:
-            print ('found %s' % dirName + 'author_ext.json')
-            author_str = open(dirName + '/author_ext.json', 'r').read().replace('\n', '')
-            author_json = json.loads(author_str)
-            fileList.remove('author_ext.json')
+
+def findPictureFiles(dir):
+    res = []
+    for f in os.listdir(dir):
+        if imghdr.what(os.path.join(dir, f)) is not None:
+            res.append(f)
+            print('ok: \t{}'.format(f))
         else:
-            warn('author_ext.json not found')
-        for fname in fileList:
-            print('\t%s' % fname)
-            out = parsePicFile(fname, os.path.basename(dirName), authorId)
-            if out is not None:
-                pic_out.append(out)
+            if f != 'author_ext.json':
+                warn('skip:\t{}'.format(f))
+    return res
 
-
-def collectPicFiles():
-    for dirName, subdirList, fileList in os.walk(rootDir):
-        print('Processing directory: %s' % dirName)
-        if 'author_ext.json' in fileList:
-            fileList.remove('author_ext.json')
-        if 'author.json' in fileList:
-            fileList.remove('author.json')
-        return fileList
 
 def collectAuthors():
     print('\nTry to load other authors')
@@ -87,28 +80,23 @@ def collectAuthors():
                 author_json = json.loads(author_str)
                 authors.append(author_json)
             except OSError:
-                warn("{} doesn't contain author_ext.json".format(dir))
+                pass
+                # warn("{} doesn't contain author_ext.json".format(dir))
     return sorted(authors, key=lambda a: a["id"])
-    print ('Done')
+    print('Done')
 
 
-def print_array(dic):
-    cnt = 0
-    for key in dic:
-        cnt = cnt + 1
-        try:
-            if (cnt == len(dic)):
-                out('        ' + json.dumps(key, ensure_ascii=False))
-            else:
-                out('        ' + json.dumps(key, ensure_ascii=False) + ',')
-        except Exception as e:
-            warn('warning! can\'t print ' + str(key) + ' '  + str(e))
-
-
-def out(s):
-    #print (s) # for Debug
-    outFile.write(s + '\n')
-
+def create_new_author(name):
+    author_json = {}
+    author_file = ('templates/author_template.json')
+    try:
+        author_str = open(author_file).read().replace('\n', '')
+        author_json = json.loads(author_str)
+        author_json['name_ru'] = name
+        print("Loaded", author_file)
+    except OSError:
+        warn("{} not found, will create new one".format(author_file))
+    return author_json
 
 
 # ========= start ==========
@@ -119,37 +107,30 @@ rootDir = sys.argv[1]
 author_name = os.path.basename(os.path.normpath(rootDir))
 print("For [%s]" % author_name)
 
-# get pic files
+# get author pic files in dir
 
-pics = collectPicFiles()
-if type(pics) is list and len(pics) > 0:
-    print("found pics:")
-    for pic in pics:
-        print('\t',pic)
-else:
+pics_f = findPictureFiles(rootDir)
+if len(pics_f) == 0:
     warn("pics files not found in {}".format(rootDir))
     exit(1)
 
-# get author_ext.json
+# try to load or create new author_ext.json
 
 author_file = os.path.join(rootDir, 'author_ext.json')
 print("\nTry load ", author_file)
-author_str='{}'
 try:
-   author_str = open(author_file).read().replace('\n', '')
+    author_str = open(author_file).read().replace('\n', '')
+    author_json = json.loads(author_str)
+    print("Loaded", author_file)
 except OSError as e:
     print("author_ext.json not found, will create new one")
-author_json = json.loads(author_str)
-print ("Loaded", author_file)
+    author_json = create_new_author(author_name)
 
 # get all author id to avoid dublicate
 
 authors = collectAuthors()
 if len(authors) == 0:
-    warn ("Can't find other authors to check id is unique")
-    exit(1)
-#for a in authors:
-#    print (a["name_ru"], a["id"])
+    warn("Can't find other authors to check id is unique")
 
 # check id unique
 
@@ -159,27 +140,48 @@ if 'id' in author_json:
             warn('This id {} already exist in {}'.format(a['id'], a['name_ru']))
             warn('Next free is {}'.format(int(authors[len(authors)-1]["id"])+1))
 else:
-    print("create new ID")
+    newId = int(authors[len(authors)-1]["id"])+1
+    print("create new ID {}".format(newId))
+    author_json['id'] = newId
 
+# check images from json exist in dir
+print('Check pictures in author_ext.json:')
+for p in author_json['pictures']:
+    if len(p['path']) == 0:
+        author_json['pictures'].remove(p)
+        del p
+        warn('!found picture with empty path! gonna remove it!')
+        continue
+    if os.path.basename(p['path']) not in pics_f:
+        warn('!!!Miss {} file from json'.format(p['path']))
 
+# check images in dir added to json and add new
+pictures_to_add = []
+for p_f in pics_f:
+    full_path = os.path.join(author_name, p_f)
+    exist = False
+    for pic in author_json['pictures']:
+        if pic['path'] == full_path:
+            exist = True
+    if exist is True:
+        print('file found')
+    else:
+        print('file {} not found, will add'.format(full_path))
+        p_str = open('templates/picture_template.json', 'r').\
+            read().replace('\n', '')
+        p = json.loads(p_str)
+        p = tryFillFromName(p, p_f)
+        p['path'] = full_path
+        p['author'] = author_json['id']
+        pictures_to_add.append(p)
 
-print("\n")
+for p in pictures_to_add:
+    author_json['pictures'].append(p)
 
-#print(json.dumps(author_json, indent=2, ensure_ascii=False))
+outFile = open(os.path.join(rootDir, "author_ext.json"), 'w')
+outFile.write(json.dumps(author_json, indent=2, ensure_ascii=False))
+outFile.close()
 
-#author_out = sorted(author_out, key=lambda a: a["id"])
-
-#db_out = {}
-#db_out["content"] = {}
-#db_out["content"] = json.loads(open(os.path.join(rootDir, 'movements.json')).read())
-#db_out["content"]["authors"] = author_out
-#db_out["content"]["pictures"] = pic_out
-#print("writing...")
-#outFile = open("out_db.json",'w')
-#db_pretty_print (db_out)
-#outFile.close()
-#print("saved to out_db.json")
+print("author_ext.json updated")
+print("\n\n ======== collected warnings =========\n")
 sys.stdout.write(' '.join(warn_out))
-#print('\n -------------- Statistics --------------\n')
-#db_print_movements_stat(db_out)
-#db_print_authors_stat(db_out)

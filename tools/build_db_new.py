@@ -51,7 +51,7 @@ def collectPic():
             fileList.remove('author_ext.json')
             for p in author_j["pictures"]:
                 if not os.path.basename(p["path"]) in fileList:
-                    warn(p["path"] + " not found")
+                    warn(p["path"] + " not found on disk")
                 p["author"] = author_j["id"]
                 pic_out.append(p)
             for f in fileList:
@@ -61,7 +61,7 @@ def collectPic():
                         found = True;
                         break;
                 if found == False:
-                    warn("!!!! Missing file: " + dirName+f + " not in json")
+                    warn("!!!! Missing file: " + dirName+'/'+f + " not in json")
             author_j.pop("pictures", None)
             for a in author_out:
                 if a["id"] == authorId:
@@ -187,6 +187,7 @@ outFile = open("out_db.1.json",'w')
 db_pretty_print (db_out)
 outFile.close()
 print("saved to out_db.json")
+print ("\n\n collected warnings \n\n")
 sys.stdout.write(" ".join(warn_out))
 print('\n -------------- Statistics --------------\n')
 db_print_movements_stat(db_out)
