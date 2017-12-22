@@ -4,7 +4,6 @@ import sys
 import re
 import json
 import os
-import imghdr
 
 RED = "\033[1;31m"
 BLUE = "\033[1;34m"
@@ -57,7 +56,8 @@ def tryFillFromName(p, p_f):
 def findPictureFiles(dir):
     res = []
     for f in os.listdir(dir):
-        if imghdr.what(os.path.join(dir, f)) is not None:
+        ext = os.path.splitext(f)[1].lower()
+        if ext in ['.jpeg', '.jpg']:
             res.append(f)
             print('ok: \t{}'.format(f))
         else:
@@ -76,7 +76,8 @@ def collectAuthors():
 
         if (os.path.isdir(a_dir) and dir != current_dir):
             try:
-                author_str = open(p, 'r', encoding="utf8").read().replace('\n', '')
+                author_str = open(p, 'r', encoding="utf8")\
+                    .read().replace('\n', '')
                 author_json = json.loads(author_str)
                 authors.append(author_json)
             except OSError:
@@ -90,7 +91,8 @@ def create_new_author(name):
     author_json = {}
     author_file = ('templates/author_template.json')
     try:
-        author_str = open(author_file, 'r', encoding="utf8").read().replace('\n', '')
+        author_str = open(author_file, 'r', encoding="utf8")\
+            .read().replace('\n', '')
         author_json = json.loads(author_str)
         author_json['name_ru'] = name
         print("Loaded", author_file)
@@ -117,7 +119,8 @@ if len(pics_f) == 0:
 author_file = os.path.join(rootDir, 'author_ext.json')
 print("\nTry load ", author_file)
 try:
-    author_str = open(author_file, 'r', encoding="utf8").read().replace('\n', '')
+    author_str = open(author_file, 'r', encoding="utf8")\
+        .read().replace('\n', '')
     author_json = json.loads(author_str)
     print("Loaded", author_file)
 except OSError as e:
@@ -166,7 +169,7 @@ for p_f in pics_f:
         if pic['path'] == full_path:
             exist = True
     if exist is True:
-        print('file found')
+        print('✓ file found')
     else:
         print('file {} not found, will add'.format(full_path))
         p = tryFillFromName(p, p_f)
