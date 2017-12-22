@@ -44,10 +44,11 @@ def collectPic():
         authorId = 0
         if 'author_ext.json' in fileList:
             print ('found author_ext.json in %s' % dirName)
-            author_str = open(dirName + '/author_ext.json', 'r').read().replace('\n', '')
+            author_str = open(dirName + '/author_ext.json', 'r', encoding="utf8").read().replace('\n', '')
             author_j = json.loads(author_str)
             authorId = author_j["id"]
-            fileList.remove('author.json')
+            if 'author.json' in fileList:
+                fileList.remove('author.json')
             fileList.remove('author_ext.json')
             for p in author_j["pictures"]:
                 if not os.path.basename(p["path"]) in fileList:
@@ -69,7 +70,7 @@ def collectPic():
                     raise ValueError('Author has already used by " + a["name_en"]')
             author_out.append(author_j)
         else:
-            warn('author.json not found in ' + dirName)
+            warn('author_ext.json not found in ' + dirName)
 #        for fname in fileList:
 #            print('\t%s' % fname)
 #            out = parsePicFile(fname, os.path.basename(dirName), authorId)
@@ -179,11 +180,11 @@ author_out = sorted(author_out, key=lambda a: a["id"])
 
 db_out = {}
 db_out["content"] = {}
-db_out["content"] = json.loads(open(os.path.join(rootDir, 'movements.json')).read())
+db_out["content"] = json.loads(open(os.path.join(rootDir, 'movements.json'), 'r', encoding="utf8").read())
 db_out["content"]["authors"] = author_out
 db_out["content"]["pictures"] = pic_out
 print("writing...")
-outFile = open("out_db.1.json",'w')
+outFile = open("out_db.1.json",'w', encoding="utf8")
 db_pretty_print (db_out)
 outFile.close()
 print("saved to out_db.json")

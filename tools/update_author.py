@@ -76,7 +76,7 @@ def collectAuthors():
 
         if (os.path.isdir(a_dir) and dir != current_dir):
             try:
-                author_str = open(p, 'r').read().replace('\n', '')
+                author_str = open(p, 'r', encoding="utf8").read().replace('\n', '')
                 author_json = json.loads(author_str)
                 authors.append(author_json)
             except OSError:
@@ -90,7 +90,7 @@ def create_new_author(name):
     author_json = {}
     author_file = ('templates/author_template.json')
     try:
-        author_str = open(author_file).read().replace('\n', '')
+        author_str = open(author_file, 'r', encoding="utf8").read().replace('\n', '')
         author_json = json.loads(author_str)
         author_json['name_ru'] = name
         print("Loaded", author_file)
@@ -108,18 +108,16 @@ author_name = os.path.basename(os.path.normpath(rootDir))
 print("For [%s]" % author_name)
 
 # get author pic files in dir
-
 pics_f = findPictureFiles(rootDir)
 if len(pics_f) == 0:
     warn("pics files not found in {}".format(rootDir))
     exit(1)
 
 # try to load or create new author_ext.json
-
 author_file = os.path.join(rootDir, 'author_ext.json')
 print("\nTry load ", author_file)
 try:
-    author_str = open(author_file).read().replace('\n', '')
+    author_str = open(author_file, 'r', encoding="utf8").read().replace('\n', '')
     author_json = json.loads(author_str)
     print("Loaded", author_file)
 except OSError as e:
@@ -127,13 +125,11 @@ except OSError as e:
     author_json = create_new_author(author_name)
 
 # get all author id to avoid dublicate
-
 authors = collectAuthors()
 if len(authors) == 0:
     warn("Can't find other authors to check id is unique")
 
 # check id unique
-
 if 'id' in author_json:
     for a in authors:
         if (author_json['id'] == a['id']):
@@ -158,8 +154,14 @@ for p in author_json['pictures']:
 # check images in dir added to json and add new
 pictures_to_add = []
 for p_f in pics_f:
-    full_path = os.path.join(author_name, p_f)
+    # don't use path.join because on Windows it produces '\\' separator
+    full_path = author_name + '/' + p_f
     exist = False
+    # load template for picture
+    p_str = open('templates/picture_template.json', 'r', encoding="utf8").\
+        read().replace('\n', '')
+    p = json.loads(p_str)
+
     for pic in author_json['pictures']:
         if pic['path'] == full_path:
             exist = True
@@ -167,9 +169,6 @@ for p_f in pics_f:
         print('file found')
     else:
         print('file {} not found, will add'.format(full_path))
-        p_str = open('templates/picture_template.json', 'r').\
-            read().replace('\n', '')
-        p = json.loads(p_str)
         p = tryFillFromName(p, p_f)
         p['path'] = full_path
         p['author'] = author_json['id']
@@ -178,7 +177,7 @@ for p_f in pics_f:
 for p in pictures_to_add:
     author_json['pictures'].append(p)
 
-outFile = open(os.path.join(rootDir, "author_ext.json"), 'w')
+outFile = open(os.path.join(rootDir, "author_ext.json"), 'w', encoding="utf8")
 outFile.write(json.dumps(author_json, indent=2, ensure_ascii=False))
 outFile.close()
 
