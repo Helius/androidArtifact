@@ -19,6 +19,23 @@ public class GameDataProvider {
     private static GameDataProvider instance_;
     private boolean initialized = false;
 
+    private ArrayList<DataChangedListener> mDataChangedListeners = new ArrayList<>();
+
+
+
+    interface DataChangedListener {
+        void dataChanged();
+    }
+
+    public void addDataChangedListener(DataChangedListener listener) {
+        mDataChangedListeners.add(listener);
+    }
+
+    public void removeDataChangedListener(DataChangedListener listener) {
+        mDataChangedListeners.remove(listener);
+    }
+
+
     public static GameDataProvider instance() {
         if (instance_ == null) {
             instance_ = new GameDataProvider();
@@ -97,6 +114,9 @@ public class GameDataProvider {
         if (this.level != level) {
             this.level = level;
             createFilteredCollections();
+        }
+        for (DataChangedListener listener: mDataChangedListeners) {
+            listener.dataChanged();
         }
     }
 

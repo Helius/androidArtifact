@@ -17,7 +17,6 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -473,63 +472,16 @@ public class SizeChangeAnimation extends Animation {
     }
 
     void loadAllImages() {
-//        View v = getView();
-//        if (v != null) {
-//            View p = v.findViewById(R.id.progress_view);
-//            if (p != null) {
-//                p.setVisibility(View.INVISIBLE);
-//            }
-//        }
-//        View v = getView().findViewById(R.id.progress_view);
-//        if (v != null) {
-//            v.setVisibility(View.VISIBLE);
-//        }
-//        for (final ChooseButton b : mButtons) {
-//            b.cachedBitmap = null;
-//
-//            Glide.with(getActivity())
-//                    .using(new FirebaseImageLoader())
-//                    .load(mStorageRef.child(b.picture.path))
-//                    .asBitmap()
-//                    .override(100,100)
-//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .into(b.cachedBitmap)
-////                    .into(new SimpleTarget<Bitmap>() {
-////                        @Override
-////                        public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
-////                            b.cachedBitmap = resource;
-////                            mButtonAdapter.update(0);
-////                            int i = 0;
-////                            for (final ChooseButton b: mButtons) {
-////                                if (b.cachedBitmap != null) {
-////                                    i++;
-////                                    if (i == 4) {
-////                                        View v = getView();
-////                                        if (v != null) {
-////                                            v = v.findViewById(R.id.progress_view);
-////                                        }
-////                                        if (v != null) {
-////                                            v.setVisibility(View.INVISIBLE);
-////                                        }
-////                                    }
-////                                }
-////                            }
-////                        }
-////                    }
-//                    );
-//        }
         mButtonAdapter.update(0);
     }
+
     ArrayList<ChoosePaintGame> createNewGame(int count)
     {
-//        Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChoosePaintGame> games = new ArrayList<>();
 
-        ArrayList<Picture> tmp_pic = new ArrayList<>();
-        tmp_pic.addAll(dataProvider.getPictures());
-        Collections.shuffle(tmp_pic);
+        ArrayList<Picture> tmp_pic = getShuffledPictures(count, 0);
 
         for (int i = 0; i < count; i++) {
             ChoosePaintGame game = new ChoosePaintGame(i);

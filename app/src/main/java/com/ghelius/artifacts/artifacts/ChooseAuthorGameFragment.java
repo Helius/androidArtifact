@@ -2,15 +2,13 @@ package com.ghelius.artifacts.artifacts;
 
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -25,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-import javax.sql.DataSource;
-
 public class ChooseAuthorGameFragment extends BaseGameFragment {
 
     public static final String TAG = "ChooseAuthor";
@@ -36,7 +32,6 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     private boolean buttonBlocked;
     private TextButtonAdapter mAdapter = null;
     private ArrayList<ChooseAuthorGame> games = null;
-
 
 
     private void init () {
@@ -157,8 +152,8 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        games = createNewGame(gameCount);
         init();
+        games = createNewGame(gameCount);
     }
 
 
@@ -186,19 +181,16 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
 
     ArrayList<ChooseAuthorGame> createNewGame(int count)
     {
-//        Log.d(TAG, "create new " + count + "games");
         gameIndex = 0;
         sessionStatistic = new BaseGameStatistic();
         ArrayList<ChooseAuthorGame> games = new ArrayList<>();
 
-        ArrayList<Picture> tmp_pic = new ArrayList<>();
-        tmp_pic.addAll(dataProvider.getPictures());
-        Collections.shuffle(tmp_pic);
+        ArrayList<Picture> local_pics = getShuffledPictures(count, 0);
 
         for (int i = 0; i < count; i++) {
             ChooseAuthorGame game = new ChooseAuthorGame();
-            if (tmp_pic.size() > 0) {
-                game.picture = tmp_pic.remove(rnd.nextInt(tmp_pic.size()));
+            if (local_pics.size() > 0) {
+                game.picture = local_pics.remove(rnd.nextInt(local_pics.size()));
                 game.authors_variant.add(dataProvider.getAuthorById(game.picture.author));
                 int author_count = 3;
                 while (author_count > 0) {
@@ -214,6 +206,9 @@ public class ChooseAuthorGameFragment extends BaseGameFragment {
         }
         games.get(0).loadPicture();
         games.get(1).cachePicture();
+        for (ChooseAuthorGame g : games) {
+            Log.d("helius game:", (g.picture.path));
+        }
         return games;
     }
 

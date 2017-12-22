@@ -13,7 +13,10 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public abstract class BaseGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener {
+import java.util.ArrayList;
+import java.util.Collections;
+
+public abstract class BaseGameFragment extends Fragment implements GameSetFinishedDialog.DialogEventListener, GameDataProvider.DataChangedListener {
 
     private HistoryFragment historyFragment;
     private View historyButton = null;
@@ -27,12 +30,13 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     public BaseGameStatistic sessionStatistic;
     public int gameIndex = 0;
     public int gameCount = 10;
-
+    private ArrayList<Picture> pictureToGame;
 
 
     public BaseGameFragment() {
         // Required empty public constructor
         dataProvider = GameDataProvider.instance();
+        pictureToGame = new ArrayList<>();
     }
 
     public void setServerResources(UserData userData) {
@@ -54,6 +58,27 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
         if (historyButton != null) {
             historyButton.setVisibility(enable ? View.VISIBLE : View.INVISIBLE);
         }
+    }
+
+    private void updateShuffledPictures(int movementId) {
+        pictureToGame.clear();
+        if (movementId == 0) {
+            pictureToGame.addAll(dataProvider.getPictures());
+        } else {
+            for(Picture p : dataProvider.getPictures()) {
+                if (p.movement_id != 0) {
+                    pictureToGame.add(p);
+                }
+            }
+        }
+        Collections.shuffle(pictureToGame);
+    }
+
+    public ArrayList<Picture> getShuffledPictures(int size, int movementId) {
+        if(pictureToGame.size() < size) {
+            updateShuffledPictures(movementId);
+        }
+        return pictureToGame;
     }
 
     private void openHistory() {
@@ -78,6 +103,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
         setRetainInstance(true);
         mStorageRef = FirebaseStorage.getInstance().getReference();
         sessionStatistic = new BaseGameStatistic();
+        pictureToGame.clear();
     }
 
     @Override
@@ -114,6 +140,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
                 }
             }
         }
+        dataProvider.addDataChangedListener(this);
     }
 
     @Override
@@ -129,6 +156,7 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
             historyButton.setVisibility(View.INVISIBLE);
             this.historyButton = null;
         }
+        dataProvider.removeDataChangedListener(this);
     }
 
     @Override
@@ -139,5 +167,10 @@ public abstract class BaseGameFragment extends Fragment implements GameSetFinish
     @Override
     public void finishButtonPressed() {
         getActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void dataChanged() {
+        pictureToGame.clear();
     }
 }
