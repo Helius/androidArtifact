@@ -71,7 +71,6 @@ public class HistoryFragment extends Fragment {
             GameHistory.GameHistoryItem item = GameHistory.instance().getItem(i);
             final boolean guessed = item.success;
             final Picture p = GameDataProvider.instance().getPictureByPath(item.img_path);
-//            final Picture p = GameDataProvider.instance().getPictureByPath("Винсент Ван Гог/1_10_the_starry_night.jpg");
             if (p == null) {
                 return view;
             }
@@ -86,7 +85,6 @@ public class HistoryFragment extends Fragment {
                 viewHolder.author = (TextView) view.findViewById(R.id.history_line_1);
 
                 viewHolder.pic_name = (TextView) view.findViewById(R.id.history_line_2_first);
-                viewHolder.year = (TextView) view.findViewById(R.id.history_line_2_second);
 
                 viewHolder.holder = (TextView) view.findViewById(R.id.history_line_3_first);
 
@@ -125,21 +123,24 @@ public class HistoryFragment extends Fragment {
             }
             viewHolder.author.setText(author_text);
 
+            String name_year = "";
+            if (p.getName() != null && !p.getName().isEmpty()) {
+                name_year = p.getName();
+            }
             if (p.year != null && !p.year.isEmpty()) {
-                viewHolder.year.setVisibility(View.VISIBLE);
-                viewHolder.year.setText(", " + p.year);
-            } else {
-                viewHolder.year.setVisibility(View.GONE);
+                if (name_year.isEmpty()) {
+                    name_year = p.year;
+                } else {
+                    name_year += ". " + p.year;
+                }
             }
 
-
-            if (p.getName() != null && !p.getName().isEmpty()) {
+            if (!name_year.isEmpty()) {
                 viewHolder.pic_name.setVisibility(View.VISIBLE);
-                viewHolder.pic_name.setText(p.getName());
+                viewHolder.pic_name.setText(name_year);
             } else {
                 viewHolder.pic_name.setVisibility(View.GONE);
             }
-
 
             if(p.getHolder() != null && !p.getHolder().isEmpty())
             {

@@ -20,9 +20,10 @@ import java.util.ArrayList;
 
 public class MainMenuFragment extends Fragment {
 
-    ArrayList<GameEntry> mGameEntries;
-    MainMenuListener mListener;
-    LinearLayout toast_layout;
+    private ArrayList<GameEntry> mGameEntries;
+    private MainMenuListener mListener;
+    private LinearLayout toast_layout;
+    private String toast_text = "";
 
     public interface MainMenuListener {
         void menuClicked(int number, GameEntry entry);
@@ -75,12 +76,15 @@ public class MainMenuFragment extends Fragment {
                 hideToast();
             }
         });
-
+        if (!toast_text.isEmpty()) {
+            showToast(toast_text);
+        }
         return v;
     }
 
 
     public void showToast(String str) {
+        toast_text = str;
         TransitionManager.beginDelayedTransition(toast_layout);
         ((TextView)toast_layout.findViewById(R.id.toast_text)).setText(str);
         toast_layout.setVisibility(View.VISIBLE);
@@ -89,6 +93,7 @@ public class MainMenuFragment extends Fragment {
     public void hideToast() {
         TransitionManager.beginDelayedTransition(toast_layout);
         toast_layout.setVisibility(View.GONE);
+        toast_text="";
     }
 
     @Override
