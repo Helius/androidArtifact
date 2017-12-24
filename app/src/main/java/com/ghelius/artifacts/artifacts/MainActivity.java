@@ -326,6 +326,7 @@ public class MainActivity extends AppCompatActivity
                             final MainMenuFragment mainMenuFragment =
                                     (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.main_menu_fragment);
                             mainMenuFragment.showToast(getString(R.string.toast_miss_msg) + " " + Author.authorsToString(new_authors, 3));
+                            logEvent("NewAuthorToast");
                         }
                     };
                     d.detectNewAuthors(getApplicationContext(), GameDataProvider.instance().getFullAuthors());
