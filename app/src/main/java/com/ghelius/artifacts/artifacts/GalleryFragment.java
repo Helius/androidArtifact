@@ -33,6 +33,12 @@ public class GalleryFragment extends Fragment {
         this.movements = gameDataProvider.getFullMovements();
     }
 
+    @Override
+    public void onResume() {
+        getActivity().setTitle(R.string.gallery_title);
+        super.onResume();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,17 +48,11 @@ public class GalleryFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ArrayList<Picture> authors_picture = new ArrayList<Picture>();
-                for (Picture p: pictures) {
-                    if (p.author == authors.get(i).id) {
-                        authors_picture.add(p);
-                    }
-                }
                 PictureListFragment pictureListFragment = (PictureListFragment) getActivity().getSupportFragmentManager().findFragmentByTag("pictureList");
                 if (pictureListFragment == null) {
                     pictureListFragment = new PictureListFragment();
                 }
-                pictureListFragment.init(authors_picture, movements);
+                pictureListFragment.init(authors.get(i));
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .hide(GalleryFragment.this)
                         .replace(R.id.main_fragment_holder, pictureListFragment)

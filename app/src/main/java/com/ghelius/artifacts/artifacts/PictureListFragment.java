@@ -4,34 +4,29 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.text.TextDirectionHeuristicCompat;
-import android.support.v4.widget.TextViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
 
-/**
- * Created by eugene on 29.04.17.
- */
 public class PictureListFragment extends Fragment {
 
-    private ArrayList<Picture> pictures;
     private StorageReference mStorageRef;
-    private ArrayList<Movement> movements;
+    private ArrayList<Picture> pictures;
+    private Author author;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,47 +34,12 @@ public class PictureListFragment extends Fragment {
         setRetainInstance(true);
     }
 
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        View v = inflater.inflate(R.layout.picture_list_fragment, container, false);
-        ListView listView = (ListView) v.findViewById(R.id.picture_list_view);
-        listView.setAdapter(new PictureListAdapter(getActivity().getApplicationContext()));
-
-        String movements_str = "";
-        HashMap<Integer, Integer> mov_map = new HashMap<>();
-        for (Picture p: pictures) {
-            Integer value = mov_map.get(p.movement_id);
-            if (value == null)
-                value = 0;
-            mov_map.put(p.movement_id, ++value);
-        }
-        for(Integer collected_id : mov_map.keySet()) {
-            String name = getString(R.string.undefined_movements_name);
-            for (Movement m: movements) {
-                if (m.id == collected_id) {
-                    name = m.getName();
-                }
-            }
-            movements_str += name + ": " + mov_map.get(collected_id) + " ";
-        }
-        ((TextView) v.findViewById(R.id.authors_movements)).setText(movements_str);
-
-        return v;
-    }
-
-    public void init(ArrayList<Picture> pictures, ArrayList<Movement> movements) {
-        this.pictures = pictures;
-        this.movements = movements;
-    }
-
-    private class PictureListAdapter extends BaseAdapter {
+    private class ButtonAdapter extends BaseAdapter {
         private final LayoutInflater mInflater;
+        private ArrayList<Picture> pictures;
 
-        public PictureListAdapter(Context context) {
+        ButtonAdapter(Context context, ArrayList<Picture> pictures) {
+            this.pictures = pictures;
             this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
@@ -99,22 +59,54 @@ public class PictureListFragment extends Fragment {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int i, View view, final ViewGroup viewGroup) {
             if (view == null) {
-                view = mInflater.inflate(R.layout.gallery_picture_item, viewGroup, false);
+                view = mInflater.inflate(R.layout.choose_paint_item, viewGroup, false);
             }
-            ImageView imageView = (ImageView) view.findViewById(R.id.pic);
+            final Picture picture = pictures.get(i);
+            final ImageView pic = (ImageView) view.findViewById(R.id.picture);
+            pic.setImageResource(R.drawable.picture_dashed_placeholder);
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
-                    .load(mStorageRef.child(pictures.get(i).path))
-                    .into(imageView);
-            ((TextView) view.findViewById(R.id.picture_level_text)).
-                    setText(getResources().getString(R.string.picture_level_text, pictures.get(i).level));
-            ((TextView) view.findViewById(R.id.picture_path_text)).
-                    setText(pictures.get(i).path);
+                    .load(mStorageRef.child(picture.path))
+                    .listener(new RequestListener<StorageReference, GlideDrawable>() {
 
+                        @Override
+                        public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
 
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .override(240, 240)
+                    .into(pic);
             return view;
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        View v = inflater.inflate(R.layout.picture_list_fragment, container, false);
+        GridView gridView = (GridView) v.findViewById(R.id.paint_grid);
+        gridView.setAdapter(new ButtonAdapter(getActivity().getApplicationContext(), pictures));
+        return v;
+    }
+
+    public void init(Author author) {
+        pictures = GameDataProvider.instance().getPicturesByAuthor(author);
+        this.author = author;
+    }
+
+    @Override
+    public void onResume() {
+        getActivity().setTitle(author.getName());
+        super.onResume();
     }
 }

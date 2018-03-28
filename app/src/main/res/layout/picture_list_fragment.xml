@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/choose_pict_root_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-    <TextView
-        android:gravity="center"
-        android:id="@+id/authors_movements"
-        android:textSize="18sp"
-        android:textColor="@android:color/darker_gray"
-        android:ellipsize="none"
-        android:scrollHorizontally="false"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/grid_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="12dp"
-        />
-    <ListView
-        android:id="@+id/picture_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
-
-</LinearLayout>
+        android:layout_height="wrap_content">
+        <GridView
+            android:id="@+id/paint_grid"
+            android:numColumns="3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:verticalSpacing="3dp"
+            android:horizontalSpacing="3dp"
+            android:padding="3dp"
+            android:stretchMode="columnWidth"
+            android:layout_centerHorizontal="true"
+            android:listSelector="@drawable/list_selector"
+            android:drawSelectorOnTop="true"
+            android:focusableInTouchMode="false"
+            android:choiceMode="singleChoice" >
+        </GridView>
+        <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:id="@+id/progress_view"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cpv_color="@color/cpv_default_color"
+            app:cpv_animAutostart="true"
+            app:cpv_indeterminate="true" />
+    </RelativeLayout>
+</RelativeLayout>

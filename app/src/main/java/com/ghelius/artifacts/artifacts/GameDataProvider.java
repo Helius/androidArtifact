@@ -21,6 +21,15 @@ public class GameDataProvider {
 
     private ArrayList<DataChangedListener> mDataChangedListeners = new ArrayList<>();
 
+    public ArrayList<Picture> getPicturesByAuthor(Author author) {
+        ArrayList<Picture> result = new ArrayList<>();
+        for(Picture p : pictures) {
+            if (p.author == author.id) {
+                result.add(p);
+            }
+        }
+        return result;
+    }
 
 
     interface DataChangedListener {

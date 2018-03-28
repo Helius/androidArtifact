@@ -42,4 +42,5 @@
     <string name="you_hit">Вы угадали\u0020</string>
     <string name="favorites_empty_msg">Здесь будут отображаться последние 30 картин, которые вы видели в конкурсах</string>
     <string name="toast_miss_msg">Мы скучали без Вас! И добавили новых художников, среди которых</string>
+    <string name="gallery_title">Галлерея</string>
 </resources>
