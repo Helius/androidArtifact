@@ -25,7 +25,6 @@ public class GalleryFragment extends Fragment {
     private ArrayList<Author> authors;
     private ArrayList<Picture> pictures;
     private ArrayList<Movement> movements;
-    private String locale;
 
     public void init(GameDataProvider gameDataProvider) {
         this.authors = gameDataProvider.getFullAuthors();
@@ -42,7 +41,6 @@ public class GalleryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        locale = Locale.getDefault().getLanguage();
         View v = inflater.inflate(R.layout.gallery_fragment, container, false);
         ((TextView) v.findViewById(R.id.authors_count)).setText(getResources().getString(R.string.authors_count, authors.size()));
 

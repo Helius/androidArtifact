@@ -54,7 +54,7 @@ def job(path):
     except Exception as e:
         warn('failed: ' + url + '\n' + format(e))
 
-db = json.loads(open('out_db.json').read())
+db = json.loads(open('out_db.1.json').read())
 
 list=[]
 for pic in db['content']['pictures']:
