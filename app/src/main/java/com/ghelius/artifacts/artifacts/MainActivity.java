@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity
 //        } else if (id == R.id.nav_favorites) {
         //TODO: open favorites screen with list and zero-screen
         } else if (id == R.id.nav_history) {
-
             Bundle bundle = new Bundle();
             bundle.putString("from", "menu");
             FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
@@ -125,6 +124,17 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .hide(mainMenuFragment)
                         .replace(R.id.main_fragment_holder, statisticFragment)
+                        .addToBackStack("statistic").commit();
+            }
+        } else if (id == R.id.nav_gallery) {
+            galleryFragment = (GalleryFragment) getSupportFragmentManager().findFragmentByTag("gallery");
+            if (galleryFragment == null) {
+                galleryFragment = new GalleryFragment();
+                final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.main_menu_fragment);
+                getSupportFragmentManager().beginTransaction()
+                        .hide(mainMenuFragment)
+                        .replace(R.id.main_fragment_holder, galleryFragment)
                         .addToBackStack("statistic").commit();
             }
         } else if (id == R.id.nav_about) {

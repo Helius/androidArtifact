@@ -15,6 +15,7 @@ public class Author {
     public int movement_id;
     private String name_en;
     private String name_ru;
+    private String years;
 
 
     public Author(JSONObject jsonObject) throws JSONException {
@@ -22,10 +23,15 @@ public class Author {
         this.movement_id = jsonObject.getInt("movement_id");
         this.name_en = jsonObject.getString("name_en");
         this.name_ru = jsonObject.getString("name_ru");
+        this.years = jsonObject.getString("years");
     }
 
     public String getName() {
         return getName(Locale.getDefault().getLanguage());
+    }
+
+    public String getYears() {
+        return years;
     }
 
     public String getName(String lang) {

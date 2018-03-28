@@ -17,48 +17,26 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Locale;
 
-/**
- * Created by eugene on 28.04.17.
- */
 public class GalleryFragment extends Fragment {
 
     private ArrayList<Author> authors;
     private ArrayList<Picture> pictures;
     private ArrayList<Movement> movements;
 
-    public void init(GameDataProvider gameDataProvider) {
-        this.authors = gameDataProvider.getFullAuthors();
-        this.pictures = gameDataProvider.getFullPictures();
-        this.movements = gameDataProvider.getFullMovements();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        GameDataProvider gameDataProvider = GameDataProvider.instance();
+        this.authors = gameDataProvider.getFullAuthors();
+        this.pictures = gameDataProvider.getFullPictures();
+        this.movements = gameDataProvider.getFullMovements();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.gallery_fragment, container, false);
-        ((TextView) v.findViewById(R.id.authors_count)).setText(getResources().getString(R.string.authors_count, authors.size()));
-
-        int level_1_cnt = 0;
-        int level_2_cnt = 0;
-        int level_3_cnt = 0;
-        for (Picture p: pictures) {
-            if (p.level == 1) {
-                level_1_cnt++;
-            } else if (p.level == 2) {
-                level_2_cnt++;
-            } else if (p.level == 3) {
-                level_3_cnt++;
-            }
-        }
-        ((TextView) v.findViewById(R.id.movements_count))
-                .setText(getResources().getString(R.string.movements_count, level_1_cnt, level_2_cnt, level_3_cnt));
-
         ListView listView = (ListView) v.findViewById(R.id.gallery_listview);
         listView.setAdapter(new AuthorListAdapter(getActivity().getApplicationContext(), authors));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -115,34 +93,24 @@ public class GalleryFragment extends Fragment {
             if (view == null) {
                 view = mInflater.inflate(R.layout.gallery_author_item, viewGroup, false);
             }
-            ((TextView) view.findViewById(R.id.gallery_author_name)).setText(authors.get(i).getName());
-            int pictures_count = 0;
-            int level_1_cnt = 0;
-            int level_2_cnt = 0;
-            int level_3_cnt = 0;
-            for(Picture p: pictures) {
-                if (p.author == authors.get(i).id) {
-                    pictures_count++;
-                    if (p.level == 1) {
-                        level_1_cnt++;
-                    } else if (p.level == 2) {
-                        level_2_cnt++;
-                    } else if (p.level == 3) {
-                        level_3_cnt++;
-                    }
-                }
-            }
-            ((TextView) view.findViewById(R.id.picture_count)).setText(Integer.toString(pictures_count));
-            ((TextView) view.findViewById(R.id.pic_by_level_count))
-                    .setText(getResources().getString(R.string.pic_by_level_count, level_1_cnt, level_2_cnt, level_3_cnt));
 
-            String movement_name = "Not defined";
+            String name_string = authors.get(i).getName();
+
+            String years = authors.get(i).getYears();
+            if (!years.isEmpty()) {
+                name_string += " (" + years + ")";
+            }
+
+            ((TextView) view.findViewById(R.id.gallery_author_name)).setText(name_string);
+
+            String movement_name = "";
             for(Movement m: movements) {
                 if (authors.get(i).movement_id == m.id) {
                     movement_name = m.getName();
                     break;
                 }
             }
+
             ((TextView) view.findViewById(R.id.movement_name)).setText(movement_name);
             return view;
         }
