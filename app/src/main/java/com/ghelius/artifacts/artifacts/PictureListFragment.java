@@ -65,7 +65,6 @@ public class PictureListFragment extends Fragment {
             }
             final Picture picture = pictures.get(i);
             final ImageView pic = (ImageView) view.findViewById(R.id.picture);
-            pic.setImageResource(R.drawable.picture_dashed_placeholder);
             Glide.with(getContext())
                     .using(new FirebaseImageLoader())
                     .load(mStorageRef.child(picture.path))
