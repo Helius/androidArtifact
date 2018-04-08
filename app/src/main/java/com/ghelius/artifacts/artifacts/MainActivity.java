@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity
                         .addToBackStack("statistic").commit();
             }
         } else if (id == R.id.nav_about) {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Helius/androidArtifact"));
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Helius/androidArtifact/blob/master/README.md"));
             startActivity(i);
         }
 
@@ -312,6 +312,12 @@ public class MainActivity extends AppCompatActivity
         p.edit().putString("history",GameHistory.instance().save()).commit();
     }
 
+    void setSidebarInfo() {
+        TextView baseInfoText = (TextView) findViewById(R.id.sidebar_bottom_text);
+        GameDataProvider.ShortDbInfo info = GameDataProvider.instance().getShortInfo();
+        baseInfoText.setText(getString(R.string.db_short_info, info.authors, info.pictures));
+    }
+
     private void loadGameData() {
         if (!hasInternet()) {
             showInternetDialog();
@@ -320,6 +326,7 @@ public class MainActivity extends AppCompatActivity
         }
         if (GameDataProvider.instance().initialized()) {
             findViewById(R.id.main_progress_fade).setVisibility(View.GONE);
+            setSidebarInfo();
             return;
         }
         final long ONE_MEGABYTE = 1024 * 1024;
@@ -340,6 +347,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     };
                     d.detectNewAuthors(getApplicationContext(), GameDataProvider.instance().getFullAuthors());
+                    setSidebarInfo();
                 } catch (JSONException e) {
                     Log.d(TAG, "Can't parse json db");
                     logEvent("LoadDbDataError");

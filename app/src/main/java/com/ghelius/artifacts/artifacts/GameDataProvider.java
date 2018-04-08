@@ -18,8 +18,19 @@ public class GameDataProvider {
     private int level = 0;
     private static GameDataProvider instance_;
     private boolean initialized = false;
+    ShortDbInfo info;
 
     private ArrayList<DataChangedListener> mDataChangedListeners = new ArrayList<>();
+
+    public class ShortDbInfo {
+        int authors;
+        int pictures;
+
+        ShortDbInfo(int authors, int pictures) {
+            this.authors = authors;
+            this.pictures = pictures;
+        }
+    }
 
     public ArrayList<Picture> getPicturesByAuthor(Author author) {
         ArrayList<Picture> result = new ArrayList<>();
@@ -29,6 +40,10 @@ public class GameDataProvider {
             }
         }
         return result;
+    }
+
+    public final ShortDbInfo getShortInfo() {
+        return info;
     }
 
 
@@ -90,6 +105,7 @@ public class GameDataProvider {
 
         createFilteredCollections();
         initialized = true;
+        info = new ShortDbInfo(authors.size(), pictures.size());
     }
 
     void createFilteredCollections() {

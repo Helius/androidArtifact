@@ -43,4 +43,5 @@
     <string name="favorites_empty_msg">Здесь будут отображаться последние 30 картин, которые вы видели в конкурсах</string>
     <string name="toast_miss_msg">Мы скучали без Вас! И добавили новых художников, среди которых</string>
     <string name="gallery_title">Галлерея</string>
+    <string name="db_short_info">У нас уже %2$d картин\n и %1$d художников</string>
 </resources>

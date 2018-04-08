@@ -47,7 +47,7 @@ public class FullPictureListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return GameHistory.instance().size();
+            return pictures.size();
         }
 
         @Override
@@ -114,7 +114,7 @@ public class FullPictureListFragment extends Fragment {
                 viewHolder.button.setVisibility(View.GONE);
             }
 
-            viewHolder.guess_mark.setImageResource(0);
+            viewHolder.guess_mark.setVisibility(View.GONE);
 
             String author_text = a.getName();
             if (p.movement_id != 0) {
@@ -203,7 +203,7 @@ public class FullPictureListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle(R.string.history_title);
+        getActivity().setTitle(author.getName());
         getView().findViewById(R.id.history_empty_view).setVisibility(mAdapter.getCount() > 0 ? View.INVISIBLE : View.VISIBLE);
         list.setSelection(initPictureIndex);
     }
