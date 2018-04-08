@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -95,6 +96,25 @@ public class PictureListFragment extends Fragment {
         View v = inflater.inflate(R.layout.picture_list_fragment, container, false);
         GridView gridView = (GridView) v.findViewById(R.id.paint_grid);
         gridView.setAdapter(new ButtonAdapter(getActivity().getApplicationContext(), pictures));
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                FullPictureListFragment fullPictureListFragment =
+                        (FullPictureListFragment) getActivity()
+                                .getSupportFragmentManager()
+                                .findFragmentByTag("imageList");
+                if (fullPictureListFragment == null) {
+                    fullPictureListFragment = new FullPictureListFragment();
+                }
+
+                fullPictureListFragment.init(GameDataProvider.instance().getAuthorById(pictures.get(i).author), i);
+
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_fragment_holder, fullPictureListFragment)
+                        .addToBackStack("imageList").commit();
+            }
+        });
         return v;
     }
 
