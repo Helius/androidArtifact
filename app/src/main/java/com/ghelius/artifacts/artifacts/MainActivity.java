@@ -43,6 +43,7 @@ import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private TextView sbMainText;
     private GalleryFragment galleryFragment;
     private String uid;
+    private TextView sbDbInfoText;
 
     public void logEvent(String event) {
         logEvent(event, null);
@@ -176,6 +178,7 @@ public class MainActivity extends AppCompatActivity
         View headerLayout = navigationView.getHeaderView(0);
 
         sbMainText = (TextView) headerLayout.findViewById(R.id.side_bar_main_text);
+        sbDbInfoText = (TextView) headerLayout.findViewById(R.id.sidebar_bottom_text);
 
 
         final MainMenuFragment mainMenuFragment = (MainMenuFragment) getSupportFragmentManager()
@@ -313,9 +316,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     void setSidebarInfo() {
-        TextView baseInfoText = (TextView) findViewById(R.id.sidebar_bottom_text);
         GameDataProvider.ShortDbInfo info = GameDataProvider.instance().getShortInfo();
-        baseInfoText.setText(getString(R.string.db_short_info, info.authors, info.pictures));
+        sbDbInfoText.setText(getString(R.string.db_short_info, info.authors, info.pictures));
     }
 
     private void loadGameData() {
