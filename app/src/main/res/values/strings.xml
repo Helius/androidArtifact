@@ -45,5 +45,5 @@
     <string name="favorites_empty_msg">There you can find your 30 last viewed pictures</string>
     <string name="toast_miss_msg">We miss you! And added new authors, among with</string>
     <string name="gallery_title">Gallery</string>
-    <string name="db_short_info">There are %1$d authors and %2$d pictures</string>
+    <string name="db_short_info">We have %1$d authors and %2$d pictures</string>
 </resources>

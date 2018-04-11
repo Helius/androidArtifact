@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -47,5 +48,11 @@ public class Author {
             }
         }
         return res;
+    }
+
+    public static class AuthorNameComparator implements Comparator<Author> {
+        public int compare(Author a1, Author a2) {
+            return a1.getName().compareTo(a2.getName());
+        }
     }
 }

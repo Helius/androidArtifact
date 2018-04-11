@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 
 public class GalleryFragment extends Fragment {
@@ -31,6 +32,9 @@ public class GalleryFragment extends Fragment {
         this.authors = gameDataProvider.getFullAuthors();
         this.pictures = gameDataProvider.getFullPictures();
         this.movements = gameDataProvider.getFullMovements();
+        Collections.sort(authors, new Author.AuthorNameComparator());
+
+
     }
 
     @Override

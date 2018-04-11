@@ -42,7 +42,7 @@
     <string name="you_hit">Вы угадали\u0020</string>
     <string name="favorites_empty_msg">Здесь будут отображаться последние 30 картин, которые вы видели в конкурсах</string>
     <string name="toast_miss_msg">Мы скучали без Вас! И добавили новых художников, среди которых</string>
-    <string name="gallery_title">Галлерея</string>
+    <string name="gallery_title">Галерея</string>
     <!--<string name="db_short_info">У нас уже %2$d картин\n и %1$d художников</string>-->
-    <string name="db_short_info">В базе %2$d картины и %1$d художников</string>
+    <string name="db_short_info">У нас %2$d картины и %1$d художников</string>
 </resources>

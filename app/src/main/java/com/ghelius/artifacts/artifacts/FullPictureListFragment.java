@@ -62,7 +62,6 @@ public class FullPictureListFragment extends Fragment {
 
         class ViewHolder {
             ImageView image;
-            ImageView guess_mark;
             TextView author;
             TextView pic_name;
             TextView holder;
@@ -82,19 +81,16 @@ public class FullPictureListFragment extends Fragment {
             final Author a = GameDataProvider.instance().getAuthorById(p.author);
 
             if (view == null) {
-                view = mInflater.inflate(R.layout.history_item, viewGroup, false);
+                view = mInflater.inflate(R.layout.full_picture_gallery_item, viewGroup, false);
                 view.setDrawingCacheEnabled(true);
                 viewHolder = new ViewHolder();
                 viewHolder.image = (ImageView) view.findViewById(R.id.history_image);
 
-                viewHolder.author = (TextView) view.findViewById(R.id.history_line_1);
-
-                viewHolder.pic_name = (TextView) view.findViewById(R.id.history_line_2_first);
+                viewHolder.pic_name = (TextView) view.findViewById(R.id.history_line_1);
 
                 viewHolder.holder = (TextView) view.findViewById(R.id.history_line_3_first);
 
                 viewHolder.button = view.findViewById(R.id.history_info_button);
-                viewHolder.guess_mark = (ImageView) view.findViewById(R.id.guessed_mark);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
@@ -114,15 +110,14 @@ public class FullPictureListFragment extends Fragment {
                 viewHolder.button.setVisibility(View.GONE);
             }
 
-            viewHolder.guess_mark.setVisibility(View.GONE);
 
-            String author_text = a.getName();
-            if (p.movement_id != 0) {
-                author_text += ". " + GameDataProvider.instance().getMovementById(p.movement_id).getName();
-            } else {
-                author_text += ". " + GameDataProvider.instance().getMovementById(GameDataProvider.instance().getAuthorById(p.author).movement_id).getName();
-            }
-            viewHolder.author.setText(author_text);
+//            String author_text = a.getName();
+//            if (p.movement_id != 0) {
+//                author_text += ". " + GameDataProvider.instance().getMovementById(p.movement_id).getName();
+//            } else {
+//                author_text += ". " + GameDataProvider.instance().getMovementById(GameDataProvider.instance().getAuthorById(p.author).movement_id).getName();
+//            }
+//            viewHolder.author.setText(author_text);
 
             String name_year = "";
             if (p.getName() != null && !p.getName().isEmpty()) {
